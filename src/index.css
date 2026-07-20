@@ -1,0 +1,313 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cc-gold: #b39c4d;
+  --cc-gold-light: #c9b672;
+  --cc-gold-dark: #9a8340;
+  --cc-anthracite: #1b212e;
+  --cc-anthracite-light: #2a3242;
+
+  /* Scope-Farben (analog MBPC-Prozessschaubild) */
+  --sc-in: #2f7d4f;
+  --sc-opt: #c7962e;
+  --sc-out: #aa4628;
+
+  /* Prozessgruppen-Farben */
+  --grp-primary: #b39c4d;
+  --grp-support: #838da1;
+  --grp-manage: #ff671e;
+  --grp-regulated: #2e7d8a;
+
+  /* Semantische Flächen (Light) */
+  --app-bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --border: #e2e8f0;
+  --text: #1b212e;
+  --text-muted: #64748b;
+}
+
+.dark {
+  --app-bg: #0f141d;
+  --surface: #1c2230;
+  --surface-2: #161b26;
+  --border: #2d3644;
+  --text: #e5e9f0;
+  --text-muted: #94a3b8;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Quicksand', system-ui, 'Segoe UI', sans-serif;
+  background: var(--app-bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+@layer components {
+  .cc-card {
+    @apply rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-[#1c2230];
+  }
+  .cc-btn {
+    @apply inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors;
+  }
+  .cc-btn-gold {
+    background: var(--cc-gold);
+    @apply text-white cc-btn;
+  }
+  .cc-btn-gold:hover {
+    background: var(--cc-gold-light);
+  }
+  .cc-btn-ghost {
+    @apply cc-btn border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-[#232a37] dark:text-slate-200 dark:hover:bg-[#2a3341];
+  }
+  .cc-input {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-[#b39c4d] focus:ring-2 focus:ring-[#b39c4d]/20 dark:border-slate-600 dark:bg-[#232a37] dark:text-slate-100;
+  }
+  .cc-label {
+    @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400;
+  }
+  .cc-kpi {
+    @apply rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-[#1c2230];
+  }
+  .cc-th {
+    @apply px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400;
+  }
+  .cc-td {
+    @apply px-3 py-2 text-sm text-slate-700 dark:text-slate-200;
+  }
+}
+
+/* Scope badges */
+.scope-in {
+  @apply bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300;
+}
+.scope-opt {
+  @apply bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300;
+}
+.scope-out {
+  @apply bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300;
+}
+.scope-unset {
+  @apply bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300;
+}
+
+/* ═══════════════════════════════════════════════════════
+   MBPC-Scoping-Optik (Prozessgruppen, Scope-Pills, Karten)
+   ═══════════════════════════════════════════════════════ */
+
+.grp-primary {
+  --grp: var(--grp-primary);
+}
+.grp-support {
+  --grp: var(--grp-support);
+}
+.grp-manage {
+  --grp: var(--grp-manage);
+}
+.grp-regulated {
+  --grp: var(--grp-regulated);
+}
+
+.proc-card {
+  border-left: 4px solid var(--grp, var(--grp-primary));
+}
+
+.he-scope {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+.he-scope.sc-in {
+  background: var(--sc-in);
+  color: #fff;
+}
+.he-scope.sc-opt {
+  background: var(--sc-opt);
+  color: #1b212e;
+}
+.he-scope.sc-out {
+  background: var(--sc-out);
+  color: #fff;
+}
+.he-scope.sc-unset {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.scope-seg-group {
+  display: inline-flex;
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.scope-seg {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+  border-right: 1px solid var(--border);
+  line-height: 1;
+}
+.scope-seg:last-child {
+  border-right: none;
+}
+.scope-seg:hover {
+  background: rgba(179, 156, 77, 0.12);
+}
+.scope-seg.active[data-scope='in'] {
+  background: var(--sc-in);
+  color: #fff;
+}
+.scope-seg.active[data-scope='opt'] {
+  background: var(--sc-opt);
+  color: #1b212e;
+}
+.scope-seg.active[data-scope='out'] {
+  background: var(--sc-out);
+  color: #fff;
+}
+
+.pn-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.pn-chip.sc-in {
+  background: rgba(47, 125, 79, 0.13);
+  color: var(--sc-in);
+  border: 1px solid rgba(47, 125, 79, 0.34);
+}
+.pn-chip.sc-opt {
+  background: rgba(199, 150, 46, 0.16);
+  color: #8f6c1f;
+  border: 1px solid rgba(199, 150, 46, 0.42);
+}
+.pn-chip.sc-out {
+  background: rgba(170, 70, 40, 0.12);
+  color: var(--sc-out);
+  border: 1px solid rgba(170, 70, 40, 0.34);
+}
+.dark .pn-chip.sc-opt {
+  color: #d8b25a;
+}
+
+.pnode {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--grp, var(--grp-primary));
+  border-radius: 12px;
+  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+}
+.pnode:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(27, 33, 46, 0.12);
+}
+.pnode.scope-node-in {
+  border-top-color: var(--sc-in);
+}
+.pnode.scope-node-opt {
+  border-top-color: var(--sc-opt);
+}
+.pnode.scope-node-out {
+  border-top-color: var(--sc-out);
+  opacity: 0.6;
+}
+.pn-nr {
+  position: absolute;
+  top: -12px;
+  left: 12px;
+  min-width: 26px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 12px;
+  background: var(--grp, var(--grp-primary));
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(27, 33, 46, 0.25);
+}
+
+.map-tile {
+  position: relative;
+  display: block;
+  text-align: left;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--grp, var(--grp-primary));
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+}
+.map-tile:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(27, 33, 46, 0.14);
+}
+.map-tile.selected {
+  box-shadow: 0 0 0 2px var(--cc-gold);
+}
+
+/* ─── Dark-Mode: globale Overrides für Inline-Utilities ─── */
+.dark .bg-white {
+  background-color: #1c2230 !important;
+}
+.dark .bg-slate-50,
+.dark .bg-slate-50\/50,
+.dark .bg-slate-50\/60 {
+  background-color: #161b26 !important;
+}
+.dark .bg-slate-100 {
+  background-color: #232a37 !important;
+}
+.dark .text-cosmo-anthracite {
+  color: #e5e9f0 !important;
+}
+.dark .text-slate-700,
+.dark .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+.dark .text-slate-500,
+.dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+.dark .border-slate-100,
+.dark .border-slate-200 {
+  border-color: #2d3644 !important;
+}
+
+@media print {
+  .cc-no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+}

@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vite
+
+# Lokales Agent-/Editor-Tooling (nicht Teil der App)
+.agents
+.claude
