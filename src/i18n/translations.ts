@@ -155,7 +155,7 @@ export const T: Dict = {
   processes: { de: 'Prozessen', en: 'processes' },
 
   // Calculation
-  calc_intro: { de: 'Aufwandsschätzung je In-Scope-Feature über die fünf Success-by-Design-Phasen.', en: 'Effort estimation per in-scope feature across the five Success by Design phases.' },
+  calc_intro: { de: 'Aufwandsschätzung je In-Scope-Feature über die fünf Success-by-Design-Phasen. Über die Komplexitäts-Vorlagen (Small · Middle · Komplex) lassen sich erfahrungsbasierte Phasenwerte je Feature, Prozess oder für alle Features auf einen Klick laden.', en: 'Effort estimation per in-scope feature across the five Success by Design phases. Use the complexity templates (Small · Middle · Complex) to load experience-based phase values per feature, per process, or for all features in one click.' },
   unit_toggle: { de: 'Einheit', en: 'Unit' },
   phase_strategize: { de: 'Strategize', en: 'Strategize' },
   phase_initiate: { de: 'Initiate & Scoping', en: 'Initiate & Scoping' },
@@ -164,6 +164,20 @@ export const T: Dict = {
   phase_operate: { de: 'Operate', en: 'Operate' },
   fit_standard: { de: 'Standard', en: 'Standard' },
   fit_custom: { de: 'Customizing', en: 'Customizing' },
+
+  // Komplexitäts-Vorlagen (Aufwand je SbD-Phase, erfahrungsbasiert)
+  complexity_col: { de: 'Vorlage', en: 'Template' },
+  complexity_label: { de: 'Komplexität', en: 'Complexity' },
+  complexity_small: { de: 'Small', en: 'Small' },
+  complexity_medium: { de: 'Middle', en: 'Middle' },
+  complexity_complex: { de: 'Komplex', en: 'Complex' },
+  complexity_small_hint: { de: 'Einfaches Standard-Feature (Fit) · Σ 1,5 PT', en: 'Simple standard feature (fit) · Σ 1.5 PD' },
+  complexity_medium_hint: { de: 'Standard mit Anpassung/Setup · Σ 3,0 PT', en: 'Standard with setup/config · Σ 3.0 PD' },
+  complexity_complex_hint: { de: 'Erweiterung/Customization (Gap) · Σ 6,5 PT', en: 'Extension/customization (gap) · Σ 6.5 PD' },
+  complexity_bulk_label: { de: 'Vorlage auf alle In-Scope-Features anwenden', en: 'Apply template to all in-scope features' },
+  complexity_apply_all: { de: 'Auf alle anwenden', en: 'Apply to all' },
+  complexity_apply_proc: { de: 'Vorlage auf alle Features dieses Prozesses anwenden', en: 'Apply template to all features of this process' },
+  complexity_confirm_all: { de: 'Aufwands-Vorlage „{v}“ auf alle {n} In-Scope-Features anwenden? Bereits erfasste Aufwände werden überschrieben.', en: 'Apply effort template “{v}” to all {n} in-scope features? Existing efforts will be overwritten.' },
 
   // Parameters
   param_intro: { de: 'Dienstleistungssätze je Rolle, Rollenzuordnung je SbD-Phase sowie fachübergreifende Overhead-Rollen.', en: 'Service rates per role, role mapping per SbD phase, and cross-functional overhead roles.' },

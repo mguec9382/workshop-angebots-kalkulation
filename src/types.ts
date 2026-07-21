@@ -77,6 +77,11 @@ export interface Prospect {
 
 export type PhaseEffort = Record<PhaseKey, number>
 
+/** Aufwands-Komplexität (T-Shirt-Größe) als Erfahrungs-Vorlage je Feature. */
+export type Complexity = 'small' | 'medium' | 'complex'
+
+export const COMPLEXITY_KEYS: Complexity[] = ['small', 'medium', 'complex']
+
 export interface FeatureState {
   scope: ScopeStatus
   /** Aufwand je Phase in Tagen */
@@ -85,6 +90,8 @@ export interface FeatureState {
   products: string[]
   /** true = Standard (Fit), false = Customization (Gap) */
   standard: boolean
+  /** zuletzt angewandte Aufwands-Vorlage (Small/Middle/Complex) */
+  complexity?: Complexity
   /** Bemerkung / Kommentar auf Feature-Ebene */
   note?: string
 }

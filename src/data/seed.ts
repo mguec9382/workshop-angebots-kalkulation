@@ -1,5 +1,6 @@
 import { archetypeById, areaKey, featureKey } from './catalog'
 import type {
+  Complexity,
   Environment,
   FeatureState,
   Mandant,
@@ -34,6 +35,24 @@ export const DEFAULT_FEATURE_EFFORT: PhaseEffort = {
   prepare: 0.5,
   operate: 0.25,
 }
+
+/**
+ * Erfahrungsbasierte Aufwands-Vorlagen je Komplexität (T-Shirt-Größen).
+ * Auf Basis des Standard-MBPC und der Success-by-Design-Phasen abgeleitet
+ * (Strategize · Initiate & Scoping · Build & Implement · Prepare · Operate).
+ *
+ *   small   – einfaches Standard-Feature (reiner Fit, Konfiguration)  Σ 1,5 PT
+ *   medium  – Standard-Feature mit Anpassung/Setup                    Σ 3,0 PT
+ *   complex – Erweiterung/Customization (Gap, Entwicklung)            Σ 6,5 PT
+ */
+export const COMPLEXITY_EFFORT: Record<Complexity, PhaseEffort> = {
+  small: { strategize: 0.25, initiate: 0.25, build: 0.5, prepare: 0.25, operate: 0.25 },
+  medium: { strategize: 0.25, initiate: 0.5, build: 1.5, prepare: 0.5, operate: 0.25 },
+  complex: { strategize: 0.5, initiate: 1, build: 3.5, prepare: 1, operate: 0.5 },
+}
+
+/** Erzeugt eine Kopie der Aufwands-Vorlage für eine Komplexität. */
+export const effortForComplexity = (c: Complexity): PhaseEffort => ({ ...COMPLEXITY_EFFORT[c] })
 
 /** Erzeugt eine Kopie der Standard-Aufwandsvorlage. */
 export const defaultFeatureEffort = (): PhaseEffort => ({ ...DEFAULT_FEATURE_EFFORT })

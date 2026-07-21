@@ -2,8 +2,9 @@ import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
 import { featureKey } from '../../data/catalog'
 import { catalogForEnvironment } from '../../lib/mbpcCatalog'
-import { PHASE_KEYS } from '../../types'
-import type { PhaseKey } from '../../types'
+import { COMPLEXITY_KEYS, PHASE_KEYS } from '../../types'
+import type { Complexity, PhaseKey } from '../../types'
+import { effortForComplexity } from '../../data/seed'
 import { activeEnvironment, effectiveFeatureScope, formatCurrency, formatDays } from '../../lib/calc'
 import { EnvSelector } from '../EnvSelector'
 import { PanelTitle } from './ProspectPanel'
@@ -14,6 +15,18 @@ const PHASE_LABEL: Record<PhaseKey, string> = {
   build: 'phase_build',
   prepare: 'phase_prepare',
   operate: 'phase_operate',
+}
+
+const COMPLEXITY_LABEL: Record<Complexity, string> = {
+  small: 'complexity_small',
+  medium: 'complexity_medium',
+  complex: 'complexity_complex',
+}
+
+const COMPLEXITY_HINT: Record<Complexity, string> = {
+  small: 'complexity_small_hint',
+  medium: 'complexity_medium_hint',
+  complex: 'complexity_complex_hint',
 }
 
 export function CalculationPanel() {
@@ -37,7 +50,11 @@ export function CalculationPanel() {
     update((d) => {
       const e = d.environments.find((x) => x.id === d.activeEnvironmentId) || d.environments[0]
       const fs = e?.scope.feature[key]
-      if (fs) fs.effort[phase] = Math.max(0, days)
+      if (fs) {
+        fs.effort[phase] = Math.max(0, days)
+        // manuelle Anpassung: Vorlagen-Markierung entfernen
+        fs.complexity = undefined
+      }
     })
   }
   function toggleStandard(key: string) {
@@ -50,6 +67,26 @@ export function CalculationPanel() {
   function toggleUnit() {
     update((d) => {
       d.parameters.unit = d.parameters.unit === 'days' ? 'hours' : 'days'
+    })
+  }
+
+  /**
+   * Wendet eine erfahrungsbasierte Aufwands-Vorlage (Small/Middle/Complex) auf
+   * ein Feature an: lädt die SbD-Phasenwerte, merkt sich die Komplexität und
+   * setzt Fit/Gap automatisch (Komplex = Customization/Gap).
+   */
+  function applyComplexity(keys: string | string[], c: Complexity) {
+    const list = Array.isArray(keys) ? keys : [keys]
+    update((d) => {
+      const e = d.environments.find((x) => x.id === d.activeEnvironmentId) || d.environments[0]
+      if (!e) return
+      list.forEach((key) => {
+        const fs = e.scope.feature[key]
+        if (!fs) return
+        fs.effort = effortForComplexity(c)
+        fs.complexity = c
+        fs.standard = c !== 'complex'
+      })
     })
   }
 
@@ -72,6 +109,15 @@ export function CalculationPanel() {
 
   const unitLabel = hoursMode ? t('hours') : t('days')
 
+  const allKeys = rows.flatMap((r) => r.items.map((i) => i.key))
+  function bulkApply(c: Complexity) {
+    if (allKeys.length === 0) return
+    const label = t(COMPLEXITY_LABEL[c])
+    const msg = t('complexity_confirm_all').replace('{v}', label).replace('{n}', String(allKeys.length))
+    if (typeof window !== 'undefined' && !window.confirm(msg)) return
+    applyComplexity(allKeys, c)
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -83,6 +129,26 @@ export function CalculationPanel() {
 
       <EnvSelector />
 
+      {rows.length > 0 && (
+        <div className="cc-card flex flex-wrap items-center gap-2 p-3">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            {t('complexity_bulk_label')}
+          </span>
+          <div className="ml-auto flex flex-wrap gap-1.5">
+            {COMPLEXITY_KEYS.map((c) => (
+              <button
+                key={c}
+                onClick={() => bulkApply(c)}
+                title={t(COMPLEXITY_HINT[c])}
+                className="rounded-full border border-cosmo-gold/50 bg-cosmo-gold/10 px-3 py-1 text-xs font-semibold text-cosmo-gold-dark transition-colors hover:bg-cosmo-gold/20 dark:text-amber-200"
+              >
+                {t(COMPLEXITY_LABEL[c])} <span className="opacity-60">· {t('complexity_apply_all')}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {rows.length === 0 && (
         <div className="cc-card p-8 text-center text-sm text-slate-400">
           {t('no_inscope_features')}
@@ -91,15 +157,29 @@ export function CalculationPanel() {
 
       {rows.map(({ proc, items }) => (
         <div key={proc.id} className="cc-card overflow-hidden">
-          <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/60 px-4 py-2">
+          <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 bg-slate-50/60 px-4 py-2">
             <span className="text-lg">{proc.icon}</span>
             <span className="font-bold text-cosmo-anthracite">{lang === 'de' ? proc.nameDE : proc.nameEN}</span>
+            <div className="ml-auto flex items-center gap-1.5" title={t('complexity_apply_proc')}>
+              <span className="text-[11px] text-slate-400">{t('complexity_col')}:</span>
+              {COMPLEXITY_KEYS.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => applyComplexity(items.map((i) => i.key), c)}
+                  title={t(COMPLEXITY_HINT[c])}
+                  className="rounded border border-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-500 transition-colors hover:border-cosmo-gold hover:text-cosmo-gold-dark dark:border-slate-600"
+                >
+                  {t(COMPLEXITY_LABEL[c])}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[820px]">
+            <table className="w-full min-w-[920px]">
               <thead>
                 <tr className="border-b border-slate-100">
-                  <th className="cc-th w-[28%]">{t('feature_col')}</th>
+                  <th className="cc-th w-[24%]">{t('feature_col')}</th>
+                  <th className="cc-th text-center">{t('complexity_col')}</th>
                   {PHASE_KEYS.map((ph) => (
                     <th key={ph} className="cc-th text-center" title={roleName(params.phaseRole[ph])}>
                       {t(PHASE_LABEL[ph])}
@@ -127,6 +207,24 @@ export function CalculationPanel() {
                   return (
                     <tr key={key} className="border-b border-slate-50 hover:bg-slate-50/50">
                       <td className="cc-td">{label}</td>
+                      <td className="cc-td text-center">
+                        <div className="inline-flex overflow-hidden rounded border border-slate-200 dark:border-slate-600">
+                          {COMPLEXITY_KEYS.map((c) => (
+                            <button
+                              key={c}
+                              onClick={() => applyComplexity(key, c)}
+                              title={t(COMPLEXITY_HINT[c])}
+                              className={`px-1.5 py-0.5 text-[11px] font-semibold transition-colors ${
+                                fs.complexity === c
+                                  ? 'bg-cosmo-gold text-white'
+                                  : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700'
+                              }`}
+                            >
+                              {t(COMPLEXITY_LABEL[c]).charAt(0)}
+                            </button>
+                          ))}
+                        </div>
+                      </td>
                       {PHASE_KEYS.map((ph) => (
                         <td key={ph} className="cc-td text-center">
                           <input
