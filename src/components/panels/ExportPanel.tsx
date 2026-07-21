@@ -1,8 +1,9 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
 import { archetypeById, findIndustry } from '../../data/catalog'
 import { calculate, formatCurrency, formatDays } from '../../lib/calc'
+import { exportExcelQuote } from '../../lib/excelExport'
 import { PanelTitle } from './ProspectPanel'
 
 export function ExportPanel() {
@@ -11,14 +12,32 @@ export function ExportPanel() {
   const calc = useMemo(() => calculate(state), [state])
   const cur = state.parameters.currency
   const p = state.prospect
+  const [excelBusy, setExcelBusy] = useState(false)
+
+  async function handleExcelExport() {
+    setExcelBusy(true)
+    try {
+      await exportExcelQuote(state, lang)
+    } catch (err) {
+      console.error('Excel-Export fehlgeschlagen', err)
+      alert(lang === 'de' ? 'Excel-Export fehlgeschlagen.' : 'Excel export failed.')
+    } finally {
+      setExcelBusy(false)
+    }
+  }
 
   return (
     <div className="space-y-4">
       <div className="cc-no-print flex flex-wrap items-start justify-between gap-3">
         <PanelTitle title={t('tab_export')} intro={t('export_intro')} />
-        <button className="cc-btn-gold" onClick={() => window.print()}>
-          🖨️ {t('print_pdf')}
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button className="cc-btn-ghost" onClick={handleExcelExport} disabled={excelBusy}>
+            📊 {excelBusy ? t('export_excel_busy') : t('export_excel')}
+          </button>
+          <button className="cc-btn-gold" onClick={() => window.print()}>
+            🖨️ {t('print_pdf')}
+          </button>
+        </div>
       </div>
 
       {/* Druckbarer Report */}

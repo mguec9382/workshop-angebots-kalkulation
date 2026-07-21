@@ -253,6 +253,8 @@ export const T: Dict = {
   // Export
   export_intro: { de: 'Angebot als PDF drucken oder Projektstand als JSON sichern/teilen.', en: 'Print the quotation as PDF or save/share the project state as JSON.' },
   print_pdf: { de: 'Als PDF drucken', en: 'Print as PDF' },
+  export_excel: { de: 'Angebot als Excel', en: 'Quote as Excel' },
+  export_excel_busy: { de: 'Excel wird erstellt …', en: 'Building Excel …' },
   quotation_title: { de: 'Angebotskalkulation', en: 'Quotation calculation' },
 
   // Feature-Ebene (Kommentare, Standardvorlage, Spalten)
