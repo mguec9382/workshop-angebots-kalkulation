@@ -184,19 +184,21 @@ export function WorkshopPanel() {
               }`}
             >
               <div className="flex items-center gap-2">
-                <span className="text-xl">{proc.icon}</span>
+                <span className="shrink-0 text-xl">{proc.icon}</span>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-bold text-cosmo-anthracite">
                     {lang === 'de' ? proc.nameDE : proc.nameEN}
                   </div>
-                  <div className="text-[11px] text-slate-400">{GROUP_LABEL[proc.group][lang]}</div>
+                  <div className="truncate text-[11px] text-slate-400">{GROUP_LABEL[proc.group][lang]}</div>
                 </div>
                 {overlaySet.has(proc.id) && (
-                  <span className="text-sm" title={t('branch_relevant')} aria-label={t('branch_relevant')}>
+                  <span className="shrink-0 text-sm" title={t('branch_relevant')} aria-label={t('branch_relevant')}>
                     ⭐
                   </span>
                 )}
-                <span className={`he-scope ${scList(eff)}`}>{SCOPE_LABEL[eff][lang]}</span>
+                <span className={`he-scope shrink-0 ${scList(eff)}`} style={{ whiteSpace: 'nowrap' }}>
+                  {SCOPE_LABEL[eff][lang]}
+                </span>
               </div>
             </button>
           )
@@ -220,14 +222,14 @@ export function WorkshopPanel() {
               <div className="flex items-center gap-3 p-4">
                 <button
                   onClick={() => setExpanded((e) => ({ ...e, [proc.id]: !e[proc.id] }))}
-                  className="text-slate-400 hover:text-slate-600"
+                  className="shrink-0 text-slate-400 hover:text-slate-600"
                 >
                   {open ? '▾' : '▸'}
                 </button>
-                <span className="text-2xl">{proc.icon}</span>
+                <span className="shrink-0 text-2xl">{proc.icon}</span>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-bold text-cosmo-anthracite">
+                    <span className="break-words font-bold text-cosmo-anthracite">
                       {lang === 'de' ? proc.nameDE : proc.nameEN}
                     </span>
                     <span
@@ -252,7 +254,9 @@ export function WorkshopPanel() {
                   </div>
                   <div className="truncate text-xs text-slate-400">{lang === 'de' ? proc.intro : proc.introEN}</div>
                 </div>
-                <ScopeSegment value={procScope} onChange={(v) => setProcScope(proc.id, v)} />
+                <div className="shrink-0">
+                  <ScopeSegment value={procScope} onChange={(v) => setProcScope(proc.id, v)} />
+                </div>
               </div>
 
               {open && (
@@ -271,16 +275,19 @@ export function WorkshopPanel() {
                           </span>
                           <div className="mb-1 flex items-start justify-between gap-2">
                             <div className="min-w-0">
-                              <div className="text-sm font-semibold text-slate-700">
+                              <div className="break-words text-sm font-semibold text-slate-700">
                                 {lang === 'de' ? area.t : area.en}
                               </div>
-                              <div className="text-[11px] italic text-slate-400">
+                              <div className="break-words text-[11px] italic text-slate-400">
                                 {lang === 'de' ? area.en : area.t}
                               </div>
                             </div>
                             <div className="flex shrink-0 flex-col items-end gap-1">
                               {aEff !== 'unset' && (
-                                <span className={`he-scope ${scList(aEff)}`} style={{ fontSize: 10, padding: '2px 8px' }}>
+                                <span
+                                  className={`he-scope ${scList(aEff)}`}
+                                  style={{ fontSize: 10, padding: '2px 8px', whiteSpace: 'nowrap' }}
+                                >
                                   {SCOPE_LABEL[aEff][lang]}
                                 </span>
                               )}
@@ -311,13 +318,13 @@ export function WorkshopPanel() {
                                 <li key={stepIdx} className="py-0.5">
                                   <div className="flex items-center gap-2">
                                     {fEff !== 'unset' ? (
-                                      <span className={`pn-chip ${scList(fEff)}`}>
+                                      <span className={`pn-chip shrink-0 ${scList(fEff)}`}>
                                         {fEff === 'in' ? 'IN' : fEff === 'opt' ? 'OPT' : 'OUT'}
                                       </span>
                                     ) : (
                                       <span className="h-2 w-2 shrink-0 rounded-full bg-slate-300" />
                                     )}
-                                    <span className="flex-1 text-xs text-slate-600">
+                                    <span className="min-w-0 flex-1 break-words text-xs text-slate-600">
                                       {stepLabel}
                                       {!explicit && fEff !== 'unset' && (
                                         <span className="ml-1 text-[10px] text-slate-300">
@@ -336,11 +343,13 @@ export function WorkshopPanel() {
                                     >
                                       {hasNote ? '💬' : '🗨'}
                                     </button>
-                                    <ScopeSegment
-                                      size="sm"
-                                      value={fs?.scope || 'unset'}
-                                      onChange={(v) => setFeatureScope(proc.id, areaIdx, stepIdx, v)}
-                                    />
+                                    <div className="shrink-0">
+                                      <ScopeSegment
+                                        size="sm"
+                                        value={fs?.scope || 'unset'}
+                                        onChange={(v) => setFeatureScope(proc.id, areaIdx, stepIdx, v)}
+                                      />
+                                    </div>
                                   </div>
                                   {nOpen && (
                                     <textarea
