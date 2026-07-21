@@ -112,8 +112,8 @@ const STEPS: Step[] = [
     tab: { de: 'Angebot erzeugen', en: 'Generate the quote' },
     goal: { de: 'Das Angebot dokumentieren, sichern und ausgeben.', en: 'Document, save and output the quotation.' },
     action: {
-      de: 'Dashboard (📈) für die Kundenpräsentation prüfen › unter „Versionen & Angebote" (🗃️) eine Angebotsversion speichern › Register „Export" (📤) › „🖨️ Als PDF drucken" oder JSON/Power-BI exportieren.',
-      en: 'Review the dashboard (📈) for the customer presentation › save a quote version under "Versions & quotes" (🗃️) › open "Export" (📤) › "🖨️ Print as PDF" or export JSON/Power BI.',
+      de: 'Dashboard (📈) für die Kundenpräsentation prüfen › unter „Versionen & Angebote" (🗃️) eine Angebotsversion speichern › Register „Export" (📤) › „🖨️ Als PDF drucken" oder JSON/Excel-Report exportieren.',
+      en: 'Review the dashboard (📈) for the customer presentation › save a quote version under "Versions & quotes" (🗃️) › open "Export" (📤) › "🖨️ Print as PDF" or export JSON/Excel report.',
     },
     result: { de: 'Fertiges Angebot als PDF, versioniert und wiederherstellbar.', en: 'A finished quote as PDF, versioned and restorable.' },
     tip: { de: 'Für Kundentermine die „Kundenansicht" (👁️) im Header aktivieren – die interne Live-Kalkulation wird ausgeblendet.', en: 'For customer meetings, enable "customer view" (👁️) in the header – the internal live calculation is hidden.' },
@@ -129,9 +129,9 @@ const REGISTERS: RefItem[] = [
   { icon: '💰', title: { de: 'Kalkulation', en: 'Calculation' }, text: { de: 'Aufwand je Feature über die fünf Success-by-Design-Phasen.', en: 'Effort per feature across the five Success by Design phases.' } },
   { icon: '⚙️', title: { de: 'Parameter', en: 'Parameters' }, text: { de: 'Währung, Rollen & Tagessätze, Phasenrollen, Overhead, Branchen & Overlays.', en: 'Currency, roles & day rates, phase roles, overhead, industries & overlays.' } },
   { icon: '📊', title: { de: 'Management Summary', en: 'Management Summary' }, text: { de: 'Verdichtete Entscheidungssicht: Fit/Gap, Kosten, Aufwand je Prozess.', en: 'Condensed decision view: fit/gap, cost, effort per process.' } },
-  { icon: '📈', title: { de: 'Dashboard', en: 'Dashboard' }, text: { de: 'Interaktive KPIs, filterbar nach Environment/Land, Power-BI-Export.', en: 'Interactive KPIs, filterable by environment/country, Power BI export.' } },
+  { icon: '📈', title: { de: 'Dashboard', en: 'Dashboard' }, text: { de: 'Interaktive KPIs, filterbar nach Environment/Land, Excel-Report-Export.', en: 'Interactive KPIs, filterable by environment/country, Excel report export.' } },
   { icon: '🗃️', title: { de: 'Versionen & Angebote', en: 'Versions & quotes' }, text: { de: 'Angebotsstände speichern, vergleichen und wiederherstellen.', en: 'Save, compare and restore quote states.' } },
-  { icon: '📤', title: { de: 'Export', en: 'Export' }, text: { de: 'Druckbares Angebot (PDF), JSON-Export/Import, Power-BI-Datenmodell.', en: 'Printable quote (PDF), JSON export/import, Power BI data model.' } },
+  { icon: '📤', title: { de: 'Export', en: 'Export' }, text: { de: 'Druckbares Angebot (PDF), JSON-Export/Import, Excel-Report.', en: 'Printable quote (PDF), JSON export/import, Excel report.' } },
 ]
 
 /* ---------- Glossar ---------- */

@@ -7,7 +7,8 @@ import { calculate, formatCurrency, formatDays, formatNumber } from '../../lib/c
 import { PHASE_KEYS } from '../../types'
 import type { PhaseKey } from '../../types'
 import { PanelTitle } from './ProspectPanel'
-import { exportPowerBiWorkbook, exportVersionComparison } from '../../lib/powerbiExport'
+import { exportVersionComparison } from '../../lib/powerbiExport'
+import { exportExcelQuote } from '../../lib/excelExport'
 import { idbAvailable, listVersions } from '../../lib/library'
 import type { VersionMeta } from '../../lib/library'
 
@@ -138,7 +139,7 @@ export function DashboardPanel() {
   const doExport = async () => {
     setBusy(true)
     try {
-      await exportPowerBiWorkbook(state, lang)
+      await exportExcelQuote(state, lang)
     } finally {
       setBusy(false)
     }
@@ -159,14 +160,14 @@ export function DashboardPanel() {
             🖨️ {t('dash_print')}
           </button>
           <button className="cc-btn-gold" onClick={doExport} disabled={busy}>
-            📊 {busy ? '…' : t('dash_export_pbi')}
+            📊 {busy ? t('dash_export_excel_busy') : t('dash_export_excel')}
           </button>
         </div>
       </div>
 
-      {/* Power-BI-Hinweis */}
+      {/* Excel-Report-Hinweis */}
       <p className="cc-no-print rounded-lg border border-cosmo-gold/40 bg-cosmo-gold/10 px-3 py-2 text-xs text-cosmo-gold-dark dark:text-amber-200">
-        {t('dash_export_pbi_hint')}
+        {t('dash_export_excel_hint')}
       </p>
 
       {/* Slicer */}

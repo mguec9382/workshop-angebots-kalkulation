@@ -63,7 +63,7 @@ export function Header() {
   return (
     <header className="cc-no-print sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-700 dark:bg-[#141a24]/95">
       <div className="mx-auto flex w-full max-w-[1600px] items-center gap-4 px-4 py-3">
-        <img src="/cosmo-mark.svg" alt="COSMO CONSULT" className="h-9 w-9 shrink-0" />
+        <img src={`${import.meta.env.BASE_URL}cosmo-mark.svg`} alt="COSMO CONSULT" className="h-9 w-9 shrink-0" />
         <div className="min-w-0">
           <div className="truncate text-sm font-bold text-cosmo-anthracite">{t('appTitle')}</div>
           <div className="truncate text-xs text-slate-400">{t('appSubtitle')}</div>

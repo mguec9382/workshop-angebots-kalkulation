@@ -25,10 +25,11 @@ export const T: Dict = {
   tab_versions: { de: 'Versionen & Angebote', en: 'Versions & quotes' },
 
   // Power-BI-Dashboard
-  dash_intro: { de: 'Interaktives Berichts-Dashboard mit allen kundenrelevanten Kennzahlen – filterbar nach Environment und Land, druckbar als PDF und exportierbar als Power-BI-Datenmodell.', en: 'Interactive reporting dashboard with all customer-relevant KPIs – filterable by environment and country, printable as PDF and exportable as a Power BI data model.' },
+  dash_intro: { de: 'Interaktives Berichts-Dashboard mit allen kundenrelevanten Kennzahlen – filterbar nach Environment und Land, druckbar als PDF und exportierbar als Excel-Report.', en: 'Interactive reporting dashboard with all customer-relevant KPIs – filterable by environment and country, printable as PDF and exportable as an Excel report.' },
   dash_print: { de: 'Bericht drucken', en: 'Print report' },
-  dash_export_pbi: { de: 'Power BI Export', en: 'Power BI export' },
-  dash_export_pbi_hint: { de: 'Der Power-BI-Export erzeugt eine Excel-Arbeitsmappe im Sternschema (Faktentabellen + Dimensionen). In Power BI Desktop öffnen über: Start › Daten abrufen › Excel-Arbeitsmappe.', en: 'The Power BI export creates an Excel workbook in star-schema form (fact tables + dimensions). Open it in Power BI Desktop via: Home › Get Data › Excel workbook.' },
+  dash_export_excel: { de: 'Excel Report drucken', en: 'Print Excel report' },
+  dash_export_excel_busy: { de: 'Excel wird erstellt …', en: 'Building Excel …' },
+  dash_export_excel_hint: { de: 'Der Excel-Report erzeugt eine formatierte, rechnende Angebots-Arbeitsmappe im COSMO-CI (Deckblatt, Angebot, Aufwand & Scope, Phasen, Lizenzen, Environments u. v. m.). Eingabefelder sind gold hinterlegt, alle Summen und Kennzahlen sind Excel-Formeln.', en: 'The Excel report creates a formatted, calculating quotation workbook in COSMO CI (cover, quote, effort & scope, phases, licenses, environments and more). Input fields are highlighted in gold; all totals and KPIs are Excel formulas.' },
   dash_filter_env: { de: 'Filter: Environment', en: 'Filter: environment' },
   dash_filter_country: { de: 'Filter: Land', en: 'Filter: country' },
   dash_all: { de: 'Alle', en: 'All' },

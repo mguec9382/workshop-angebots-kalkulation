@@ -43,7 +43,7 @@ export function ExportPanel() {
       {/* Druckbarer Report */}
       <div className="cc-card mx-auto max-w-4xl p-8">
         <div className="mb-6 flex items-center gap-3 border-b-2 border-cosmo-gold pb-4">
-          <img src="/cosmo-mark.svg" alt="COSMO CONSULT" className="h-10 w-10" />
+          <img src={`${import.meta.env.BASE_URL}cosmo-mark.svg`} alt="COSMO CONSULT" className="h-10 w-10" />
           <div>
             <div className="text-lg font-bold text-cosmo-anthracite">{t('quotation_title')}</div>
             <div className="text-sm text-slate-500">{t('appSubtitle')}</div>
