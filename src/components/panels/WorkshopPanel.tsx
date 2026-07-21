@@ -102,14 +102,17 @@ export function WorkshopPanel() {
     })
   }
 
-  /** aggregierter Scope-Status eines Prozesses (für Badge in Kachel/Kopf) */
-  function procEffective(processId: string): ScopeStatus {
-    const explicit = scope.proc[processId]
-    if (explicit && explicit !== 'unset') return explicit
+  /**
+   * Aggregiert den effektiven Scope über eine Feature-Menge (Priorität in > opt > out > unset).
+   * `areaIdx === null` = ganzer Prozess, sonst nur der angegebene Bereich.
+   * Nutzt effectiveFeatureScope, sodass Feature-, Bereichs- und Prozessebene konsistent sind.
+   */
+  function aggregateScope(processId: string, areaIdx: number | null): ScopeStatus {
     const proc = catalog.find((p) => p.id === processId)
     if (!proc) return 'unset'
     let any: ScopeStatus = 'unset'
     proc.areas.forEach((area, ai) => {
+      if (areaIdx !== null && ai !== areaIdx) return
       area.steps.forEach((_s, si) => {
         const eff = effectiveFeatureScope(scope, processId, ai, si)
         if (eff === 'in') any = 'in'
@@ -118,6 +121,16 @@ export function WorkshopPanel() {
       })
     })
     return any
+  }
+
+  /** aggregierter Scope-Status eines Prozesses (für Badge in Kachel/Kopf) */
+  function procEffective(processId: string): ScopeStatus {
+    return aggregateScope(processId, null)
+  }
+
+  /** aggregierter Scope-Status eines Prozessbereichs (für Bereichs-Node & -Badge) */
+  function areaEffective(processId: string, areaIdx: number): ScopeStatus {
+    return aggregateScope(processId, areaIdx)
   }
 
   const scList = (s: ScopeStatus) => `sc-${s}`
@@ -247,8 +260,7 @@ export function WorkshopPanel() {
                   <ul className={`flex flex-wrap gap-x-4 gap-y-6 pt-3 grp-${proc.group}`}>
                     {proc.areas.map((area, areaIdx) => {
                       const aScope = scope.area[areaKey(proc.id, areaIdx)] || 'unset'
-                      const aEff: ScopeStatus =
-                        aScope !== 'unset' ? aScope : procScope !== 'unset' ? procScope : 'unset'
+                      const aEff: ScopeStatus = areaEffective(proc.id, areaIdx)
                       return (
                         <li
                           key={areaIdx}
@@ -266,7 +278,14 @@ export function WorkshopPanel() {
                                 {lang === 'de' ? area.en : area.t}
                               </div>
                             </div>
-                            <ScopeSegment size="sm" value={aScope} onChange={(v) => setAreaScope(proc.id, areaIdx, v)} />
+                            <div className="flex shrink-0 flex-col items-end gap-1">
+                              {aEff !== 'unset' && (
+                                <span className={`he-scope ${scList(aEff)}`} style={{ fontSize: 10, padding: '2px 8px' }}>
+                                  {SCOPE_LABEL[aEff][lang]}
+                                </span>
+                              )}
+                              <ScopeSegment size="sm" value={aScope} onChange={(v) => setAreaScope(proc.id, areaIdx, v)} />
+                            </div>
                           </div>
                           <div className="mb-2 text-[11px] text-slate-400">{lang === 'de' ? area.hint : area.hintEN}</div>
                           <div className="mb-2 flex flex-wrap gap-1">
