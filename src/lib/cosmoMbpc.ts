@@ -38,10 +38,12 @@ interface StoredCosmoStandard {
 const BUNDLED_CATALOG = bundled as unknown as CatalogProcess[]
 
 /* ---------- Fest integrierter Life-Science-Prozess ----------
-   „Validierung & Compliance" ist ein COSMO-Kernprozess für regulierte
+   „500 Validierung bis Compliance" ist ein COSMO-Kernprozess für regulierte
    Industrien (Pharma, MedTech, Life Sciences, Chemie, Food). Er ist NICHT
    Teil der Microsoft-MBPC-Excel-Vorlage und wird daher fest ergänzt – auch
-   nach einem Re-Import bleibt er im Standard-Katalog erhalten. Die
+   nach einem Re-Import bleibt er im Standard-Katalog erhalten. Die Nummer 500
+   liegt bewusst außerhalb des Microsoft-Nummernkreises (10–99); die
+   „‹Start› bis ‹Ende›"-Nomenklatur folgt der Microsoft-MBPC-Konvention. Die
    Prozess-ID „quality-to-compliance" entspricht dem Branchen-Overlay, damit
    die Vorbelegung nach Branche (Life Science) den Prozess automatisch
    markiert. */
@@ -143,12 +145,12 @@ const LS_AREAS: LsAreaDef[] = [
 
 const LIFE_SCIENCE_PROCESS: CatalogProcess = {
   id: 'quality-to-compliance',
-  catId: 99,
+  catId: 500,
   icon: '🛡️',
   group: 'regulated',
   cosmo: true,
-  nameDE: '99 Validierung & Compliance',
-  nameEN: '99 Validation & compliance',
+  nameDE: '500 Validierung bis Compliance',
+  nameEN: '500 Validation to compliance',
   intro:
     'Regulierte End-to-End-Qualitäts- und Compliance-Prozesse für Pharma, MedTech, Life Sciences, Chemie und Food – von der Wareneingangs- und Chargenprüfung über Abweichungs- und CAPA-Management bis zu Dokumentenlenkung, Zulassung, Validierung und Audit.',
   introEN:
