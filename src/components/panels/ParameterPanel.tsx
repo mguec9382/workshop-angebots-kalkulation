@@ -1,6 +1,6 @@
 import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
-import { PHASE_KEYS } from '../../types'
+import { CALC_PHASE_KEYS } from '../../types'
 import type { Industry, OverheadRole, PhaseKey } from '../../types'
 import { ARCHETYPES, CATALOG, INDUSTRIES } from '../../data/catalog'
 import { PanelTitle } from './ProspectPanel'
@@ -143,8 +143,8 @@ export function ParameterPanel() {
       {/* Rolle je Phase */}
       <div className="cc-card p-5">
         <div className="mb-3 font-bold text-cosmo-anthracite">{t('phase_roles')}</div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {PHASE_KEYS.map((ph) => (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {CALC_PHASE_KEYS.map((ph) => (
             <label key={ph} className="block">
               <span className="cc-label">{t(PHASE_LABEL[ph])}</span>
               <select

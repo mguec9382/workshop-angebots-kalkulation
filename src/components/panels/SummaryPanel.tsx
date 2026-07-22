@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
 import { catalogsForState } from '../../lib/mbpcCatalog'
-import { PHASE_KEYS } from '../../types'
+import { CALC_PHASE_KEYS } from '../../types'
 import type { PhaseKey } from '../../types'
 import { calculate, formatCurrency, formatDays, formatNumber } from '../../lib/calc'
 import { PanelTitle } from './ProspectPanel'
@@ -28,7 +28,7 @@ export function SummaryPanel() {
     calc.standardCount + calc.customCount > 0
       ? (calc.standardCount / (calc.standardCount + calc.customCount)) * 100
       : 0
-  const maxPhase = Math.max(1, ...PHASE_KEYS.map((p) => calc.phaseDays[p]))
+  const maxPhase = Math.max(1, ...CALC_PHASE_KEYS.map((p) => calc.phaseDays[p]))
 
   // Prozesse mit In-Scope-Anteil (über alle Environments) für die fachliche Bewertung
   const scopedProcesses = catalogsForState(state).filter((p) => {
@@ -68,7 +68,7 @@ export function SummaryPanel() {
       <div className="cc-card p-5">
         <div className="mb-4 font-bold text-cosmo-anthracite">{t('effort_by_phase')}</div>
         <div className="space-y-3">
-          {PHASE_KEYS.map((ph) => (
+          {CALC_PHASE_KEYS.map((ph) => (
             <div key={ph} className="flex items-center gap-3">
               <div className="w-40 shrink-0 text-sm text-slate-600">{t(PHASE_LABEL[ph])}</div>
               <div className="h-6 flex-1 overflow-hidden rounded-md bg-slate-100">

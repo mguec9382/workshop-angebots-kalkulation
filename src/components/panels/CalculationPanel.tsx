@@ -2,7 +2,7 @@ import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
 import { featureKey } from '../../data/catalog'
 import { catalogForEnvironment } from '../../lib/mbpcCatalog'
-import { COMPLEXITY_KEYS, PHASE_KEYS } from '../../types'
+import { COMPLEXITY_KEYS, CALC_PHASE_KEYS } from '../../types'
 import type { Complexity, PhaseKey } from '../../types'
 import { effortForComplexity } from '../../data/seed'
 import { activeEnvironment, effectiveFeatureScope, formatCurrency, formatDays } from '../../lib/calc'
@@ -180,7 +180,7 @@ export function CalculationPanel() {
                 <tr className="border-b border-slate-100">
                   <th className="cc-th w-[24%]">{t('feature_col')}</th>
                   <th className="cc-th text-center">{t('complexity_col')}</th>
-                  {PHASE_KEYS.map((ph) => (
+                  {CALC_PHASE_KEYS.map((ph) => (
                     <th key={ph} className="cc-th text-center" title={roleName(params.phaseRole[ph])}>
                       {t(PHASE_LABEL[ph])}
                       <div className="text-[10px] font-normal normal-case text-slate-400">
@@ -198,7 +198,7 @@ export function CalculationPanel() {
                   const fs = scope!.feature[key]!
                   let days = 0
                   let cost = 0
-                  PHASE_KEYS.forEach((ph) => {
+                  CALC_PHASE_KEYS.forEach((ph) => {
                     const d = fs.effort[ph] || 0
                     days += d
                     cost += d * roleRate(params.phaseRole[ph])
@@ -225,7 +225,7 @@ export function CalculationPanel() {
                           ))}
                         </div>
                       </td>
-                      {PHASE_KEYS.map((ph) => (
+                      {CALC_PHASE_KEYS.map((ph) => (
                         <td key={ph} className="cc-td text-center">
                           <input
                             type="number"

@@ -42,7 +42,7 @@ import {
   zebraGrid,
 } from './excelTheme'
 import type { CatalogProcess, Lang, PhaseKey, ProjectState } from '../types'
-import { PHASE_KEYS } from '../types'
+import { CALC_PHASE_KEYS } from '../types'
 
 const SHEET = {
   cover: 'Deckblatt',
@@ -202,7 +202,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
     ['left', 'left', 'right', 'right', 'left', 'center', 'left'])
   const roleFirst = r
   const phasesOfRole: Record<string, string[]> = {}
-  for (const p of PHASE_KEYS) {
+  for (const p of CALC_PHASE_KEYS) {
     const id = params.phaseRole[p]
     ;(phasesOfRole[id] ||= []).push(PHASE_LABEL[p])
   }
@@ -247,7 +247,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   const phaseRoleFirst = r
   const phaseRateRef: Record<PhaseKey, string> = {} as Record<PhaseKey, string>
   const phaseRoleRow: Record<PhaseKey, number> = {} as Record<PhaseKey, number>
-  for (const p of PHASE_KEYS) {
+  for (const p of CALC_PHASE_KEYS) {
     const roleId = params.phaseRole[p]
     const role = params.roles.find((x) => x.id === roleId)
     wsP.getCell(r, 1).value = PHASE_LABEL[p]
@@ -327,15 +327,15 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
      ═════════════════════════════════════════════════════════════════════ */
   const wsA = wb.addWorksheet(SHEET.scope, { properties: { tabColor: { argb: `FF${CI.gold}` } } })
   r = sheetHeader(wsA, 'KALKULATION', 'Aufwand & Scope je Feature',
-    'Aufwandsschätzung je In-Scope-Feature über die fünf Success-by-Design-Phasen', 15)
-  r = section(wsA, r, 'In-Scope-Features', 15,
+    'Aufwandsschätzung je In-Scope-Feature über die vier kalkulationsrelevanten Success-by-Design-Phasen', 14)
+  r = section(wsA, r, 'In-Scope-Features', 14,
     'Aufwand in Personentagen (PT). Kosten = Σ (Phasenaufwand × Tagessatz der Phasenrolle) laut Blatt „8 · Parameter“.')
   const scopeHead = r
   r = tableHeader(wsA, r,
     ['Environment', 'Prozess', 'Prozessbereich', 'Feature / Prozessschritt', 'Scope', 'Typ',
-      ...PHASE_KEYS.map((p) => PHASE_LABEL[p]), 'Aufwand PT', 'Stunden', `Kosten (${cur})`, 'Bemerkung'],
-    [20, 22, 24, 34, 11, 13, 10, 10, 10, 10, 10, 12, 15, 15, 26],
-    ['left', 'left', 'left', 'left', 'center', 'center', 'right', 'right', 'right', 'right', 'right', 'right', 'right', 'right', 'left'])
+      ...CALC_PHASE_KEYS.map((p) => PHASE_LABEL[p]), 'Aufwand PT', 'Stunden', `Kosten (${cur})`, 'Bemerkung'],
+    [20, 22, 24, 34, 11, 13, 10, 10, 10, 10, 12, 15, 15, 26],
+    ['left', 'left', 'left', 'left', 'center', 'center', 'right', 'right', 'right', 'right', 'right', 'right', 'right', 'left'])
   const scopeFirst = r
   for (const f of featureRows) {
     wsA.getCell(r, 1).value = f.env
@@ -358,7 +358,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
     typ.alignment = align('center')
     typ.font = font(9, false, f.standard ? CI.slate600 : CI.red)
     typ.dataValidation = { type: 'list', allowBlank: false, formulae: ['"Standard,Customizing"'] }
-    PHASE_KEYS.forEach((p, i) => {
+    CALC_PHASE_KEYS.forEach((p, i) => {
       const cell = wsA.getCell(r, 7 + i)
       cell.value = f.phaseDays[p] || null
       cell.numFmt = fmt.days2
@@ -366,59 +366,59 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
       cell.font = font(9.5)
       cell.fill = fill(CI.gold10)
     })
-    const days = PHASE_KEYS.reduce((s, p) => s + (f.phaseDays[p] || 0), 0)
-    const cost = PHASE_KEYS.reduce(
+    const days = CALC_PHASE_KEYS.reduce((s, p) => s + (f.phaseDays[p] || 0), 0)
+    const cost = CALC_PHASE_KEYS.reduce(
       (s, p) => s + (f.phaseDays[p] || 0) * (params.roles.find((x) => x.id === params.phaseRole[p])?.rate ?? 0), 0)
-    const total = wsA.getCell(r, 12)
-    total.value = formula(`SUM(G${r}:K${r})`, days)
+    const total = wsA.getCell(r, 11)
+    total.value = formula(`SUM(G${r}:J${r})`, days)
     total.numFmt = fmt.days
     total.font = font(9.5, true)
     total.alignment = align('right')
-    const hours = wsA.getCell(r, 13)
-    hours.value = formula(`L${r}*${R_HOURS}`, days * (params.hoursPerDay || 8))
+    const hours = wsA.getCell(r, 12)
+    hours.value = formula(`K${r}*${R_HOURS}`, days * (params.hoursPerDay || 8))
     hours.numFmt = fmt.hours
     hours.font = font(9, false, CI.slate600)
     hours.alignment = align('right')
-    const costCell = wsA.getCell(r, 14)
+    const costCell = wsA.getCell(r, 13)
     costCell.value = formula(
-      PHASE_KEYS.map((p, i) => `${col(7 + i)}${r}*${phaseRateRef[p]}`).join('+'), cost)
+      CALC_PHASE_KEYS.map((p, i) => `${col(7 + i)}${r}*${phaseRateRef[p]}`).join('+'), cost)
     costCell.numFmt = EUR
     costCell.font = font(9.5, true)
     costCell.alignment = align('right')
     if (!f.standard) {
-      wsA.getCell(r, 15).value = 'Customizing – Aufwand mit Entwicklung abstimmen'
-      wsA.getCell(r, 15).font = font(8.5, false, CI.red, true)
+      wsA.getCell(r, 14).value = 'Customizing – Aufwand mit Entwicklung abstimmen'
+      wsA.getCell(r, 14).font = font(8.5, false, CI.red, true)
     }
     r++
   }
   const scopeLast = r - 1
-  zebraGrid(wsA, scopeFirst, scopeLast, 1, 15)
-  addAutoFilter(wsA, scopeHead, scopeLast, 15)
+  zebraGrid(wsA, scopeFirst, scopeLast, 1, 14)
+  addAutoFilter(wsA, scopeHead, scopeLast, 14)
 
   const scopeTotalRow = r
   wsA.getCell(r, 1).value = 'Summe In-Scope-Features'
   wsA.getCell(r, 1).alignment = align('left', 1)
   wsA.getCell(r, 4).value = `${featureRows.length} Features`
   wsA.getCell(r, 4).alignment = align('left', 1)
-  PHASE_KEYS.forEach((p, i) => {
+  CALC_PHASE_KEYS.forEach((p, i) => {
     const c = wsA.getCell(r, 7 + i)
     c.value = formula(`SUM(${col(7 + i)}${scopeFirst}:${col(7 + i)}${scopeLast})`, calc.phaseDays[p])
     c.numFmt = fmt.days
     c.alignment = align('right')
   })
-  wsA.getCell(r, 12).value = formula(`SUM(L${scopeFirst}:L${scopeLast})`, calc.featureDays)
-  wsA.getCell(r, 12).numFmt = fmt.days
+  wsA.getCell(r, 11).value = formula(`SUM(K${scopeFirst}:K${scopeLast})`, calc.featureDays)
+  wsA.getCell(r, 11).numFmt = fmt.days
+  wsA.getCell(r, 11).alignment = align('right')
+  wsA.getCell(r, 12).value = formula(`SUM(L${scopeFirst}:L${scopeLast})`, calc.featureDays * (params.hoursPerDay || 8))
+  wsA.getCell(r, 12).numFmt = fmt.hours
   wsA.getCell(r, 12).alignment = align('right')
-  wsA.getCell(r, 13).value = formula(`SUM(M${scopeFirst}:M${scopeLast})`, calc.featureDays * (params.hoursPerDay || 8))
-  wsA.getCell(r, 13).numFmt = fmt.hours
+  wsA.getCell(r, 13).value = formula(`SUM(M${scopeFirst}:M${scopeLast})`, calc.featureCost)
+  wsA.getCell(r, 13).numFmt = EUR
   wsA.getCell(r, 13).alignment = align('right')
-  wsA.getCell(r, 14).value = formula(`SUM(N${scopeFirst}:N${scopeLast})`, calc.featureCost)
-  wsA.getCell(r, 14).numFmt = EUR
-  wsA.getCell(r, 14).alignment = align('right')
-  totalsRow(wsA, r, 1, 15)
+  totalsRow(wsA, r, 1, 14)
 
   wsA.addConditionalFormatting({
-    ref: `L${scopeFirst}:L${scopeLast}`,
+    ref: `K${scopeFirst}:K${scopeLast}`,
     rules: [{
       type: 'dataBar', priority: 1, gradient: true, showValue: true,
       cfvo: [{ type: 'num', value: 0 }, { type: 'max' }],
@@ -427,13 +427,13 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   })
   printSetup(wsA, { titleRow: scopeHead })
 
-  const R_FEATURE_DAYS = ref(SHEET.scope, abs(12, scopeTotalRow))
-  const R_FEATURE_COST = ref(SHEET.scope, abs(14, scopeTotalRow))
+  const R_FEATURE_DAYS = ref(SHEET.scope, abs(11, scopeTotalRow))
+  const R_FEATURE_COST = ref(SHEET.scope, abs(13, scopeTotalRow))
   const RG_ENV = range(SHEET.scope, 1, scopeFirst, scopeLast)
   const RG_PROC = range(SHEET.scope, 2, scopeFirst, scopeLast)
   const RG_TYPE = range(SHEET.scope, 6, scopeFirst, scopeLast)
-  const RG_DAYS = range(SHEET.scope, 12, scopeFirst, scopeLast)
-  const RG_COST = range(SHEET.scope, 14, scopeFirst, scopeLast)
+  const RG_DAYS = range(SHEET.scope, 11, scopeFirst, scopeLast)
+  const RG_COST = range(SHEET.scope, 13, scopeFirst, scopeLast)
 
   /* ═════════════════════════════════════════════════════════════════════
      3 · PHASEN
@@ -448,7 +448,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
     [18, 42, 22, 16, 14, 15, 18, 15],
     ['left', 'left', 'left', 'right', 'right', 'right', 'right', 'right'])
   const phFirst = r
-  PHASE_KEYS.forEach((p) => {
+  CALC_PHASE_KEYS.forEach((p) => {
     const rate = params.roles.find((x) => x.id === params.phaseRole[p])?.rate ?? 0
     wsPh.getCell(r, 1).value = PHASE_LABEL[p]
     wsPh.getCell(r, 1).font = font(10, true)
@@ -464,12 +464,12 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
     rateCell.alignment = align('right')
     rateCell.font = font(9.5)
     const daysCell = wsPh.getCell(r, 5)
-    daysCell.value = formula(`SUM(${range(SHEET.scope, 7 + PHASE_KEYS.indexOf(p), scopeFirst, scopeLast)})`, calc.phaseDays[p])
+    daysCell.value = formula(`SUM(${range(SHEET.scope, 7 + CALC_PHASE_KEYS.indexOf(p), scopeFirst, scopeLast)})`, calc.phaseDays[p])
     daysCell.numFmt = fmt.days
     daysCell.font = font(10, true)
     daysCell.alignment = align('right')
     const shareDays = wsPh.getCell(r, 6)
-    shareDays.value = formula(`IFERROR(E${r}/SUM($E$${phFirst}:$E$${phFirst + PHASE_KEYS.length - 1}),0)`,
+    shareDays.value = formula(`IFERROR(E${r}/SUM($E$${phFirst}:$E$${phFirst + CALC_PHASE_KEYS.length - 1}),0)`,
       calc.featureDays ? calc.phaseDays[p] / calc.featureDays : 0)
     shareDays.numFmt = fmt.percent
     shareDays.alignment = align('right')
@@ -480,7 +480,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
     costCell.font = font(10, true)
     costCell.alignment = align('right')
     const shareCost = wsPh.getCell(r, 8)
-    shareCost.value = formula(`IFERROR(G${r}/SUM($G$${phFirst}:$G$${phFirst + PHASE_KEYS.length - 1}),0)`,
+    shareCost.value = formula(`IFERROR(G${r}/SUM($G$${phFirst}:$G$${phFirst + CALC_PHASE_KEYS.length - 1}),0)`,
       calc.featureCost ? calc.phaseCost[p] / calc.featureCost : 0)
     shareCost.numFmt = fmt.percent
     shareCost.alignment = align('right')
@@ -726,7 +726,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   }
   const daysByProc = new Map<string, number>()
   for (const f of featureRows) {
-    const d = PHASE_KEYS.reduce((s, p) => s + (f.phaseDays[p] || 0), 0)
+    const d = CALC_PHASE_KEYS.reduce((s, p) => s + (f.phaseDays[p] || 0), 0)
     daysByProc.set(f.processId, (daysByProc.get(f.processId) || 0) + d)
   }
   const usedProcs = [...daysByProc.keys()].sort((a, b) => (daysByProc.get(b) || 0) - (daysByProc.get(a) || 0))
@@ -909,9 +909,9 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
     undefined,
     ['left', 'left', 'right', 'right', 'right', 'right', 'left'])
   const qPhaseFirst = r
-  const qPhaseLast = qPhaseFirst + PHASE_KEYS.length - 1
+  const qPhaseLast = qPhaseFirst + CALC_PHASE_KEYS.length - 1
   const qFeatureSubtotal = qPhaseLast + 1
-  PHASE_KEYS.forEach((p, i) => {
+  CALC_PHASE_KEYS.forEach((p, i) => {
     const row = qPhaseFirst + i
     const p3 = phFirst + i
     wsQ.getCell(row, 1).value = `Phase ${i + 1} · ${PHASE_LABEL[p]}`

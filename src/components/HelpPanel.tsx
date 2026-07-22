@@ -90,10 +90,10 @@ const STEPS: Step[] = [
     n: 6,
     icon: '💰',
     tab: { de: 'Kalkulation', en: 'Calculation' },
-    goal: { de: 'Aufwand je In-Scope-Feature über die fünf SbD-Phasen schätzen.', en: 'Estimate effort per in-scope feature across the five SbD phases.' },
+    goal: { de: 'Aufwand je In-Scope-Feature über die vier SbD-Phasen schätzen.', en: 'Estimate effort per in-scope feature across the four SbD phases.' },
     action: {
-      de: 'Register „Kalkulation" › Aufwände je Feature und Phase (Strategize, Initiate, Build, Prepare, Operate) in Tagen/Stunden erfassen oder Standardvorlage übernehmen.',
-      en: 'Open "Calculation" › capture effort per feature and phase (Strategize, Initiate, Build, Prepare, Operate) in days/hours or use the default template.',
+      de: 'Register „Kalkulation" › Aufwände je Feature und Phase (Initiate, Build, Prepare, Operate) in Tagen/Stunden erfassen oder Standardvorlage übernehmen.',
+      en: 'Open "Calculation" › capture effort per feature and phase (Initiate, Build, Prepare, Operate) in days/hours or use the default template.',
     },
     result: { de: 'Aufwand × Tagessatz + Overhead ergeben die Dienstleistungskosten (Live in der Seitenleiste).', en: 'Effort × day rate + overhead yields the service cost (live in the sidebar).' },
     tip: { de: 'Beim Aufnehmen eines Features wird automatisch eine Standard-Aufwandsvorlage (3,0 PT) gesetzt.', en: 'When a feature is added, a default effort template (3.0 person-days) is applied automatically.' },

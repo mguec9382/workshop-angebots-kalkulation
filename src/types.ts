@@ -11,6 +11,12 @@ export type PhaseKey = 'strategize' | 'initiate' | 'build' | 'prepare' | 'operat
 
 export const PHASE_KEYS: PhaseKey[] = ['strategize', 'initiate', 'build', 'prepare', 'operate']
 
+/**
+ * Phasen, die tatsächlich in die Aufwands-/Kostenkalkulation einfließen.
+ * „Strategize" ist bewusst ausgenommen – diese Phase wird in der Kalkulation nicht benötigt.
+ */
+export const CALC_PHASE_KEYS: PhaseKey[] = ['initiate', 'build', 'prepare', 'operate']
+
 /* ---------- MBPC-Katalog (statischer Seed) ---------- */
 
 export interface CatalogArea {

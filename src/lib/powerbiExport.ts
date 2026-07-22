@@ -2,7 +2,7 @@ import { archetypeById, findIndustry, GROUP_LABEL, processById } from '../data/c
 import { calculate } from './calc'
 import { catalogsForState } from './mbpcCatalog'
 import type { Lang, ProjectState } from '../types'
-import { PHASE_KEYS } from '../types'
+import { CALC_PHASE_KEYS } from '../types'
 import type { VersionMeta } from './library'
 
 /**
@@ -127,7 +127,7 @@ export async function exportPowerBiWorkbook(
         'Aufwand PT': round(f.days),
         Kosten: round(f.cost),
       }
-      for (const k of PHASE_KEYS) row[phaseLabel(k)] = round(f.phaseDays[k])
+      for (const k of CALC_PHASE_KEYS) row[phaseLabel(k)] = round(f.phaseDays[k])
       prozesse.push(row)
     }
   }
@@ -135,7 +135,7 @@ export async function exportPowerBiWorkbook(
   // ── Sheet: Phasen (Fakten je Environment) ──────────────────────────────
   const phasen: Array<Record<string, string | number>> = []
   for (const e of calc.perEnvironment) {
-    for (const k of PHASE_KEYS) {
+    for (const k of CALC_PHASE_KEYS) {
       phasen.push({
         EnvironmentId: e.id,
         Environment: e.name,

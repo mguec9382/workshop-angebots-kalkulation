@@ -4,7 +4,7 @@ import { useLang } from '../../i18n/LanguageContext'
 import { catalogsForState } from '../../lib/mbpcCatalog'
 import { archetypeById, findIndustry, GROUP_LABEL, processById } from '../../data/catalog'
 import { calculate, formatCurrency, formatDays, formatNumber } from '../../lib/calc'
-import { PHASE_KEYS } from '../../types'
+import { CALC_PHASE_KEYS } from '../../types'
 import type { PhaseKey } from '../../types'
 import { PanelTitle } from './ProspectPanel'
 import { exportVersionComparison } from '../../lib/powerbiExport'
@@ -90,7 +90,7 @@ export function DashboardPanel() {
     let customCount = 0
     const featuresByProc = new Map<string, { days: number; cost: number }>()
     for (const e of envs) {
-      for (const k of PHASE_KEYS) phaseDays[k] += e.scope.phaseDays[k]
+      for (const k of CALC_PHASE_KEYS) phaseDays[k] += e.scope.phaseDays[k]
       scope.in += e.scope.scopeStats.in
       scope.opt += e.scope.scopeStats.opt
       scope.out += e.scope.scopeStats.out
@@ -146,7 +146,7 @@ export function DashboardPanel() {
   }
 
   const maxEnvTotal = Math.max(1, ...view.envs.map((e) => e.serviceCostOneTime + e.licensePeriod))
-  const maxPhase = Math.max(1, ...PHASE_KEYS.map((k) => view.phaseDays[k]))
+  const maxPhase = Math.max(1, ...CALC_PHASE_KEYS.map((k) => view.phaseDays[k]))
   const maxProc = Math.max(1, ...view.processes.map((p) => p.days))
   const scopeTotal = Math.max(1, view.scope.total)
   const p = state.prospect
@@ -260,7 +260,7 @@ export function DashboardPanel() {
         <div className="cc-card p-5">
           <h3 className="mb-3 text-sm font-bold text-cosmo-anthracite dark:text-slate-100">{t('dash_effort_by_phase')}</h3>
           <div className="space-y-2">
-            {PHASE_KEYS.map((k) => (
+            {CALC_PHASE_KEYS.map((k) => (
               <BarRow
                 key={k}
                 label={t(PHASE_LABEL[k])}

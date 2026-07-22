@@ -9,7 +9,7 @@ import type {
   ScopeState,
   ScopeStatus,
 } from '../types'
-import { PHASE_KEYS } from '../types'
+import { CALC_PHASE_KEYS } from '../types'
 
 /** Effektiver Scope eines Features (Feature > Area > Prozess > unset) */
 export function effectiveFeatureScope(
@@ -137,7 +137,7 @@ export function calcScope(scope: ScopeState, params: Parameters, catalog: Catalo
         const pd = emptyPhaseRecord()
         let days = 0
         let cost = 0
-        for (const phase of PHASE_KEYS) {
+        for (const phase of CALC_PHASE_KEYS) {
           const d = fs.effort[phase] || 0
           if (d <= 0) continue
           const rate = roleRate(params, params.phaseRole[phase])
@@ -165,8 +165,8 @@ export function calcScope(scope: ScopeState, params: Parameters, catalog: Catalo
     })
   }
 
-  const featureDays = PHASE_KEYS.reduce((s, p) => s + phaseDays[p], 0)
-  const featureCost = PHASE_KEYS.reduce((s, p) => s + phaseCost[p], 0)
+  const featureDays = CALC_PHASE_KEYS.reduce((s, p) => s + phaseDays[p], 0)
+  const featureCost = CALC_PHASE_KEYS.reduce((s, p) => s + phaseCost[p], 0)
 
   return { features, featureDays, featureCost, phaseDays, phaseCost, scopeStats, standardCount, customCount }
 }
@@ -212,7 +212,7 @@ export function calculate(state: ProjectState): CalcResult {
   let customCount = 0
   for (const ec of perEnvironment) {
     features.push(...ec.scope.features)
-    for (const p of PHASE_KEYS) {
+    for (const p of CALC_PHASE_KEYS) {
       phaseDays[p] += ec.scope.phaseDays[p]
       phaseCost[p] += ec.scope.phaseCost[p]
     }
@@ -225,8 +225,8 @@ export function calculate(state: ProjectState): CalcResult {
     customCount += ec.scope.customCount
   }
 
-  const featureDays = PHASE_KEYS.reduce((s, p) => s + phaseDays[p], 0)
-  const featureCost = PHASE_KEYS.reduce((s, p) => s + phaseCost[p], 0)
+  const featureDays = CALC_PHASE_KEYS.reduce((s, p) => s + phaseDays[p], 0)
+  const featureCost = CALC_PHASE_KEYS.reduce((s, p) => s + phaseCost[p], 0)
 
   // Länder / länderübergreifend
   const distinctCountries = new Set(environments.map((e) => e.country).filter(Boolean)).size
