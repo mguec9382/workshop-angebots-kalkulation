@@ -72,22 +72,22 @@ const FAMILY_ORDER = [
   'Sonstige',
 ]
 
-/** Emoji-Icon für einen End-to-End-Prozess anhand von Schlüsselwörtern. */
+/** Emoji-Icon für einen End-to-End-Prozess anhand von Schlüsselwörtern (EN + DE). */
 function iconForProcess(title: string): string {
   const t = title.toLowerCase()
-  if (t.includes('cash') || t.includes('order')) return '💰'
-  if (t.includes('procure') || t.includes('source') || t.includes('pay')) return '🛒'
-  if (t.includes('report') || t.includes('record')) return '📊'
-  if (t.includes('inventory') || t.includes('deliver') || t.includes('warehouse')) return '📦'
-  if (t.includes('produce') || t.includes('plan') || t.includes('manufactur')) return '🏭'
-  if (t.includes('design') || t.includes('concept') || t.includes('market') || t.includes('retire')) return '🧬'
-  if (t.includes('project')) return '📐'
-  if (t.includes('hire') || t.includes('retire') || t.includes('people')) return '👥'
-  if (t.includes('service') || t.includes('case') || t.includes('resolution')) return '🛠️'
-  if (t.includes('acquire') || t.includes('asset') || t.includes('dispose')) return '🏗️'
-  if (t.includes('administer') || t.includes('operate') || t.includes('govern')) return '⚙️'
-  if (t.includes('prospect') || t.includes('quote') || t.includes('lead')) return '🎯'
-  if (t.includes('forecast') || t.includes('supply')) return '📈'
+  if (t.includes('cash') || t.includes('order') || t.includes('verkauf') || t.includes('vertrieb')) return '💰'
+  if (t.includes('procure') || t.includes('source') || t.includes('pay') || t.includes('einkauf') || t.includes('beschaffung')) return '🛒'
+  if (t.includes('report') || t.includes('record') || t.includes('bericht') || t.includes('finanz') || t.includes('buchhaltung')) return '📊'
+  if (t.includes('inventory') || t.includes('deliver') || t.includes('warehouse') || t.includes('lager') || t.includes('logistik') || t.includes('bestand')) return '📦'
+  if (t.includes('produce') || t.includes('plan') || t.includes('manufactur') || t.includes('produktion') || t.includes('fertigung')) return '🏭'
+  if (t.includes('design') || t.includes('concept') || t.includes('market') || t.includes('retire') || t.includes('konzept') || t.includes('entwicklung') || t.includes('produktmanagement')) return '🧬'
+  if (t.includes('project') || t.includes('projekt')) return '📐'
+  if (t.includes('hire') || t.includes('retire') || t.includes('people') || t.includes('personal') || t.includes('mitarbeiter')) return '👥'
+  if (t.includes('service') || t.includes('case') || t.includes('resolution') || t.includes('wartung') || t.includes('lösung') || t.includes('kundenbetreuung')) return '🛠️'
+  if (t.includes('acquire') || t.includes('asset') || t.includes('dispose') || t.includes('erwerb') || t.includes('veräußerung') || t.includes('anlage')) return '🏗️'
+  if (t.includes('administer') || t.includes('operate') || t.includes('govern') || t.includes('qualit') || t.includes('architektur')) return '⚙️'
+  if (t.includes('prospect') || t.includes('quote') || t.includes('lead') || t.includes('marketing')) return '🎯'
+  if (t.includes('forecast') || t.includes('supply') || t.includes('absatz') || t.includes('planung')) return '📈'
   return '📋'
 }
 
@@ -122,16 +122,38 @@ export async function parseMbpcWorkbook(file: File): Promise<MbpcCatalog> {
   const XLSX = await import('xlsx')
   const buffer = await file.arrayBuffer()
   const wb = XLSX.read(buffer, { type: 'array' })
-  const ws = wb.Sheets[wb.SheetNames[0]]
+
+  // Bevorzugt das Register „Import mit features"; sonst das erste Blatt.
+  const preferred = wb.SheetNames.find((n) => /import\s*mit\s*features/i.test(String(n)))
+  const sheetName = preferred ?? wb.SheetNames[0]
+  const ws = wb.Sheets[sheetName]
   const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: '' })
 
-  const get = (row: Record<string, unknown>, key: string): string => {
+  // Schema-Erkennung anhand der Kopfzeile.
+  const headerKeys = rows.length ? Object.keys(rows[0]).map((k) => String(k).trim()) : []
+  const hasCol = (re: RegExp) => headerKeys.some((k) => re.test(k))
+  // „Import mit features"-Schema: Work Item Type (Epic/Feature) · Title 1..4 · Area Path
+  const isFeatureSchema = hasCol(/^work\s*item\s*type$/i) && hasCol(/^title\s*1$/i)
+
+  const processes = isFeatureSchema ? parseFeatureRows(rows) : parseLegacyRows(rows)
+  const familyResolver = isFeatureSchema ? () => 'Business Central' : (label: string) => familyOf(label)
+  return buildCatalog(processes, file.name, familyResolver)
+}
+
+/** Zellzugriff, der Kopfzeilen tolerant (getrimmt) auflöst. */
+function cellGetter(row: Record<string, unknown>) {
+  return (key: string): string => {
     const found = Object.keys(row).find((k) => String(k).trim() === key)
     return found ? String(row[found] ?? '').trim() : ''
   }
+}
 
+/**
+ * Legacy-Schema (Raw Export): „Work item type" = End to end / Process area / Process
+ * über Title 2/3/4, Produkte in „Products MS BPC".
+ */
+function parseLegacyRows(rows: Record<string, unknown>[]): MbpcProcess[] {
   const processes: MbpcProcess[] = []
-  const workloadCount: Record<string, { label: string; count: number }> = {}
   let curProc: MbpcProcess | null = null
   let curArea: MbpcArea | null = null
 
@@ -151,33 +173,93 @@ export async function parseMbpcWorkbook(file: File): Promise<MbpcCatalog> {
   }
 
   for (const row of rows) {
-    const type = get(row, COL.workItemType)
+    const get = cellGetter(row)
+    const type = get(COL.workItemType)
     if (type === 'End to end') {
-      ensureProc(get(row, COL.title2))
+      ensureProc(get(COL.title2))
     } else if (type === 'Process area') {
-      if (!curProc) ensureProc(get(row, COL.title2) || '(Allgemein)')
-      ensureArea(get(row, COL.title3))
+      if (!curProc) ensureProc(get(COL.title2) || '(Allgemein)')
+      ensureArea(get(COL.title3))
     } else if (type === 'Process') {
-      if (!curProc) ensureProc(get(row, COL.title2) || '(Allgemein)')
-      if (!curArea) ensureArea(get(row, COL.title3) || '(Allgemein)')
-      const workloads = splitProducts(get(row, COL.products))
-      curArea!.steps.push({ title: get(row, COL.title4) || '(Prozess)', workloads })
+      if (!curProc) ensureProc(get(COL.title2) || '(Allgemein)')
+      if (!curArea) ensureArea(get(COL.title3) || '(Allgemein)')
+      curArea!.steps.push({ title: get(COL.title4) || '(Prozess)', workloads: splitProducts(get(COL.products)) })
     }
     // Scenario / Test case / System process / Tree → ignorieren
   }
+  return processes
+}
 
-  // Prozess-Workloads aggregieren + globale Workload-Zählung
+/**
+ * „Import mit features"-Schema (DE-MBPC mit COSMO Area Path):
+ *   Epic + Title 1    → End-to-End-Prozess
+ *   Epic + Title 2    → Prozessbereich
+ *   Feature + Title 3 → Feature/Step
+ * Der „Area Path" (COSMO-Modul, z. B. „\Finanzbuchhaltung") dient als Workload
+ * zur Mehrfachauswahl/Filterung.
+ */
+function parseFeatureRows(rows: Record<string, unknown>[]): MbpcProcess[] {
+  const processes: MbpcProcess[] = []
+  let curProc: MbpcProcess | null = null
+  let curArea: MbpcArea | null = null
+
+  const ensureProc = (title: string): MbpcProcess => {
+    const p: MbpcProcess = { id: slug(title || 'process'), title: title || '(Allgemein)', icon: iconForProcess(title), workloads: [], areas: [] }
+    processes.push(p)
+    curProc = p
+    curArea = null
+    return p
+  }
+  const ensureArea = (title: string): MbpcArea => {
+    if (!curProc) ensureProc('(Allgemein)')
+    const a: MbpcArea = { title: title || '(Allgemein)', steps: [] }
+    curProc!.areas.push(a)
+    curArea = a
+    return a
+  }
+
+  for (const row of rows) {
+    const get = cellGetter(row)
+    const type = get('Work Item Type')
+    const t1 = get('Title 1')
+    const t2 = get('Title 2')
+    const t3 = get('Title 3')
+    const t4 = get('Title 4')
+    const areaPath = get('Area Path')
+      .replace(/^[\\/]+/, '')
+      .replace(/[\\/]+/g, ' / ')
+      .trim()
+    if (type === 'Epic' && t1) {
+      ensureProc(t1)
+    } else if (type === 'Epic' && t2) {
+      if (!curProc) ensureProc('(Allgemein)')
+      ensureArea(t2)
+    } else if (type === 'Feature' && (t3 || t4)) {
+      if (!curProc) ensureProc('(Allgemein)')
+      if (!curArea) ensureArea('(Allgemein)')
+      curArea!.steps.push({ title: t3 || t4 || '(Feature)', workloads: areaPath ? [areaPath] : [] })
+    }
+  }
+  return processes
+}
+
+/** Aggregiert Workloads, entfernt leere Prozesse und baut das MbpcCatalog-Objekt. */
+function buildCatalog(
+  processes: MbpcProcess[],
+  fileName: string,
+  familyResolver: (label: string) => string,
+): MbpcCatalog {
+  const workloadCount: Record<string, { label: string; count: number }> = {}
   const uniqueProcCounted = new Set<string>()
   for (const p of processes) {
     const set = new Set<string>()
     for (const a of p.areas) for (const s of a.steps) for (const w of s.workloads) set.add(w)
     p.workloads = [...set]
     for (const w of p.workloads) {
-      const key = w
-      if (!workloadCount[key]) workloadCount[key] = { label: w, count: 0 }
+      if (!workloadCount[w]) workloadCount[w] = { label: w, count: 0 }
       const tag = `${p.id}|${w}`
       if (!uniqueProcCounted.has(tag)) {
-        workloadCount[key].count++
+        workloadCount[w].count++
         uniqueProcCounted.add(tag)
       }
     }
@@ -186,16 +268,21 @@ export async function parseMbpcWorkbook(file: File): Promise<MbpcCatalog> {
   // leere Prozesse (ohne Steps) entfernen
   const nonEmpty = processes.filter((p) => p.areas.some((a) => a.steps.length > 0))
 
+  const familyRank = (f: string) => {
+    const i = FAMILY_ORDER.indexOf(f)
+    return i === -1 ? FAMILY_ORDER.length : i
+  }
+
   const workloads: MbpcWorkload[] = Object.values(workloadCount)
-    .map((w) => ({ id: slug(w.label).replace(/^ms-/, ''), label: w.label, family: familyOf(w.label), count: w.count }))
+    .map((w) => ({ id: slug(w.label).replace(/^ms-/, ''), label: w.label, family: familyResolver(w.label), count: w.count }))
     .sort((a, b) => {
-      const fa = FAMILY_ORDER.indexOf(a.family)
-      const fb = FAMILY_ORDER.indexOf(b.family)
+      const fa = familyRank(a.family)
+      const fb = familyRank(b.family)
       if (fa !== fb) return fa - fb
       return b.count - a.count
     })
 
-  const families = FAMILY_ORDER.filter((f) => workloads.some((w) => w.family === f))
+  const families = [...new Set(workloads.map((w) => w.family))].sort((a, b) => familyRank(a) - familyRank(b))
 
   let areaCount = 0
   let stepCount = 0
@@ -209,7 +296,7 @@ export async function parseMbpcWorkbook(file: File): Promise<MbpcCatalog> {
     workloads,
     families,
     importedAt: new Date().toISOString(),
-    fileName: file.name,
+    fileName,
     processCount: nonEmpty.length,
     areaCount,
     stepCount,
