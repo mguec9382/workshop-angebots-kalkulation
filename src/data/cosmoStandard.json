@@ -1,0 +1,2519 @@
+[
+ {
+  "id": "10-erwerb-bis-veraeusserung",
+  "catId": 10,
+  "icon": "🏭",
+  "group": "primary",
+  "nameDE": "10 Erwerb bis Veräußerung",
+  "nameEN": "10 Erwerb bis Veräußerung",
+  "intro": "Microsoft Business Process Catalog · End-to-End-Prozess „10 Erwerb bis Veräußerung“.",
+  "introEN": "Microsoft Business Process Catalog · end-to-end process “10 Erwerb bis Veräußerung”.",
+  "cosmo": true,
+  "areas": [
+   {
+    "t": "10.40 Aktive Anlagen verwalten",
+    "en": "10.40 Aktive Anlagen verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Anlagenbuchhaltung",
+     "Erweiterte Anlagenbuchhaltung (Anlagen verschrotten, Anlagenspiegel, …)"
+    ],
+    "stepsEN": [
+     "Anlagenbuchhaltung",
+     "Erweiterte Anlagenbuchhaltung (Anlagen verschrotten, Anlagenspiegel, …)"
+    ],
+    "stepModule": [
+     "",
+     "Continia Finance - Erw. Anlagenbuchhaltung"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 0.5,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0.25
+     }
+    ]
+   },
+   {
+    "t": "10.70 Anlagen analysieren",
+    "en": "10.70 Anlagen analysieren",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Anlagen analysieren"
+    ],
+    "stepsEN": [
+     "Anlagen analysieren"
+    ],
+    "stepModule": [
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "20-fall-bis-loesung",
+  "catId": 20,
+  "icon": "🛟",
+  "group": "primary",
+  "nameDE": "20 Fall bis Lösung",
+  "nameEN": "20 Fall bis Lösung",
+  "intro": "Microsoft Business Process Catalog · End-to-End-Prozess „20 Fall bis Lösung“.",
+  "introEN": "Microsoft Business Process Catalog · end-to-end process “20 Fall bis Lösung”.",
+  "cosmo": true,
+  "areas": [
+   {
+    "t": "20.40 Fälle bearbeiten und verwalten",
+    "en": "20.40 Fälle bearbeiten und verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Ticketverwaltung"
+    ],
+    "stepsEN": [
+     "Ticketverwaltung"
+    ],
+    "stepModule": [
+     "HelpDesk365"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 3,
+      "prepare": 5,
+      "operate": 2
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "40-design-bis-ausmusterung",
+  "catId": 40,
+  "icon": "⚙️",
+  "group": "primary",
+  "nameDE": "40 Design bis Ausmusterung",
+  "nameEN": "40 Design bis Ausmusterung",
+  "intro": "Microsoft Business Process Catalog · End-to-End-Prozess „40 Design bis Ausmusterung“.",
+  "introEN": "Microsoft Business Process Catalog · end-to-end process “40 Design bis Ausmusterung”.",
+  "cosmo": true,
+  "areas": [
+   {
+    "t": "40.20 Produkte einführen",
+    "en": "40.20 Produkte einführen",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Artikelstammdaten verwalten",
+     "Artikelverfolgung verwalten (Chargen-, Seriennummern, Haltbarkeitsdaten)",
+     "Rezepturen entwickeln und verwalten",
+     "Musterfertigung und Rezepturen abbilden",
+     "Musterbau & Prototypenfertigung abbilden",
+     "Produkt-Entwicklungsprojekten abbilden",
+     "Gefahrstoffmanagement"
+    ],
+    "stepsEN": [
+     "Artikelstammdaten verwalten",
+     "Artikelverfolgung verwalten (Chargen-, Seriennummern, Haltbarkeitsdaten)",
+     "Rezepturen entwickeln und verwalten",
+     "Musterfertigung und Rezepturen abbilden",
+     "Musterbau & Prototypenfertigung abbilden",
+     "Produkt-Entwicklungsprojekten abbilden",
+     "Gefahrstoffmanagement"
+    ],
+    "stepModule": [
+     "",
+     "",
+     "COSMO Industry Solution",
+     "COSMO Industry Solution",
+     "COSMO Industry Solution",
+     "COSMO Industry Solution",
+     "COSMO Hazardous Substance Management"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 1,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 1.5,
+      "prepare": 0.25,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 1.5,
+      "prepare": 0.25,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 3,
+      "prepare": 1.5,
+      "operate": 2
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 3,
+      "prepare": 1.5,
+      "operate": 2
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 1.5,
+      "prepare": 2,
+      "operate": 1
+     }
+    ]
+   },
+   {
+    "t": "40.50 Aktive Produkte verwalten",
+    "en": "40.50 Aktive Produkte verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Zeichnungsverwaltung (Zeichnungen, Revisionen, Änderungsmanagement ECN, ECS)",
+     "CAD PDM Anbindung"
+    ],
+    "stepsEN": [
+     "Zeichnungsverwaltung (Zeichnungen, Revisionen, Änderungsmanagement ECN, ECS)",
+     "CAD PDM Anbindung"
+    ],
+    "stepModule": [
+     "COSMO Product Data Management",
+     "CADLink"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 3,
+      "prepare": 0.25,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 4,
+      "prepare": 0.5,
+      "operate": 0.5
+     }
+    ]
+   },
+   {
+    "t": "40.90 Produktleistung analysieren",
+    "en": "40.90 Produktleistung analysieren",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Produktleistung analysieren"
+    ],
+    "stepsEN": [
+     "Produktleistung analysieren"
+    ],
+    "stepModule": [
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0.75,
+      "prepare": 0,
+      "operate": 0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "50-prognose-bis-plan",
+  "catId": 50,
+  "icon": "📈",
+  "group": "manage",
+  "nameDE": "50 Prognose bis Plan",
+  "nameEN": "50 Prognose bis Plan",
+  "intro": "Microsoft Business Process Catalog · End-to-End-Prozess „50 Prognose bis Plan“.",
+  "introEN": "Microsoft Business Process Catalog · end-to-end process “50 Prognose bis Plan”.",
+  "cosmo": true,
+  "areas": [
+   {
+    "t": "50.20 Prognose von Angebot und Nachfrage",
+    "en": "50.20 Prognose von Angebot und Nachfrage",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Absatzpläne verwalten - Standard"
+    ],
+    "stepsEN": [
+     "Absatzpläne verwalten - Standard"
+    ],
+    "stepModule": [
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 1.5,
+      "prepare": 0.375,
+      "operate": 0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "55-einstellung-bis-austritt",
+  "catId": 55,
+  "icon": "👥",
+  "group": "support",
+  "nameDE": "55 Einstellung bis Austritt",
+  "nameEN": "55 Einstellung bis Austritt",
+  "intro": "Microsoft Business Process Catalog · End-to-End-Prozess „55 Einstellung bis Austritt“.",
+  "introEN": "Microsoft Business Process Catalog · end-to-end process “55 Einstellung bis Austritt”.",
+  "cosmo": true,
+  "areas": [
+   {
+    "t": "55.10 Talente rekrutieren und einarbeiten",
+    "en": "55.10 Talente rekrutieren und einarbeiten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Mitarbeiterverwaltung (einfach)"
+    ],
+    "stepsEN": [
+     "Mitarbeiterverwaltung (einfach)"
+    ],
+    "stepModule": [
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0.75,
+      "prepare": 1,
+      "operate": 0
+     }
+    ]
+   },
+   {
+    "t": "55.50 Arbeitszeit und Anwesenheit verwalten",
+    "en": "55.50 Arbeitszeit und Anwesenheit verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Personalzeiterfassung",
+     "Mobile PZE",
+     "Urlaubsanträge",
+     "Führerscheinkontrolle",
+     "Reisekostenabrechnung"
+    ],
+    "stepsEN": [
+     "Personalzeiterfassung",
+     "Mobile PZE",
+     "Urlaubsanträge",
+     "Führerscheinkontrolle",
+     "Reisekostenabrechnung"
+    ],
+    "stepModule": [
+     "TempVision",
+     "TempVision",
+     "TempVision",
+     "TempVision",
+     "Continia Expense Management"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 2,
+      "build": 2,
+      "prepare": 3,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 1,
+      "prepare": 1,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0.5,
+      "prepare": 0.5,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0.5,
+      "prepare": 0.5,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 1,
+      "prepare": 1,
+      "operate": 1
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "60-lagerung-bis-lieferung",
+  "catId": 60,
+  "icon": "📦",
+  "group": "primary",
+  "nameDE": "60 Lagerung bis Lieferung",
+  "nameEN": "60 Lagerung bis Lieferung",
+  "intro": "Microsoft Business Process Catalog · End-to-End-Prozess „60 Lagerung bis Lieferung“.",
+  "introEN": "Microsoft Business Process Catalog · end-to-end process “60 Lagerung bis Lieferung”.",
+  "cosmo": true,
+  "areas": [
+   {
+    "t": "60.10 Lagerbetrieb verwalten",
+    "en": "60.10 Lagerbetrieb verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Einfache Lagerführung",
+     "Dynamische Lagerführung"
+    ],
+    "stepsEN": [
+     "Einfache Lagerführung",
+     "Dynamische Lagerführung"
+    ],
+    "stepModule": [
+     "",
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 0.5,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 1,
+      "prepare": 1,
+      "operate": 1
+     }
+    ]
+   },
+   {
+    "t": "60.20 Lagerbestände aufrechterhalten",
+    "en": "60.20 Lagerbestände aufrechterhalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Lagerbestände verwalten (Umlagerungen, Inventur, manuelle Zu- und Abgänge)",
+     "Warenursprung und Präferenzkalkulation",
+     "Mobile Datenerfassung"
+    ],
+    "stepsEN": [
+     "Lagerbestände verwalten (Umlagerungen, Inventur, manuelle Zu- und Abgänge)",
+     "Warenursprung und Präferenzkalkulation",
+     "Mobile Datenerfassung"
+    ],
+    "stepModule": [
+     "",
+     "Comsol WUP",
+     "COSMO Mobile Solution"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 0.5,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 2,
+      "prepare": 3,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 3,
+      "prepare": 3,
+      "operate": 1
+     }
+    ]
+   },
+   {
+    "t": "60.30 Wareneingang abwickeln",
+    "en": "60.30 Wareneingang abwickeln",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Wareneingang für Einkauf und Produktion (einstufig, zweistufig)",
+     "Ware etikettieren"
+    ],
+    "stepsEN": [
+     "Wareneingang für Einkauf und Produktion (einstufig, zweistufig)",
+     "Ware etikettieren"
+    ],
+    "stepModule": [
+     "",
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 1,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0.25
+     }
+    ]
+   },
+   {
+    "t": "60.40 Warenausgang abwickeln",
+    "en": "60.40 Warenausgang abwickeln",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Warenausgang für Verkauf und Produktion (einstufig, zweistufig)",
+     "Erweiterte Logistikprozesse (Warenausgänge zusammenfassen, NVE, Konsilager,…)"
+    ],
+    "stepsEN": [
+     "Warenausgang für Verkauf und Produktion (einstufig, zweistufig)",
+     "Erweiterte Logistikprozesse (Warenausgänge zusammenfassen, NVE, Konsilager,…)"
+    ],
+    "stepModule": [
+     "",
+     "COSMO Logistics"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 1.5,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 1,
+      "prepare": 2,
+      "operate": 0.5
+     }
+    ]
+   },
+   {
+    "t": "60.50 Lagerqualität verwalten",
+    "en": "60.50 Lagerqualität verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Qualitätsprüfungen"
+    ],
+    "stepsEN": [
+     "Qualitätsprüfungen"
+    ],
+    "stepModule": [
+     "COSMO Quality Assurance OR Standard"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 1,
+      "prepare": 0.5,
+      "operate": 1
+     }
+    ]
+   },
+   {
+    "t": "60.60 Fracht und Transport verwalten",
+    "en": "60.60 Fracht und Transport verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Transport und Frachtabwicklung",
+     "Integrierte Zollabwicklung",
+     "KEP- und Speditionsanbindung"
+    ],
+    "stepsEN": [
+     "Transport und Frachtabwicklung",
+     "Integrierte Zollabwicklung",
+     "KEP- und Speditionsanbindung"
+    ],
+    "stepModule": [
+     "COSMO EDI",
+     "Comsol Exposys Atlas",
+     "Comsol Multiship"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 1,
+      "prepare": 2,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 1,
+      "prepare": 2,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 1,
+      "prepare": 2,
+      "operate": 1
+     }
+    ]
+   },
+   {
+    "t": "60.80 Lagerprozesse analysieren",
+    "en": "60.80 Lagerprozesse analysieren",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Lagerprozesse analysieren"
+    ],
+    "stepsEN": [
+     "Lagerprozesse analysieren"
+    ],
+    "stepModule": [
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "65-verkaufsauftrag-bis-zahlungseingang",
+  "catId": 65,
+  "icon": "💰",
+  "group": "primary",
+  "nameDE": "65 Verkaufsauftrag bis Zahlungseingang",
+  "nameEN": "65 Verkaufsauftrag bis Zahlungseingang",
+  "intro": "Microsoft Business Process Catalog · End-to-End-Prozess „65 Verkaufsauftrag bis Zahlungseingang“.",
+  "introEN": "Microsoft Business Process Catalog · end-to-end process “65 Verkaufsauftrag bis Zahlungseingang”.",
+  "cosmo": true,
+  "areas": [
+   {
+    "t": "65.20 Verkaufsaufträge verwalten",
+    "en": "65.20 Verkaufsaufträge verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Konditionen für Artikel und Leistungen verwalten - Standard",
+     "Konditionen für Artikel und Leistungen verwalten - Erweitert",
+     "Konditionen auf Basis eines Kalkulationsschematas berechnen",
+     "Auftragsabwicklung (Standardartikel und -leistungen)",
+     "Auftragsabwicklung (Konfiguration)",
+     "Auftragsabwicklung (Projekte)",
+     "Auftragsabwicklung (Mietgeschäft)",
+     "Auftragsabwicklung (Subscriptions)",
+     "Auftragsabwicklung (Rahmenaufträge)",
+     "Reklamationsabwicklung - Verkauf",
+     "EDI - Verkauf",
+     "Webshop - Integration",
+     "Provisionsabrechnung"
+    ],
+    "stepsEN": [
+     "Konditionen für Artikel und Leistungen verwalten - Standard",
+     "Konditionen für Artikel und Leistungen verwalten - Erweitert",
+     "Konditionen auf Basis eines Kalkulationsschematas berechnen",
+     "Auftragsabwicklung (Standardartikel und -leistungen)",
+     "Auftragsabwicklung (Konfiguration)",
+     "Auftragsabwicklung (Projekte)",
+     "Auftragsabwicklung (Mietgeschäft)",
+     "Auftragsabwicklung (Subscriptions)",
+     "Auftragsabwicklung (Rahmenaufträge)",
+     "Reklamationsabwicklung - Verkauf",
+     "EDI - Verkauf",
+     "Webshop - Integration",
+     "Provisionsabrechnung"
+    ],
+    "stepModule": [
+     "",
+     "COSMO Advanced Pricing and Discounting",
+     "COSMO Industry Solution",
+     "",
+     "COSMO Industry Solution",
+     "COSMO Industry Solution",
+     "COSMO Rental",
+     "",
+     "",
+     "",
+     "COSMO EDI",
+     "Shopify Connector OR Codeunit Solution",
+     "COSMO Commission"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 1,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.5,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 0.5,
+      "prepare": 2,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 4.5,
+      "build": 0.5,
+      "prepare": 3.5,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.5,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 0.5,
+      "prepare": 2,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 0.5,
+      "prepare": 2,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0.25,
+      "prepare": 0.5,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 4,
+      "prepare": 3,
+      "operate": 2
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 1,
+      "prepare": 1,
+      "operate": 0
+     }
+    ]
+   },
+   {
+    "t": "65.30 Forderungen verwalten",
+    "en": "65.30 Forderungen verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Debitorenbuchhaltung",
+     "Debitorenzahlungen verarbeiten",
+     "Anzahlungsrechnungen auf Basis eines mehrstufigen Zahlplanes erstellen",
+     "Bauabrechnungen nach VOB erstellen",
+     "Mehrstufigen Skonto verwalten",
+     "Verbände",
+     "E-Rechnungen versenden"
+    ],
+    "stepsEN": [
+     "Debitorenbuchhaltung",
+     "Debitorenzahlungen verarbeiten",
+     "Anzahlungsrechnungen auf Basis eines mehrstufigen Zahlplanes erstellen",
+     "Bauabrechnungen nach VOB erstellen",
+     "Mehrstufigen Skonto verwalten",
+     "Verbände",
+     "E-Rechnungen versenden"
+    ],
+    "stepModule": [
+     "",
+     "Continia Banking",
+     "COSMO Advanced Payment",
+     "COSMO Advanced Payment",
+     "Continia Banking",
+     "Continia Finance",
+     "Continia Document Output OR COSMO E-Invoice OR Standard"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.25,
+      "build": 0.25,
+      "prepare": 1,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0.25,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.75,
+      "operate": 0.25
+     }
+    ]
+   },
+   {
+    "t": "65.60 Vertriebsleistung analysieren",
+    "en": "65.60 Vertriebsleistung analysieren",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Vertriebsleistung analysieren"
+    ],
+    "stepsEN": [
+     "Vertriebsleistung analysieren"
+    ],
+    "stepModule": [
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "70-produktionsplanung",
+  "catId": 70,
+  "icon": "🏭",
+  "group": "primary",
+  "nameDE": "70 Produktionsplanung",
+  "nameEN": "70 Produktionsplanung",
+  "intro": "Microsoft Business Process Catalog · End-to-End-Prozess „70 Produktionsplanung“.",
+  "introEN": "Microsoft Business Process Catalog · end-to-end process “70 Produktionsplanung”.",
+  "cosmo": true,
+  "areas": [
+   {
+    "t": "70.10 Produktionsstrategien entwickeln",
+    "en": "70.10 Produktionsstrategien entwickeln",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Standard Produktionsstammdaten",
+     "Prozessfertigung Produktionsstammdaten"
+    ],
+    "stepsEN": [
+     "Standard Produktionsstammdaten",
+     "Prozessfertigung Produktionsstammdaten"
+    ],
+    "stepModule": [
+     "COSMO Industry Solution OR Standard",
+     "COSMO Industry Solution"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 2.5,
+      "build": 2,
+      "prepare": 1,
+      "operate": 2
+     },
+     {
+      "strategize": 0,
+      "initiate": 5,
+      "build": 3,
+      "prepare": 1,
+      "operate": 1
+     }
+    ]
+   },
+   {
+    "t": "70.20 Produktionsabläufe planen",
+    "en": "70.20 Produktionsabläufe planen",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Fertigungsaufträge erstellen",
+     "Fertigungspapiere erstellen",
+     "MRP Lauf",
+     "Gantt Chart visualisieren",
+     "Personalplanung und Einsatzplanung erstellen",
+     "Prozessfertigung Reihenfolgeplanung",
+     "etagis Einplanung",
+     "Taktorientierte Planung (TOP) Plantafel",
+     "Taktorientierte Planung (TOP) Kapazitäten",
+     "Taktorientierte Planung (TOP) Material",
+     "Taktorientierte Planung (TOP) Kennzahlen",
+     "Taktorientierte Planung (TOP) BDE"
+    ],
+    "stepsEN": [
+     "Fertigungsaufträge erstellen",
+     "Fertigungspapiere erstellen",
+     "MRP Lauf",
+     "Gantt Chart visualisieren",
+     "Personalplanung und Einsatzplanung erstellen",
+     "Prozessfertigung Reihenfolgeplanung",
+     "etagis Einplanung",
+     "Taktorientierte Planung (TOP) Plantafel",
+     "Taktorientierte Planung (TOP) Kapazitäten",
+     "Taktorientierte Planung (TOP) Material",
+     "Taktorientierte Planung (TOP) Kennzahlen",
+     "Taktorientierte Planung (TOP) BDE"
+    ],
+    "stepModule": [
+     "COSMO Industry Solution OR Standard",
+     "COSMO Industry Solution OR Standard OR COSMO Document Set",
+     "COSMO Industry Solution OR Standard",
+     "COSMO Industry Solution",
+     "COSMO Industry Solution",
+     "COSMO Industry Solution",
+     "",
+     "COSMO Task-Based Scheduling",
+     "COSMO Task-Based Scheduling",
+     "COSMO Task-Based Scheduling",
+     "COSMO Task-Based Scheduling",
+     "COSMO Task-Based Scheduling"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1,
+      "build": 0.5,
+      "prepare": 0.5,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 1,
+      "build": 0.5,
+      "prepare": 0.25,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 0.25,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.5,
+      "prepare": 0.25,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 3,
+      "prepare": 3,
+      "operate": 2
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 2,
+      "prepare": 4,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 6,
+      "build": 1,
+      "prepare": 6,
+      "operate": 3
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 1,
+      "prepare": 2,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 1,
+      "prepare": 2,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     }
+    ]
+   },
+   {
+    "t": "70.30 Produktionsprozesse durchführen",
+    "en": "70.30 Produktionsprozesse durchführen",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Betriebsdatenerfassung (BDE) über Terminaldialog",
+     "Diskrete Fertigungsaufträge ausführen",
+     "Fremdfertigung",
+     "Prozessfertigung Fertigungsaufträge ausführen",
+     "Prozessfertigung Abfüllung"
+    ],
+    "stepsEN": [
+     "Betriebsdatenerfassung (BDE) über Terminaldialog",
+     "Diskrete Fertigungsaufträge ausführen",
+     "Fremdfertigung",
+     "Prozessfertigung Fertigungsaufträge ausführen",
+     "Prozessfertigung Abfüllung"
+    ],
+    "stepModule": [
+     "COSMO Factory Data Capture OR Power App",
+     "COSMO Industry Solution",
+     "COSMO Industry Solution OR Standard",
+     "COSMO Industry Solution",
+     "COSMO Industry Solution"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 2,
+      "build": 1,
+      "prepare": 2,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.5,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.5,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 0.5,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0.25
+     }
+    ]
+   },
+   {
+    "t": "70.70 Produktionsprozesse analysieren",
+    "en": "70.70 Produktionsprozesse analysieren",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Produktionsprozesse analysieren"
+    ],
+    "stepsEN": [
+     "Produktionsprozesse analysieren"
+    ],
+    "stepModule": [
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "75-beschaffung-bis-zahlungsausgang",
+  "catId": 75,
+  "icon": "🛒",
+  "group": "primary",
+  "nameDE": "75 Beschaffung bis Zahlungsausgang",
+  "nameEN": "75 Beschaffung bis Zahlungsausgang",
+  "intro": "Microsoft Business Process Catalog · End-to-End-Prozess „75 Beschaffung bis Zahlungsausgang“.",
+  "introEN": "Microsoft Business Process Catalog · end-to-end process “75 Beschaffung bis Zahlungsausgang”.",
+  "cosmo": true,
+  "areas": [
+   {
+    "t": "75.30 Lieferantenbeziehungen verwalten",
+    "en": "75.30 Lieferantenbeziehungen verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Lieferantenverwaltung (inkl. Konditionen für Artikel und Leistungen)",
+     "Einkaufspreisverwaltung - Erweitert",
+     "DATANORM-Kataloge einlesen",
+     "Legierungszuschläge verwalten",
+     "Lieferanten bewerten"
+    ],
+    "stepsEN": [
+     "Lieferantenverwaltung (inkl. Konditionen für Artikel und Leistungen)",
+     "Einkaufspreisverwaltung - Erweitert",
+     "DATANORM-Kataloge einlesen",
+     "Legierungszuschläge verwalten",
+     "Lieferanten bewerten"
+    ],
+    "stepModule": [
+     "",
+     "COSMO Advanced Pricing and Discounting",
+     "",
+     "COSMO Alloy Management",
+     "COSMO Vendor Rating"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0,
+      "prepare": 0.5,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 1,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 1,
+      "prepare": 2,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.75,
+      "operate": 0.25
+     }
+    ]
+   },
+   {
+    "t": "75.35 Waren und Dienstleistungen beschaffen und vertraglich binden",
+    "en": "75.35 Waren und Dienstleistungen beschaffen und vertraglich binden",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Lieferantenangebot vergleichen (Preisspiegel)"
+    ],
+    "stepsEN": [
+     "Lieferantenangebot vergleichen (Preisspiegel)"
+    ],
+    "stepModule": [
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.75,
+      "operate": 0.25
+     }
+    ]
+   },
+   {
+    "t": "75.40 Waren und Dienstleistungen beschaffen",
+    "en": "75.40 Waren und Dienstleistungen beschaffen",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Dispositionsparameter für die Wiederbeschaffung verwalten",
+     "Bestellabwicklung",
+     "Einkaufsreklamationen",
+     "Bestellanforderungen",
+     "EDI - Einkauf"
+    ],
+    "stepsEN": [
+     "Dispositionsparameter für die Wiederbeschaffung verwalten",
+     "Bestellabwicklung",
+     "Einkaufsreklamationen",
+     "Bestellanforderungen",
+     "EDI - Einkauf"
+    ],
+    "stepModule": [
+     "",
+     "",
+     "",
+     "COSMO Purchase Requisition",
+     "COSMO EDI"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.5,
+      "prepare": 0.5,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 4.5,
+      "build": 0.5,
+      "prepare": 1.5,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 1,
+      "build": 4,
+      "prepare": 3,
+      "operate": 2
+     }
+    ]
+   },
+   {
+    "t": "75.50 Verbindlichkeiten verwalten",
+    "en": "75.50 Verbindlichkeiten verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Kreditorenbuchhaltung",
+     "Anzahlungsrechnungen auf Basis eines mehrstufigen Zahlplanes erfassen",
+     "Verbände",
+     "Eingangsrechnungen per OCR erfassen",
+     "E-Rechnungen empfangen",
+     "Kreditorenzahlungen erstellen"
+    ],
+    "stepsEN": [
+     "Kreditorenbuchhaltung",
+     "Anzahlungsrechnungen auf Basis eines mehrstufigen Zahlplanes erfassen",
+     "Verbände",
+     "Eingangsrechnungen per OCR erfassen",
+     "E-Rechnungen empfangen",
+     "Kreditorenzahlungen erstellen"
+    ],
+    "stepModule": [
+     "",
+     "COSMO Advanced Payment",
+     "Continia Finance",
+     "Continia Document Capture",
+     "Continia Document Capture OR COSMO E-Invoice OR Standard",
+     "Continia Banking"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 1,
+      "build": 1,
+      "prepare": 2,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0
+     }
+    ]
+   },
+   {
+    "t": "75.80 Beschaffungsprozesse analysieren",
+    "en": "75.80 Beschaffungsprozesse analysieren",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Beschaffungsprozesse analysieren"
+    ],
+    "stepsEN": [
+     "Beschaffungsprozesse analysieren"
+    ],
+    "stepModule": [
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "80-projekt-bis-ergebnis",
+  "catId": 80,
+  "icon": "📊",
+  "group": "primary",
+  "nameDE": "80 Projekt bis Ergebnis",
+  "nameEN": "80 Projekt bis Ergebnis",
+  "intro": "Microsoft Business Process Catalog · End-to-End-Prozess „80 Projekt bis Ergebnis“.",
+  "introEN": "Microsoft Business Process Catalog · end-to-end process “80 Projekt bis Ergebnis”.",
+  "cosmo": true,
+  "areas": [
+   {
+    "t": "80.20 Projektverträge verwalten",
+    "en": "80.20 Projektverträge verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Projektstammdaten verwalten",
+     "Geräte- und Fahrzeuge verwalten"
+    ],
+    "stepsEN": [
+     "Projektstammdaten verwalten",
+     "Geräte- und Fahrzeuge verwalten"
+    ],
+    "stepModule": [
+     "COSMO Industry Solution",
+     "COSMO Industry Solution"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 0.5,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 1,
+      "build": 0.25,
+      "prepare": 0.5,
+      "operate": 0.25
+     }
+    ]
+   },
+   {
+    "t": "80.30 Projekte planen",
+    "en": "80.30 Projekte planen",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Projektstruktur entwickeln (Struktur-, Kosten- & Ergebnisplanung)",
+     "Leistungsverzeichnisstruktur entwickeln (Struktur-, Kosten- & Ergebnisplanung)",
+     "Projekttermin- und Ressourceneinsatzplanung durchführen (tabellarisch & grafisch)"
+    ],
+    "stepsEN": [
+     "Projektstruktur entwickeln (Struktur-, Kosten- & Ergebnisplanung)",
+     "Leistungsverzeichnisstruktur entwickeln (Struktur-, Kosten- & Ergebnisplanung)",
+     "Projekttermin- und Ressourceneinsatzplanung durchführen (tabellarisch & grafisch)"
+    ],
+    "stepModule": [
+     "COSMO Industry Solution",
+     "COSMO Industry Solution",
+     "COSMO Industry Solution"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 4.5,
+      "build": 0.5,
+      "prepare": 3,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 0.5,
+      "prepare": 2,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 1,
+      "prepare": 1,
+      "operate": 1
+     }
+    ]
+   },
+   {
+    "t": "80.40 Projektdurchführung steuern",
+    "en": "80.40 Projektdurchführung steuern",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Projektabwicklung und -rückmeldung",
+     "Bauprojektabwicklung und -rückmeldung",
+     "Digitale Prozesse/Anforderungen auf der Baustelle mit KENEXOS"
+    ],
+    "stepsEN": [
+     "Projektabwicklung und -rückmeldung",
+     "Bauprojektabwicklung und -rückmeldung",
+     "Digitale Prozesse/Anforderungen auf der Baustelle mit KENEXOS"
+    ],
+    "stepModule": [
+     "COSMO Industry Solution",
+     "COSMO Industry Solution",
+     "KENEXOS"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 6,
+      "build": 0.5,
+      "prepare": 2,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 0.5,
+      "prepare": 2,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 6,
+      "build": 1,
+      "prepare": 1,
+      "operate": 1
+     }
+    ]
+   },
+   {
+    "t": "80.50 Projektfinanzen verwalten",
+    "en": "80.50 Projektfinanzen verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Projektabrechnung mittels Rechnungslauf vorbereiten",
+     "Bauprojektabrechnung vorbereiten"
+    ],
+    "stepsEN": [
+     "Projektabrechnung mittels Rechnungslauf vorbereiten",
+     "Bauprojektabrechnung vorbereiten"
+    ],
+    "stepModule": [
+     "COSMO Industry Solution",
+     "COSMO Industry Solution"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.25,
+      "prepare": 0.5,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 1,
+      "operate": 0.5
+     }
+    ]
+   },
+   {
+    "t": "80.60 Projektergebnisse analysieren",
+    "en": "80.60 Projektergebnisse analysieren",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Projektcontrolling",
+     "Bauprojektcontrolling"
+    ],
+    "stepsEN": [
+     "Projektcontrolling",
+     "Bauprojektcontrolling"
+    ],
+    "stepModule": [
+     "COSMO Industry Solution",
+     "COSMO Industry Solution"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0,
+      "prepare": 1,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0,
+      "prepare": 1,
+      "operate": 0.5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "85-interessent-bis-angebot",
+  "catId": 85,
+  "icon": "🎯",
+  "group": "primary",
+  "nameDE": "85 Interessent bis Angebot",
+  "nameEN": "85 Interessent bis Angebot",
+  "intro": "Microsoft Business Process Catalog · End-to-End-Prozess „85 Interessent bis Angebot“.",
+  "introEN": "Microsoft Business Process Catalog · end-to-end process “85 Interessent bis Angebot”.",
+  "cosmo": true,
+  "areas": [
+   {
+    "t": "85.20 Kundenbeziehungen pflegen",
+    "en": "85.20 Kundenbeziehungen pflegen",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Unternehmens- und Personenkontakte verwalten",
+     "Erweiterte Kundenverwaltung (Kontingente, Liefereinschränken)",
+     "CTI",
+     "DSGVO",
+     "Sanktionslistenprüfung"
+    ],
+    "stepsEN": [
+     "Unternehmens- und Personenkontakte verwalten",
+     "Erweiterte Kundenverwaltung (Kontingente, Liefereinschränken)",
+     "CTI",
+     "DSGVO",
+     "Sanktionslistenprüfung"
+    ],
+    "stepModule": [
+     "",
+     "",
+     "Simova Phone Connect",
+     "GDPR Toolbox",
+     "Comsol Sanscreen"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.25,
+      "prepare": 0.5,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 1,
+      "prepare": 1,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0.25,
+      "prepare": 0.5,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0.5,
+      "prepare": 1,
+      "operate": 0
+     }
+    ]
+   },
+   {
+    "t": "85.50 Verkaufschancen verfolgen",
+    "en": "85.50 Verkaufschancen verfolgen",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Verkaufschancen verwalten"
+    ],
+    "stepsEN": [
+     "Verkaufschancen verwalten"
+    ],
+    "stepModule": [
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.5,
+      "operate": 0
+     }
+    ]
+   },
+   {
+    "t": "85.60 Angebote kalkulieren und erstellen",
+    "en": "85.60 Angebote kalkulieren und erstellen",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Angebotserstellung (Standardartikel und -leistungen)",
+     "Angebotserstellung (Konfiguration)",
+     "Angebotserstellung (Konfiguration + MatiCon Advanced)",
+     "Angebotserstellung (Konfiguration + MatiCon Premium)",
+     "Angebotserstellung (Projekte)",
+     "Angebotserstellung (Mietgeschäft)",
+     "Angebotserstellung (Subscriptions)"
+    ],
+    "stepsEN": [
+     "Angebotserstellung (Standardartikel und -leistungen)",
+     "Angebotserstellung (Konfiguration)",
+     "Angebotserstellung (Konfiguration + MatiCon Advanced)",
+     "Angebotserstellung (Konfiguration + MatiCon Premium)",
+     "Angebotserstellung (Projekte)",
+     "Angebotserstellung (Mietgeschäft)",
+     "Angebotserstellung (Subscriptions)"
+    ],
+    "stepModule": [
+     "",
+     "COSMO Industry Solution",
+     "COSMO Graphical Configurator",
+     "COSMO Graphical Configurator",
+     "COSMO Industry Solution",
+     "COSMO Rental",
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 0.5,
+      "prepare": 2,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 4.5,
+      "build": 0.5,
+      "prepare": 3.5,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 4.5,
+      "build": 3,
+      "prepare": 4,
+      "operate": 2
+     },
+     {
+      "strategize": 0,
+      "initiate": 6,
+      "build": 4,
+      "prepare": 5,
+      "operate": 2
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.5,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 0.5,
+      "prepare": 2,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 0.5,
+      "prepare": 2,
+      "operate": 0.5
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "90-buchung-bis-bericht",
+  "catId": 90,
+  "icon": "📒",
+  "group": "support",
+  "nameDE": "90 Buchung bis Bericht",
+  "nameEN": "90 Buchung bis Bericht",
+  "intro": "Microsoft Business Process Catalog · End-to-End-Prozess „90 Buchung bis Bericht“.",
+  "introEN": "Microsoft Business Process Catalog · end-to-end process “90 Buchung bis Bericht”.",
+  "cosmo": true,
+  "areas": [
+   {
+    "t": "90.10 Rechnungslegungsrichtlinien definieren",
+    "en": "90.10 Rechnungslegungsrichtlinien definieren",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Finanzstammdaten verwalten"
+    ],
+    "stepsEN": [
+     "Finanzstammdaten verwalten"
+    ],
+    "stepModule": [
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 1.5,
+      "operate": 0.5
+     }
+    ]
+   },
+   {
+    "t": "90.25 Liquidität verwalten",
+    "en": "90.25 Liquidität verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Liquiditätsprognose",
+     "Mandantenübergreifende Liquiditätsprognose (Treasury)"
+    ],
+    "stepsEN": [
+     "Liquiditätsprognose",
+     "Mandantenübergreifende Liquiditätsprognose (Treasury)"
+    ],
+    "stepModule": [
+     "",
+     "Continia Finance"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 0.75,
+      "operate": 0.25
+     }
+    ]
+   },
+   {
+    "t": "90.30 Budgets verwalten",
+    "en": "90.30 Budgets verwalten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Jahresplanung erstellen und überwachen"
+    ],
+    "stepsEN": [
+     "Jahresplanung erstellen und überwachen"
+    ],
+    "stepModule": [
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.5,
+      "operate": 0.25
+     }
+    ]
+   },
+   {
+    "t": "90.50 Finanztransaktionen buchen",
+    "en": "90.50 Finanztransaktionen buchen",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Sachbuchungen",
+     "OP-geführte Sachkonten verwalten",
+     "Lohndaten aus Vorsystem (z. B. DATEV LODAS) übernehmen",
+     "Kostenstellenrechnung",
+     "Kostenträgerrechnung"
+    ],
+    "stepsEN": [
+     "Sachbuchungen",
+     "OP-geführte Sachkonten verwalten",
+     "Lohndaten aus Vorsystem (z. B. DATEV LODAS) übernehmen",
+     "Kostenstellenrechnung",
+     "Kostenträgerrechnung"
+    ],
+    "stepModule": [
+     "",
+     "",
+     "",
+     "CKL Kostenrechnung 365",
+     "CKL Kostenrechnung 365"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.25,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.25,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 1,
+      "prepare": 2,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 1,
+      "prepare": 2,
+      "operate": 1
+     }
+    ]
+   },
+   {
+    "t": "90.60 Finanzperioden abschließen",
+    "en": "90.60 Finanzperioden abschließen",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Abschlussarbeiten",
+     "Belege, die mehr als eine Umsatz Steuer ID haben, abwickeln",
+     "Betriebsergebnis nach dem Gesamtkostenverfahren ermitteln",
+     "Umsatzsteuerliche Organschaft abbilden",
+     "Mehrere UST-IDs abbilden",
+     "Zusammenfassende Meldung erstellen",
+     "Intrastatmeldung erstellen",
+     "Lagerbestand ermitteln und bewerten",
+     "Umlaufbestand von Projekten (WIP) ermitteln und bewerten",
+     "Daten an DATEV übergeben",
+     "Daten aus DATEV übernehmen",
+     "E-Bilanz erstellen und übermitteln",
+     "Konsolidierung"
+    ],
+    "stepsEN": [
+     "Abschlussarbeiten",
+     "Belege, die mehr als eine Umsatz Steuer ID haben, abwickeln",
+     "Betriebsergebnis nach dem Gesamtkostenverfahren ermitteln",
+     "Umsatzsteuerliche Organschaft abbilden",
+     "Mehrere UST-IDs abbilden",
+     "Zusammenfassende Meldung erstellen",
+     "Intrastatmeldung erstellen",
+     "Lagerbestand ermitteln und bewerten",
+     "Umlaufbestand von Projekten (WIP) ermitteln und bewerten",
+     "Daten an DATEV übergeben",
+     "Daten aus DATEV übernehmen",
+     "E-Bilanz erstellen und übermitteln",
+     "Konsolidierung"
+    ],
+    "stepModule": [
+     "",
+     "COSMO Intra-Community Taxation",
+     "COSMO Period Costing",
+     "Continia Finance - Erweiterte Berichte",
+     "COSMO VAT ID",
+     "",
+     "",
+     "",
+     "COSMO Industry Solutions",
+     "SIEVERS DATEV",
+     "SIEVERS DATEV",
+     "COSMO E-Balance",
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.5,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.5,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.5,
+      "build": 0.25,
+      "prepare": 0,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0.25,
+      "prepare": 0.25,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0.25,
+      "prepare": 0.5,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0.5,
+      "prepare": 0.5,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 1,
+      "build": 0.5,
+      "prepare": 0.5,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.5,
+      "prepare": 0.5,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.25,
+      "prepare": 0.75,
+      "operate": 0.25
+     }
+    ]
+   },
+   {
+    "t": "90.70 Finanzleistung analysieren",
+    "en": "90.70 Finanzleistung analysieren",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Finanzleistung analysieren"
+    ],
+    "stepsEN": [
+     "Finanzleistung analysieren"
+    ],
+    "stepModule": [
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "95-service-bis-zahlungseingang",
+  "catId": 95,
+  "icon": "🔧",
+  "group": "primary",
+  "nameDE": "95 Service bis Zahlungseingang",
+  "nameEN": "95 Service bis Zahlungseingang",
+  "intro": "Microsoft Business Process Catalog · End-to-End-Prozess „95 Service bis Zahlungseingang“.",
+  "introEN": "Microsoft Business Process Catalog · end-to-end process “95 Service bis Zahlungseingang”.",
+  "cosmo": true,
+  "areas": [
+   {
+    "t": "95.15 Serviceeinsätze planen",
+    "en": "95.15 Serviceeinsätze planen",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Serviceeinsatzplanung",
+     "Grafische Serviceeinsatzplanung (Dime-Scheduler)"
+    ],
+    "stepsEN": [
+     "Serviceeinsatzplanung",
+     "Grafische Serviceeinsatzplanung (Dime-Scheduler)"
+    ],
+    "stepModule": [
+     "",
+     "Dime.Scheduler"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.25,
+      "prepare": 1,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 3,
+      "build": 2,
+      "prepare": 5,
+      "operate": 1
+     }
+    ]
+   },
+   {
+    "t": "95.25 Serviceaufträge bearbeiten",
+    "en": "95.25 Serviceaufträge bearbeiten",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Serviceauftragsabwicklung (Standard)",
+     "Erweiterte Serviceprozesse (RMA, Ersatzteilwesen, Instandhaltung, Serivcechecklisten)"
+    ],
+    "stepsEN": [
+     "Serviceauftragsabwicklung (Standard)",
+     "Erweiterte Serviceprozesse (RMA, Ersatzteilwesen, Instandhaltung, Serivcechecklisten)"
+    ],
+    "stepModule": [
+     "",
+     "COSMO Industry Solution"
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 6,
+      "build": 1,
+      "prepare": 4,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 0.5,
+      "prepare": 0.5,
+      "operate": 0.25
+     }
+    ]
+   },
+   {
+    "t": "95.35 Serviceleistungen erbringen",
+    "en": "95.35 Serviceleistungen erbringen",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Serviceleistungen erfassen (Handyman)",
+     "Serviceleistungen erfassen (Dynamics 365 Field Service)"
+    ],
+    "stepsEN": [
+     "Serviceleistungen erfassen (Handyman)",
+     "Serviceleistungen erfassen (Dynamics 365 Field Service)"
+    ],
+    "stepModule": [
+     "Handyman Field-Service Management",
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     }
+    ]
+   },
+   {
+    "t": "95.45 Serviceleistung analysieren",
+    "en": "95.45 Serviceleistung analysieren",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Serviceleistung analysieren"
+    ],
+    "stepsEN": [
+     "Serviceleistung analysieren"
+    ],
+    "stepModule": [
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "99-verwalten-bis-betrieb",
+  "catId": 99,
+  "icon": "🛡️",
+  "group": "support",
+  "nameDE": "99 Verwalten bis Betrieb",
+  "nameEN": "99 Verwalten bis Betrieb",
+  "intro": "Microsoft Business Process Catalog · End-to-End-Prozess „99 Verwalten bis Betrieb“.",
+  "introEN": "Microsoft Business Process Catalog · end-to-end process “99 Verwalten bis Betrieb”.",
+  "cosmo": true,
+  "areas": [
+   {
+    "t": "99.20 Systemfunktionen administrieren",
+    "en": "99.20 Systemfunktionen administrieren",
+    "hint": "",
+    "hintEN": "",
+    "bc": [],
+    "steps": [
+     "Dokumentenverwaltung (SharePoint)",
+     "Revisionssichere Dokumentenverwaltung (SharePoint)",
+     "Externes Dokumentenverwaltung anbinden (z. B. DocuWare)",
+     "Intercompany (Belegaustausch)",
+     "Intercompany (Stammdaten)",
+     "Workflow-Management (Belege, Stammdaten, …)",
+     "Power BI Unterstützungskontingent",
+     "Power BI für Finanzen",
+     "Power BI für Offene Posten",
+     "Power BI für Verkauf",
+     "Power BI für Einkauf",
+     "Power BI für Produktion",
+     "Power BI für Lager",
+     "Power BI für COSMO Projekt"
+    ],
+    "stepsEN": [
+     "Dokumentenverwaltung (SharePoint)",
+     "Revisionssichere Dokumentenverwaltung (SharePoint)",
+     "Externes Dokumentenverwaltung anbinden (z. B. DocuWare)",
+     "Intercompany (Belegaustausch)",
+     "Intercompany (Stammdaten)",
+     "Workflow-Management (Belege, Stammdaten, …)",
+     "Power BI Unterstützungskontingent",
+     "Power BI für Finanzen",
+     "Power BI für Offene Posten",
+     "Power BI für Verkauf",
+     "Power BI für Einkauf",
+     "Power BI für Produktion",
+     "Power BI für Lager",
+     "Power BI für COSMO Projekt"
+    ],
+    "stepModule": [
+     "COSMO Document Management System",
+     "",
+     "COSMO DMS Connector",
+     "COSMO Interconpany OR Standard",
+     "COSMO Interconpany OR Standard",
+     "COSMO Workflow OR Standard",
+     "",
+     "",
+     "",
+     "",
+     "",
+     "",
+     "",
+     ""
+    ],
+    "stepEffort": [
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 3,
+      "prepare": 2.5,
+      "operate": 1
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0,
+      "build": 0,
+      "prepare": 0,
+      "operate": 0
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 1,
+      "prepare": 2,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.75,
+      "build": 1,
+      "prepare": 2,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 2.5,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 1.5,
+      "build": 0.5,
+      "prepare": 2.5,
+      "operate": 0.5
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.5,
+      "build": 0.5,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.5,
+      "build": 0.5,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.5,
+      "build": 0.5,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.5,
+      "build": 0.5,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.5,
+      "build": 0.5,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.5,
+      "build": 0.5,
+      "prepare": 0.75,
+      "operate": 0.25
+     },
+     {
+      "strategize": 0,
+      "initiate": 0.5,
+      "build": 0.5,
+      "prepare": 0.75,
+      "operate": 0.25
+     }
+    ]
+   }
+  ]
+ }
+]

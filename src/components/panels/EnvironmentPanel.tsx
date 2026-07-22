@@ -17,6 +17,13 @@ import {
   parseMbpcWorkbook,
   saveMbpcCatalog,
 } from '../../lib/mbpcCatalog'
+import {
+  clearCosmoStandard,
+  hasImportedCosmoStandard,
+  loadCosmoStandardMeta,
+  parseCosmoMbpcWorkbook,
+  type CosmoStandardMeta,
+} from '../../lib/cosmoMbpc'
 import type { LicenseCatalog, LicenseCatalogItem, MbpcCatalog } from '../../types'
 import { PanelTitle } from './ProspectPanel'
 
@@ -34,6 +41,35 @@ export function EnvironmentPanel() {
   const [mbpcImporting, setMbpcImporting] = useState(false)
   const [mbpcError, setMbpcError] = useState<string | null>(null)
   const mbpcFileRef = useRef<HTMLInputElement>(null)
+
+  const [cosmoStd, setCosmoStd] = useState<{ meta: CosmoStandardMeta; imported: boolean }>(() => ({
+    meta: loadCosmoStandardMeta(),
+    imported: hasImportedCosmoStandard(),
+  }))
+  const [cosmoStdImporting, setCosmoStdImporting] = useState(false)
+  const [cosmoStdError, setCosmoStdError] = useState<string | null>(null)
+  const cosmoStdFileRef = useRef<HTMLInputElement>(null)
+
+  async function onImportCosmoStd(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setCosmoStdImporting(true)
+    setCosmoStdError(null)
+    try {
+      const { meta } = await parseCosmoMbpcWorkbook(file)
+      setCosmoStd({ meta, imported: true })
+    } catch (err) {
+      setCosmoStdError(err instanceof Error ? err.message : t('import_failed'))
+    } finally {
+      setCosmoStdImporting(false)
+    }
+  }
+
+  function resetCosmoStd() {
+    clearCosmoStandard()
+    setCosmoStd({ meta: loadCosmoStandardMeta(), imported: false })
+  }
 
   async function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -148,6 +184,57 @@ export function EnvironmentPanel() {
             </>
           ) : (
             t('no_pricelist')
+          )}
+        </div>
+      </div>
+
+      {/* COSMO Standard-MBPC (Prozesskatalog · Pakete, Module, SbD-Aufwände) – Import-Schnittstelle */}
+      <div className="cc-card p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2 text-sm font-bold text-cosmo-anthracite">
+              📚 {t('cosmo_std_title')}
+            </div>
+            <div className="mt-0.5 max-w-2xl text-xs text-slate-400">{t('cosmo_std_intro')}</div>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              ref={cosmoStdFileRef}
+              type="file"
+              accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              className="hidden"
+              onChange={onImportCosmoStd}
+            />
+            <button
+              className="cc-btn-gold"
+              onClick={() => cosmoStdFileRef.current?.click()}
+              disabled={cosmoStdImporting}
+            >
+              ⭳ {cosmoStdImporting ? '…' : t('cosmo_std_import')}
+            </button>
+            {cosmoStd.imported && (
+              <button className="cc-btn-ghost" onClick={resetCosmoStd}>
+                {t('cosmo_std_reset')}
+              </button>
+            )}
+          </div>
+        </div>
+        {cosmoStdError && <div className="mt-2 text-xs font-semibold text-rose-500">{cosmoStdError}</div>}
+        <div className="mt-2 text-xs text-slate-500">
+          <b className={cosmoStd.imported ? 'text-cosmo-gold-dark' : 'text-cosmo-anthracite'}>
+            {cosmoStd.imported ? t('cosmo_std_imported') : t('cosmo_std_bundled')}
+          </b>
+          {' · '}
+          <b className="text-cosmo-anthracite">{cosmoStd.meta.processCount}</b> {t('mbpc_processes')} ·{' '}
+          <b className="text-cosmo-anthracite">{cosmoStd.meta.areaCount}</b> {t('mbpc_areas')} ·{' '}
+          <b className="text-cosmo-anthracite">{cosmoStd.meta.packageCount}</b> {t('cosmo_std_packages')} ·{' '}
+          <b className="text-cosmo-gold-dark">{cosmoStd.meta.moduleCount}</b> {t('cosmo_std_modules')}
+          {cosmoStd.imported && (
+            <>
+              {' · '}
+              {cosmoStd.meta.fileName} · {t('imported_on')}{' '}
+              {new Date(cosmoStd.meta.importedAt).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-GB')}
+            </>
           )}
         </div>
       </div>

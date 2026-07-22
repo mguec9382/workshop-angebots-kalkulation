@@ -2,6 +2,7 @@ import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
 import { PRODUCT_POOL, featureKey } from '../../data/catalog'
 import { catalogForEnvironment } from '../../lib/mbpcCatalog'
+import { stepModulesFor } from '../../lib/cosmoMbpc'
 import { activeEnvironment, effectiveFeatureScope } from '../../lib/calc'
 import { EnvSelector } from '../EnvSelector'
 import { PanelTitle } from './ProspectPanel'
@@ -17,6 +18,7 @@ export function MappingPanel() {
   const { state, update } = useStore()
   const env = activeEnvironment(state)
   const scope = env?.scope
+  const catalog = env ? catalogForEnvironment(env) : []
 
   function toggleProduct(key: string, productId: string) {
     update((d) => {
@@ -31,14 +33,18 @@ export function MappingPanel() {
 
   const rows = !scope
     ? []
-    : catalogForEnvironment(env).map((proc) => {
-        const items: { key: string; label: string }[] = []
+    : catalog.map((proc) => {
+        const items: { key: string; label: string; modules: string[] }[] = []
         proc.areas.forEach((area, areaIdx) => {
           area.steps.forEach((label, stepIdx) => {
             const key = featureKey(proc.id, areaIdx, stepIdx)
             if (!scope.feature[key]) return
             if (effectiveFeatureScope(scope, proc.id, areaIdx, stepIdx) !== 'in') return
-            items.push({ key, label: lang === 'de' ? label : area.stepsEN[stepIdx] || label })
+            items.push({
+              key,
+              label: lang === 'de' ? label : area.stepsEN[stepIdx] || label,
+              modules: stepModulesFor(catalog, proc.id, areaIdx, stepIdx),
+            })
           })
         })
         return { proc, items }
@@ -54,6 +60,9 @@ export function MappingPanel() {
         <span className={`rounded border px-2 py-1 ${VENDOR_STYLE.microsoft}`}>Microsoft</span>
         <span className={`rounded border px-2 py-1 ${VENDOR_STYLE.cosmo}`}>COSMO CONSULT</span>
         <span className={`rounded border px-2 py-1 ${VENDOR_STYLE.thirdparty}`}>Third-Party</span>
+        <span className="rounded border border-cosmo-gold/50 bg-cosmo-gold/15 px-2 py-1 font-semibold text-cosmo-gold-dark">
+          ✓ {t('mapping_module_legend')}
+        </span>
       </div>
 
       {rows.length === 0 && (
@@ -69,11 +78,26 @@ export function MappingPanel() {
             <span className="font-bold text-cosmo-anthracite">{lang === 'de' ? proc.nameDE : proc.nameEN}</span>
           </div>
           <div className="divide-y divide-slate-50">
-            {items.map(({ key, label }) => {
+            {items.map(({ key, label, modules }) => {
               const fs = scope!.feature[key]!
               return (
-                <div key={key} className="flex flex-col gap-2 px-4 py-3 md:flex-row md:items-center">
-                  <div className="w-full text-sm font-medium text-slate-700 md:w-64 md:shrink-0">{label}</div>
+                <div key={key} className="flex flex-col gap-2 px-4 py-3 md:flex-row md:items-start">
+                  <div className="w-full text-sm font-medium text-slate-700 md:w-64 md:shrink-0">
+                    {label}
+                    {modules.length > 0 && (
+                      <div className="mt-1.5 flex flex-wrap gap-1">
+                        {modules.map((m) => (
+                          <span
+                            key={m}
+                            className="inline-flex items-center gap-1 rounded border border-cosmo-gold/50 bg-cosmo-gold/15 px-1.5 py-0.5 text-[11px] font-semibold text-cosmo-gold-dark"
+                            title={t('mapping_module_hint')}
+                          >
+                            ✓ {m}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   <div className="flex flex-wrap gap-1.5">
                     {PRODUCT_POOL.map((prod) => {
                       const on = fs.products.includes(prod.id)

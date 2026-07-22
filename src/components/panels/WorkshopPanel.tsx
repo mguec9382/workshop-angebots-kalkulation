@@ -3,6 +3,7 @@ import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
 import { ARCHETYPES, GROUP_LABEL, archetypeById, areaKey, featureKey, industryOverlay } from '../../data/catalog'
 import { catalogForEnvironment } from '../../lib/mbpcCatalog'
+import { stepEffortFor } from '../../lib/cosmoMbpc'
 import { activeEnvironment, effectiveFeatureScope } from '../../lib/calc'
 import { defaultFeatureEffort, isEffortEmpty } from '../../data/seed'
 import { ScopeSegment } from '../ScopeSegment'
@@ -37,7 +38,10 @@ export function WorkshopPanel() {
   const scope: ScopeState = env.scope
   const catalog = catalogForEnvironment(env)
   const arch = archetypeById(env.archetypeId)
-  const relevant = env.catalogSource === 'mbpc' ? null : arch.procs
+  // Archetyp-Fokus nur, wenn die Archetyp-Prozess-IDs zum aktiven Katalog passen
+  // (der COSMO-Standard-MBPC nutzt eigene Prozess-IDs).
+  const relevant =
+    arch.procs && catalog.some((p) => arch.procs!.includes(p.id)) ? arch.procs : null
   const overlaySet = new Set(
     industryOverlay(
       state.prospect.industryId,
@@ -67,14 +71,19 @@ export function WorkshopPanel() {
     mutateScope((e) => {
       const key = featureKey(processId, areaIdx, stepIdx)
       const existing = e.scope.feature[key]
+      // SbD-Vorschlagsaufwand des Pakets (COSMO-MBPC); Fallback = generische Vorlage
+      const seedEffort = () => {
+        const eff = stepEffortFor(catalog, processId, areaIdx, stepIdx)
+        return eff ? { ...eff } : defaultFeatureEffort()
+      }
       if (existing) {
         existing.scope = v
         // Standard-Aufwandsvorlage anwenden, wenn Feature aufgenommen wird und noch kein Aufwand erfasst ist
-        if (v === 'in' && isEffortEmpty(existing.effort)) existing.effort = defaultFeatureEffort()
+        if (v === 'in' && isEffortEmpty(existing.effort)) existing.effort = seedEffort()
       } else {
         e.scope.feature[key] = {
           scope: v,
-          effort: v === 'in' ? defaultFeatureEffort() : { strategize: 0, initiate: 0, build: 0, prepare: 0, operate: 0 },
+          effort: v === 'in' ? seedEffort() : { strategize: 0, initiate: 0, build: 0, prepare: 0, operate: 0 },
           products: [],
           standard: true,
         }

@@ -27,6 +27,10 @@ export interface CatalogArea {
   bc: string[]
   steps: string[]
   stepsEN: string[]
+  /** je Paket das zugeordnete Modul (Lizenzierung) aus dem COSMO-MBPC; leer = Business-Central-Standard */
+  stepModule?: string[]
+  /** je Paket der Success-by-Design-Vorschlagsaufwand (Personentage je Phase) aus dem COSMO-MBPC */
+  stepEffort?: PhaseEffort[]
 }
 
 export interface CatalogProcess {

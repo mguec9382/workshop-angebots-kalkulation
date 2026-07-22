@@ -8,7 +8,7 @@ import type {
   MbpcWorkload,
   ProjectState,
 } from '../types'
-import { CATALOG } from '../data/catalog'
+import { loadCosmoStandardCatalog } from './cosmoMbpc'
 import { translateMbpcTitle } from './mbpcTranslations'
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -399,7 +399,7 @@ export function catalogForEnvironment(env: Environment | undefined): CatalogProc
       return _memoResult
     }
   }
-  return CATALOG
+  return loadCosmoStandardCatalog()
 }
 
 /** Vereinigte Prozessliste über alle Environments (für die aggregierte Zusammenfassung). */
@@ -414,5 +414,5 @@ export function catalogsForState(state: ProjectState): CatalogProcess[] {
       }
     }
   }
-  return out.length ? out : CATALOG
+  return out.length ? out : loadCosmoStandardCatalog()
 }
