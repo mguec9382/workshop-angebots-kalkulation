@@ -37,10 +37,145 @@ interface StoredCosmoStandard {
 
 const BUNDLED_CATALOG = bundled as unknown as CatalogProcess[]
 
+/* ---------- Fest integrierter Life-Science-Prozess ----------
+   „Validierung & Compliance" ist ein COSMO-Kernprozess für regulierte
+   Industrien (Pharma, MedTech, Life Sciences, Chemie, Food). Er ist NICHT
+   Teil der Microsoft-MBPC-Excel-Vorlage und wird daher fest ergänzt – auch
+   nach einem Re-Import bleibt er im Standard-Katalog erhalten. Die
+   Prozess-ID „quality-to-compliance" entspricht dem Branchen-Overlay, damit
+   die Vorbelegung nach Branche (Life Science) den Prozess automatisch
+   markiert. */
+const LS_EFFORT: PhaseEffort = { strategize: 0, initiate: 0.5, build: 1.5, prepare: 0.5, operate: 0.25 }
+
+interface LsAreaDef {
+  t: string
+  en: string
+  hint: string
+  hintEN: string
+  bc: string[]
+  steps: string[]
+  stepsEN: string[]
+  module: string
+}
+
+const LS_AREAS: LsAreaDef[] = [
+  {
+    t: 'Wareneingangs- & Qualitätsprüfung',
+    en: 'Incoming and quality inspection',
+    hint: 'Prüfpläne, Prüfmerkmale und Frage-/Antwort-Vorlagen für Wareneingang, Prozess und Fertigung definieren und QC-Tests durchführen.',
+    hintEN: 'Define inspection plans, characteristics and Q&A templates for incoming, process and production and run QC tests.',
+    bc: ['COSMO Quality Assurance', 'Quality Check (Prüfvorlagen)', 'QC-Setup', 'Prüflose'],
+    module: 'COSMO Quality Assurance',
+    steps: ['Prüfplan & Prüfmerkmale definieren', 'Prüfvorlage (Q&A) zuordnen', 'QC-Test bei Wareneingang/Fertigung anlegen', 'Prüfergebnisse erfassen', 'Prüfentscheid dokumentieren'],
+    stepsEN: ['Define inspection plan & characteristics', 'Assign inspection template (Q&A)', 'Create QC test at receipt/production', 'Record inspection results', 'Document inspection decision'],
+  },
+  {
+    t: 'Sperr-, Quarantäne- & Freigabesteuerung',
+    en: 'Quarantine and release control',
+    hint: 'Bestände über QC-Status sperren, in Quarantäne legen oder freigeben; Verwendungsentscheid und Chargenfreigabe dokumentieren.',
+    hintEN: 'Block, quarantine or release stock via QC status; document usage decision and batch release.',
+    bc: ['QC-Status', 'Quarantäne / Sperrbestand', 'Verwendungsentscheid', 'Chargenfreigabe'],
+    module: 'COSMO Quality Assurance',
+    steps: ['QC-Status einrichten', 'Ware in Quarantäne buchen', 'Charge bewerten', 'Verwendungsentscheid treffen', 'Charge freigeben oder sperren'],
+    stepsEN: ['Set up QC status', 'Post goods to quarantine', 'Assess batch', 'Make usage decision', 'Release or block batch'],
+  },
+  {
+    t: 'Chargenrückverfolgung & UDI',
+    en: 'Batch traceability and UDI',
+    hint: 'Lückenlose Chargen-/Los-Rückverfolgung, UDI-Kennzeichnung sowie Haltbarkeit und Restlaufzeit (MHD) in Planung und Logistik.',
+    hintEN: 'Full batch/lot traceability, UDI labeling and shelf life / remaining life (expiry) in planning and logistics.',
+    bc: ['Batch Tracking', 'Los-/Chargenverfolgung', 'UDI-Kennzeichnung', 'Restlaufzeit / MHD (MRP)'],
+    module: 'COSMO Batch Tracking',
+    steps: ['Chargen-/Los-Nummern vergeben', 'UDI-Kennzeichnung erzeugen', 'Vorwärts-/Rückwärtsverfolgung', 'Restlaufzeit / MHD überwachen', 'Rückruf simulieren'],
+    stepsEN: ['Assign batch/lot numbers', 'Generate UDI labeling', 'Forward/backward tracing', 'Monitor remaining life / expiry', 'Simulate recall'],
+  },
+  {
+    t: 'Abweichungs-, Reklamations- & CAPA-Management',
+    en: 'Deviation, complaint and CAPA management',
+    hint: 'Abweichungen, Out-of-Spec-Fälle und Reklamationen erfassen, Ursachen analysieren und Korrektur-/Vorbeugemaßnahmen (CAPA) steuern.',
+    hintEN: 'Record deviations, out-of-spec cases and complaints, analyze root causes and steer corrective/preventive actions (CAPA).',
+    bc: ['COSMO Quality Management Pack', 'Incident: Abweichung / Out of Spec', 'Reklamation (Complaint)', 'CAPA', 'Webcon Connector'],
+    module: 'COSMO Quality Management Pack',
+    steps: ['Abweichung / Out of Spec erfassen', 'Reklamation aufnehmen', 'Ursachenanalyse (Root Cause)', 'CAPA definieren & umsetzen', 'Wirksamkeit prüfen & abschließen'],
+    stepsEN: ['Record deviation / out of spec', 'Log complaint', 'Root cause analysis', 'Define & implement CAPA', 'Verify effectiveness & close'],
+  },
+  {
+    t: 'Änderungslenkung (Change Control)',
+    en: 'Change control',
+    hint: 'Änderungsanträge stellen, Auswirkungen und Risiken bewerten, genehmigen und die kontrollierte Umsetzung nachweisen.',
+    hintEN: 'Raise change requests, assess impact and risk, approve and evidence controlled implementation.',
+    bc: ['Change Control (QMP)', 'Genehmigungsworkflow', 'Risiko- & Impact-Bewertung'],
+    module: 'COSMO Quality Management Pack',
+    steps: ['Änderungsantrag stellen', 'Impact- & Risikobewertung', 'Änderung genehmigen', 'Umsetzung steuern', 'Änderung dokumentieren'],
+    stepsEN: ['Raise change request', 'Impact & risk assessment', 'Approve change', 'Steer implementation', 'Document change'],
+  },
+  {
+    t: 'Dokumentenlenkung & Schulung',
+    en: 'Document control and training',
+    hint: 'Gelenkte SOPs und Dokumente über den vollen Lebenszyklus inkl. Schulungsnachweis – GAMP-5-konform.',
+    hintEN: 'Controlled SOPs and documents across the full lifecycle incl. training records – GAMP 5 compliant.',
+    bc: ['Document Control (cDMS)', 'GAMP 5 / GxP', 'Elektronische Signatur', 'Schulungsmanagement', 'COSMO Workflow'],
+    module: 'COSMO Document Control (cDMS)',
+    steps: ['SOP / Dokument erstellen', 'Review- & Freigabeworkflow', 'Elektronische Signatur', 'Versionierung & Archivierung', 'Schulung zuweisen & nachweisen'],
+    stepsEN: ['Create SOP / document', 'Review & approval workflow', 'Electronic signature', 'Versioning & archiving', 'Assign & evidence training'],
+  },
+  {
+    t: 'Regulatory Affairs & Marktzulassung',
+    en: 'Regulatory affairs and market approval',
+    hint: 'Regulatorische Anforderungen, technische Dokumentation, Konformitätsbewertung sowie Zulassungen, Registrierungen und Kennzeichnung verwalten.',
+    hintEN: 'Manage regulatory requirements, technical documentation, conformity assessment and approvals, registrations and labeling.',
+    bc: ['COSMO Regulatory Affairs', 'Technische Dokumentation', 'Konformitätsbewertung', 'Labeling'],
+    module: 'COSMO Regulatory Affairs',
+    steps: ['Regulatorische Anforderungen erfassen', 'Technische Dokumentation pflegen', 'Konformität bewerten', 'Zulassung / Registrierung verwalten', 'Kennzeichnung & Labeling freigeben'],
+    stepsEN: ['Capture regulatory requirements', 'Maintain technical documentation', 'Assess conformity', 'Manage approval / registration', 'Release labeling'],
+  },
+  {
+    t: 'Audit, Inspektion & Systemvalidierung',
+    en: 'Audit, inspection and computer system validation',
+    hint: 'Audits und Inspektionen planen und durchführen, Findings und Maßnahmen verfolgen sowie die computergestützte Systemvalidierung (CSV) sicherstellen.',
+    hintEN: 'Plan and run audits and inspections, track findings and actions and ensure computer system validation (CSV).',
+    bc: ['Audit Management', 'Computersystemvalidierung (CSV)', 'Audit Trail', 'GAMP 5'],
+    module: 'COSMO Audit Management',
+    steps: ['Auditplan erstellen', 'Interne / externe Audits durchführen', 'Findings & Maßnahmen verfolgen', 'Systemvalidierung (CSV / GAMP 5)', 'Audit-Trail & Inspektionsbereitschaft'],
+    stepsEN: ['Create audit plan', 'Conduct internal / external audits', 'Track findings & actions', 'System validation (CSV / GAMP 5)', 'Audit trail & inspection readiness'],
+  },
+]
+
+const LIFE_SCIENCE_PROCESS: CatalogProcess = {
+  id: 'quality-to-compliance',
+  catId: 99,
+  icon: '🛡️',
+  group: 'regulated',
+  cosmo: true,
+  nameDE: '99 Validierung & Compliance',
+  nameEN: '99 Validation & compliance',
+  intro:
+    'Regulierte End-to-End-Qualitäts- und Compliance-Prozesse für Pharma, MedTech, Life Sciences, Chemie und Food – von der Wareneingangs- und Chargenprüfung über Abweichungs- und CAPA-Management bis zu Dokumentenlenkung, Zulassung, Validierung und Audit.',
+  introEN:
+    'Regulated end-to-end quality and compliance processes for pharma, medtech, life sciences, chemicals and food – from incoming and batch inspection through deviation and CAPA management to document control, market approval, validation and audit.',
+  areas: LS_AREAS.map((a) => ({
+    t: a.t,
+    en: a.en,
+    hint: a.hint,
+    hintEN: a.hintEN,
+    bc: a.bc,
+    steps: a.steps,
+    stepsEN: a.stepsEN,
+    stepModule: a.steps.map(() => a.module),
+    stepEffort: a.steps.map(() => ({ ...LS_EFFORT })),
+  })),
+}
+
+/** Ergänzt den fest integrierten Life-Science-Prozess, falls noch nicht enthalten. */
+function withLifeScience(catalog: CatalogProcess[]): CatalogProcess[] {
+  if (catalog.some((p) => p.id === LIFE_SCIENCE_PROCESS.id)) return catalog
+  return [...catalog, LIFE_SCIENCE_PROCESS]
+}
+
 const BUNDLED_META: CosmoStandardMeta = {
   fileName: 'COSMO Standard-MBPC (gebündelt)',
   importedAt: '2025-05-01T00:00:00.000Z',
-  ...countCatalog(BUNDLED_CATALOG),
+  ...countCatalog(withLifeScience(BUNDLED_CATALOG)),
 }
 
 function countCatalog(catalog: CatalogProcess[]): {
@@ -80,7 +215,7 @@ function readStore(): StoredCosmoStandard | null {
 /** Aktiver Standard-Prozesskatalog (importierte Fassung oder gebündelter Default). */
 export function loadCosmoStandardCatalog(): CatalogProcess[] {
   const stored = readStore()
-  return stored?.catalog?.length ? stored.catalog : BUNDLED_CATALOG
+  return withLifeScience(stored?.catalog?.length ? stored.catalog : BUNDLED_CATALOG)
 }
 
 /** Metadaten der aktiven Standard-Fassung (für die Import-Anzeige). */
@@ -266,7 +401,7 @@ export async function parseCosmoMbpcWorkbook(
   const meta: CosmoStandardMeta = {
     fileName: file.name,
     importedAt: new Date().toISOString(),
-    ...countCatalog(catalog),
+    ...countCatalog(withLifeScience(catalog)),
   }
   save(catalog, meta)
   return { catalog, meta }
