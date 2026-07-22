@@ -1,6 +1,7 @@
 import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
-import { ARCHETYPES, CATALOG, INDUSTRIES, archetypeById, industryOverlay } from '../../data/catalog'
+import { ARCHETYPES, INDUSTRIES, archetypeById, industryOverlay, processMatchesRefs } from '../../data/catalog'
+import { catalogForEnvironment } from '../../lib/mbpcCatalog'
 
 export function ProspectPanel({ onNext }: { onNext: () => void }) {
   const { t, lang } = useLang()
@@ -29,13 +30,24 @@ export function ProspectPanel({ onNext }: { onNext: () => void }) {
       const e = d.environments.find((x) => x.id === d.activeEnvironmentId) || d.environments[0]
       if (!e) return
       e.archetypeId = p.archetypeId
-      for (const proc of CATALOG) {
-        if (!relevant) e.scope.proc[proc.id] = 'in'
-        else e.scope.proc[proc.id] = relevant.includes(proc.id) ? 'in' : 'out'
+      // Vorbelegung auf Basis des aktiven Prozesskatalogs (COSMO-Standard-MBPC,
+      // importierter MBPC oder Microsoft Workload-MBPC).
+      const catalog = catalogForEnvironment(e)
+      // Passende Prozesse für den Archetyp bestimmen (ID- oder catId-Abgleich).
+      const matched = relevant ? catalog.filter((proc) => processMatchesRefs(proc, relevant)) : catalog
+      // Ist der Archetyp im aktiven Katalog nicht abbildbar, alle Prozesse in Scope nehmen.
+      const useAll = !relevant || matched.length === 0
+      const matchedSet = new Set(matched.map((m) => m.id))
+      for (const proc of catalog) {
+        e.scope.proc[proc.id] = useAll || matchedSet.has(proc.id) ? 'in' : 'out'
       }
       // Branchen-Overlay: branchenrelevante Prozesse zusätzlich in den Scope nehmen
       const overlay = industryOverlay(p.industryId, d.parameters.customIndustries ?? [], d.parameters.industryOverlays ?? {})
-      for (const pid of overlay) e.scope.proc[pid] = 'in'
+      if (overlay.length) {
+        for (const proc of catalog) {
+          if (processMatchesRefs(proc, overlay)) e.scope.proc[proc.id] = 'in'
+        }
+      }
     })
   }
 

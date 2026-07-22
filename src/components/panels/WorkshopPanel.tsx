@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
-import { ARCHETYPES, GROUP_LABEL, archetypeById, areaKey, featureKey, industryOverlay } from '../../data/catalog'
+import { ARCHETYPES, GROUP_LABEL, archetypeById, areaKey, featureKey, industryOverlay, processMatchesRefs } from '../../data/catalog'
 import { catalogForEnvironment } from '../../lib/mbpcCatalog'
 import { stepEffortFor } from '../../lib/cosmoMbpc'
 import { activeEnvironment, effectiveFeatureScope } from '../../lib/calc'
@@ -38,17 +38,18 @@ export function WorkshopPanel() {
   const scope: ScopeState = env.scope
   const catalog = catalogForEnvironment(env)
   const arch = archetypeById(env.archetypeId)
-  // Archetyp-Fokus nur, wenn die Archetyp-Prozess-IDs zum aktiven Katalog passen
-  // (der COSMO-Standard-MBPC nutzt eigene Prozess-IDs).
+  // Archetyp-Fokus: passt der Archetyp (auch per catId-Nummer) zu Prozessen des
+  // aktiven Katalogs, wird darauf fokussiert – sonst kein Fokus.
   const relevant =
-    arch.procs && catalog.some((p) => arch.procs!.includes(p.id)) ? arch.procs : null
-  const overlaySet = new Set(
-    industryOverlay(
-      state.prospect.industryId,
-      state.parameters.customIndustries ?? [],
-      state.parameters.industryOverlays ?? {},
-    ),
+    arch.procs && catalog.some((p) => processMatchesRefs(p, arch.procs!)) ? arch.procs : null
+  // Branchen-Overlay (⭐ branchenrelevant) – ebenfalls per ID oder catId-Nummer.
+  const overlayRefs = industryOverlay(
+    state.prospect.industryId,
+    state.parameters.customIndustries ?? [],
+    state.parameters.industryOverlays ?? {},
   )
+  const isBranchRelevant = (proc: { id: string; catId: string | number }) =>
+    overlayRefs.length > 0 && processMatchesRefs(proc, overlayRefs)
 
   function mutateScope(fn: (e: Environment) => void) {
     update((d) => {
@@ -60,11 +61,27 @@ export function WorkshopPanel() {
   function setProcScope(processId: string, v: ScopeStatus) {
     mutateScope((e) => {
       e.scope.proc[processId] = v
+      // Top-Down (durchgängig): untergeordnete Overrides auflösen, damit Bereiche
+      // und Features dem Prozess folgen. Aufwand/Produkte/Notizen bleiben erhalten.
+      const proc = catalog.find((p) => p.id === processId)
+      proc?.areas.forEach((area, ai) => {
+        delete e.scope.area[areaKey(processId, ai)]
+        area.steps.forEach((_s, si) => {
+          const fs = e.scope.feature[featureKey(processId, ai, si)]
+          if (fs) fs.scope = 'unset'
+        })
+      })
     })
   }
   function setAreaScope(processId: string, areaIdx: number, v: ScopeStatus) {
     mutateScope((e) => {
       e.scope.area[areaKey(processId, areaIdx)] = v
+      // Top-Down: Feature-Overrides dieses Bereichs auflösen (Aufwand bleibt erhalten).
+      const proc = catalog.find((p) => p.id === processId)
+      proc?.areas[areaIdx]?.steps.forEach((_s, si) => {
+        const fs = e.scope.feature[featureKey(processId, areaIdx, si)]
+        if (fs) fs.scope = 'unset'
+      })
     })
   }
   function setFeatureScope(processId: string, areaIdx: number, stepIdx: number, v: ScopeStatus) {
@@ -182,7 +199,7 @@ export function WorkshopPanel() {
       {/* Prozess-Kachelübersicht (Map-Tiles) */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {catalog.map((proc) => {
-          const inFocus = !relevant || relevant.includes(proc.id)
+          const inFocus = !relevant || processMatchesRefs(proc, relevant)
           const eff = procEffective(proc.id)
           return (
             <button
@@ -200,7 +217,7 @@ export function WorkshopPanel() {
                   </div>
                   <div className="truncate text-[11px] text-slate-400">{GROUP_LABEL[proc.group][lang]}</div>
                 </div>
-                {overlaySet.has(proc.id) && (
+                {isBranchRelevant(proc) && (
                   <span className="shrink-0 text-sm" title={t('branch_relevant')} aria-label={t('branch_relevant')}>
                     ⭐
                   </span>
@@ -217,8 +234,7 @@ export function WorkshopPanel() {
       {/* Prozesskarten (detailliertes Scoping) */}
       <div className="space-y-3">
         {catalog.map((proc) => {
-          const inFocus = !relevant || relevant.includes(proc.id)
-          const procScope = scope.proc[proc.id] || 'unset'
+          const inFocus = !relevant || processMatchesRefs(proc, relevant)
           const eff = procEffective(proc.id)
           const open = expanded[proc.id]
           return (
@@ -251,7 +267,7 @@ export function WorkshopPanel() {
                     <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500">
                       {GROUP_LABEL[proc.group][lang]}
                     </span>
-                    {overlaySet.has(proc.id) && (
+                    {isBranchRelevant(proc) && (
                       <span
                         className="rounded bg-cosmo-gold/15 px-1.5 py-0.5 text-[10px] font-bold text-cosmo-gold-dark"
                         title={t('branch_relevant')}
@@ -264,7 +280,7 @@ export function WorkshopPanel() {
                   <div className="truncate text-xs text-slate-400">{lang === 'de' ? proc.intro : proc.introEN}</div>
                 </div>
                 <div className="shrink-0">
-                  <ScopeSegment value={procScope} onChange={(v) => setProcScope(proc.id, v)} />
+                  <ScopeSegment value={eff} allowUnset={false} onChange={(v) => setProcScope(proc.id, v)} />
                 </div>
               </div>
 
@@ -272,7 +288,6 @@ export function WorkshopPanel() {
                 <div className="border-t border-slate-100 bg-slate-50/50 p-3">
                   <ul className={`flex flex-wrap gap-x-4 gap-y-6 pt-3 grp-${proc.group}`}>
                     {proc.areas.map((area, areaIdx) => {
-                      const aScope = scope.area[areaKey(proc.id, areaIdx)] || 'unset'
                       const aEff: ScopeStatus = areaEffective(proc.id, areaIdx)
                       return (
                         <li
@@ -300,7 +315,7 @@ export function WorkshopPanel() {
                                   {SCOPE_LABEL[aEff][lang]}
                                 </span>
                               )}
-                              <ScopeSegment size="sm" value={aScope} onChange={(v) => setAreaScope(proc.id, areaIdx, v)} />
+                              <ScopeSegment size="sm" value={aEff} allowUnset={false} onChange={(v) => setAreaScope(proc.id, areaIdx, v)} />
                             </div>
                           </div>
                           <div className="mb-2 text-[11px] text-slate-400">{lang === 'de' ? area.hint : area.hintEN}</div>

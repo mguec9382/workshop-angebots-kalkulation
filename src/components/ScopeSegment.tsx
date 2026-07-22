@@ -11,10 +11,14 @@ export function ScopeSegment({
   value,
   onChange,
   size = 'md',
+  allowUnset = true,
 }: {
   value: ScopeStatus
   onChange: (v: ScopeStatus) => void
   size?: 'sm' | 'md'
+  /** false = Klick auf den aktiven Wert wendet ihn erneut an (statt auf „unset" zurückzusetzen).
+   *  Für aggregierte Prozess-/Bereichsregler, die eine Kaskade auslösen. */
+  allowUnset?: boolean
 }) {
   return (
     <div className="scope-seg-group">
@@ -24,7 +28,7 @@ export function ScopeSegment({
           data-scope={o.value}
           className={`scope-seg ${value === o.value ? 'active' : ''}`}
           style={{ padding: size === 'sm' ? '2px 8px' : '4px 11px', fontSize: size === 'sm' ? 10 : 12 }}
-          onClick={() => onChange(value === o.value ? 'unset' : o.value)}
+          onClick={() => onChange(value === o.value && allowUnset ? 'unset' : o.value)}
         >
           {o.label}
         </button>

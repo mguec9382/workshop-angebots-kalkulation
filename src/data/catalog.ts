@@ -326,6 +326,39 @@ export function archetypeById(id: string): Archetype {
   return ARCHETYPES.find((a) => a.id === id) || ARCHETYPES[0]
 }
 
+/**
+ * Übersetzt die semantischen Prozess-IDs der Archetypen/Branchen (altes Katalog-
+ * modell) auf die numerischen catId-Präfixe des COSMO-Standard-MBPC.
+ * So funktionieren Branchen-Vorbelegung und Fokus-Hervorhebung auch mit dem
+ * neuen COSMO-MBPC (dessen Prozesse eigene IDs, aber stabile Nummern tragen).
+ */
+export const ARCHETYPE_PROC_TO_CATID: Record<string, number> = {
+  'order-to-cash': 65,
+  'source-to-pay': 75,
+  'inventory-to-deliver': 60,
+  'record-to-report': 90,
+  'plan-to-produce': 70,
+  'design-to-retire': 40,
+  'project-to-profit': 80,
+  'hire-to-retire': 55,
+  // quality-to-compliance: kein direkter COSMO-End-to-End-Prozess (Qualität ist
+  // im COSMO-MBPC prozessübergreifend eingebettet) → keine Nummernzuordnung.
+}
+
+/**
+ * true, wenn ein Katalogprozess zu einer der Referenz-IDs passt – entweder per
+ * direkter Prozess-ID (statischer/alter Katalog) oder per catId-Nummer (COSMO-MBPC).
+ */
+export function processMatchesRefs(
+  proc: { id: string; catId: string | number },
+  refIds: string[],
+): boolean {
+  if (refIds.includes(proc.id)) return true
+  const num = typeof proc.catId === 'number' ? proc.catId : parseInt(String(proc.catId), 10)
+  if (!Number.isFinite(num)) return false
+  return refIds.some((r) => ARCHETYPE_PROC_TO_CATID[r] === num)
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    Branchen (COSMO CONSULT) mit Prozess-Overlay (branchenspezifische Betonung)
    ═══════════════════════════════════════════════════════════════════════ */
