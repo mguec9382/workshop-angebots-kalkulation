@@ -54,6 +54,12 @@ export interface ScopeCalc {
   featureCost: number
   phaseDays: Record<PhaseKey, number>
   phaseCost: Record<PhaseKey, number>
+  /** optionale (opt) Positionen – separat ausgewiesen, nicht in features/featureCost enthalten */
+  optFeatures: FeatureCalc[]
+  optFeatureDays: number
+  optFeatureCost: number
+  optPhaseDays: Record<PhaseKey, number>
+  optPhaseCost: Record<PhaseKey, number>
   scopeStats: ScopeStats
   standardCount: number
   customCount: number
@@ -66,6 +72,12 @@ export interface CalcResult {
   featureCost: number
   phaseDays: Record<PhaseKey, number>
   phaseCost: Record<PhaseKey, number>
+  /** optionale (opt) Positionen – separat ausgewiesen, nicht in Dienstleistung/Investition enthalten */
+  optFeatures: FeatureCalc[]
+  optFeatureDays: number
+  optFeatureCost: number
+  optPhaseDays: Record<PhaseKey, number>
+  optPhaseCost: Record<PhaseKey, number>
   overheadDays: number
   overheadCost: number
   overheadLines: { name: string; days: number; cost: number; applied: boolean; reason?: string }[]
@@ -116,6 +128,9 @@ export function calcScope(scope: ScopeState, params: Parameters, catalog: Catalo
   const features: FeatureCalc[] = []
   const phaseDays = emptyPhaseRecord()
   const phaseCost = emptyPhaseRecord()
+  const optFeatures: FeatureCalc[] = []
+  const optPhaseDays = emptyPhaseRecord()
+  const optPhaseCost = emptyPhaseRecord()
   const scopeStats: ScopeStats = { in: 0, opt: 0, out: 0, unset: 0, total: 0 }
   let standardCount = 0
   let customCount = 0
@@ -132,8 +147,9 @@ export function calcScope(scope: ScopeState, params: Parameters, catalog: Catalo
 
         const fs = scope.feature[featureKey(proc.id, areaIdx, stepIdx)]
         if (!fs) return
-        if (eff !== 'in') return
+        if (eff !== 'in' && eff !== 'opt') return
 
+        const isOpt = eff === 'opt'
         const pd = emptyPhaseRecord()
         let days = 0
         let cost = 0
@@ -142,15 +158,20 @@ export function calcScope(scope: ScopeState, params: Parameters, catalog: Catalo
           if (d <= 0) continue
           const rate = roleRate(params, params.phaseRole[phase])
           pd[phase] = d
-          phaseDays[phase] += d
-          phaseCost[phase] += d * rate
           days += d
           cost += d * rate
+          if (isOpt) {
+            optPhaseDays[phase] += d
+            optPhaseCost[phase] += d * rate
+          } else {
+            phaseDays[phase] += d
+            phaseCost[phase] += d * rate
+          }
         }
-        if (days <= 0) return
-        if (fs.standard) standardCount++
-        else customCount++
-        features.push({
+        // In-Scope-Positionen ohne Aufwand werden nicht gezählt; optionale Positionen
+        // werden dagegen immer gelistet (auch ohne Schätzung), damit sie sichtbar bleiben.
+        if (days <= 0 && !isOpt) return
+        const featureCalc: FeatureCalc = {
           processId: proc.id,
           areaIdx,
           stepIdx,
@@ -160,15 +181,38 @@ export function calcScope(scope: ScopeState, params: Parameters, catalog: Catalo
           cost,
           standard: fs.standard,
           phaseDays: pd,
-        })
+        }
+        if (isOpt) {
+          optFeatures.push(featureCalc)
+        } else {
+          if (fs.standard) standardCount++
+          else customCount++
+          features.push(featureCalc)
+        }
       })
     })
   }
 
   const featureDays = CALC_PHASE_KEYS.reduce((s, p) => s + phaseDays[p], 0)
   const featureCost = CALC_PHASE_KEYS.reduce((s, p) => s + phaseCost[p], 0)
+  const optFeatureDays = CALC_PHASE_KEYS.reduce((s, p) => s + optPhaseDays[p], 0)
+  const optFeatureCost = CALC_PHASE_KEYS.reduce((s, p) => s + optPhaseCost[p], 0)
 
-  return { features, featureDays, featureCost, phaseDays, phaseCost, scopeStats, standardCount, customCount }
+  return {
+    features,
+    featureDays,
+    featureCost,
+    phaseDays,
+    phaseCost,
+    optFeatures,
+    optFeatureDays,
+    optFeatureCost,
+    optPhaseDays,
+    optPhaseCost,
+    scopeStats,
+    standardCount,
+    customCount,
+  }
 }
 
 export function calcEnvironment(env: Environment, params: Parameters, periodMonths: number): EnvironmentCalc {
@@ -207,14 +251,20 @@ export function calculate(state: ProjectState): CalcResult {
   const features: FeatureCalc[] = []
   const phaseDays = emptyPhaseRecord()
   const phaseCost = emptyPhaseRecord()
+  const optFeatures: FeatureCalc[] = []
+  const optPhaseDays = emptyPhaseRecord()
+  const optPhaseCost = emptyPhaseRecord()
   const scopeStats: ScopeStats = { in: 0, opt: 0, out: 0, unset: 0, total: 0 }
   let standardCount = 0
   let customCount = 0
   for (const ec of perEnvironment) {
     features.push(...ec.scope.features)
+    optFeatures.push(...ec.scope.optFeatures)
     for (const p of CALC_PHASE_KEYS) {
       phaseDays[p] += ec.scope.phaseDays[p]
       phaseCost[p] += ec.scope.phaseCost[p]
+      optPhaseDays[p] += ec.scope.optPhaseDays[p]
+      optPhaseCost[p] += ec.scope.optPhaseCost[p]
     }
     scopeStats.in += ec.scope.scopeStats.in
     scopeStats.opt += ec.scope.scopeStats.opt
@@ -227,6 +277,8 @@ export function calculate(state: ProjectState): CalcResult {
 
   const featureDays = CALC_PHASE_KEYS.reduce((s, p) => s + phaseDays[p], 0)
   const featureCost = CALC_PHASE_KEYS.reduce((s, p) => s + phaseCost[p], 0)
+  const optFeatureDays = CALC_PHASE_KEYS.reduce((s, p) => s + optPhaseDays[p], 0)
+  const optFeatureCost = CALC_PHASE_KEYS.reduce((s, p) => s + optPhaseCost[p], 0)
 
   // Länder / länderübergreifend
   const distinctCountries = new Set(environments.map((e) => e.country).filter(Boolean)).size
@@ -272,6 +324,11 @@ export function calculate(state: ProjectState): CalcResult {
     featureCost,
     phaseDays,
     phaseCost,
+    optFeatures,
+    optFeatureDays,
+    optFeatureCost,
+    optPhaseDays,
+    optPhaseCost,
     overheadDays,
     overheadCost,
     overheadLines,

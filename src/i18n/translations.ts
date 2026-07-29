@@ -284,12 +284,24 @@ export const T: Dict = {
 
   // Feature-Ebene (Kommentare, Standardvorlage, Spalten)
   feature_col: { de: 'Feature', en: 'Feature' },
+  process_col: { de: 'Prozess', en: 'Process' },
   fit_col: { de: 'Fit', en: 'Fit' },
   cost: { de: 'Kosten', en: 'Cost' },
   feature_note: { de: 'Bemerkung / Kommentar', en: 'Remark / comment' },
   feature_note_placeholder: { de: 'Bemerkung zu diesem Feature …', en: 'Remark for this feature …' },
   no_inscope_features: { de: 'Noch keine In-Scope-Features. Im MBPC-Workshop Features auf „In“ setzen.', en: 'No in-scope features yet. Set features to “In” in the MBPC workshop.' },
   rated_features: { de: 'bewertete Features', en: 'rated features' },
+
+  // Optionale (Opt) Positionen
+  feature_singular: { de: 'Position', en: 'item' },
+  feature_plural: { de: 'Positionen', en: 'items' },
+  calc_optional_section: { de: 'Optionale Positionen (Opt)', en: 'Optional items (opt)' },
+  calc_optional_intro: { de: 'Im MBPC-Scoping als „Optional“ gekennzeichnete Positionen – separat ausgewiesen und nicht in der Gesamtinvestition enthalten. Aufwände lassen sich wie bei den In-Scope-Positionen erfassen.', en: 'Items flagged as “optional” in the MBPC scoping – shown separately and not included in the total investment. Effort can be captured just like for in-scope items.' },
+  dash_kpi_optional: { de: 'Optionale Positionen', en: 'Optional items' },
+  dash_optional_dist: { de: 'Optionale Positionen (Opt)', en: 'Optional items (opt)' },
+  dash_optional_none: { de: 'Keine optionalen Positionen in der aktuellen Auswahl.', en: 'No optional items in the current selection.' },
+  summary_optional: { de: 'Optionale Positionen (Opt)', en: 'Optional items (opt)' },
+  summary_optional_hint: { de: 'Zusätzlich anbietbare Positionen – nicht in der Gesamtinvestition enthalten.', en: 'Additionally offerable items – not included in the total investment.' },
 
   // Mapping
   mapping_intro: { de: 'Zuordnung der passenden Produkte (Microsoft · COSMO · Third-Party) je In-Scope-Feature.', en: 'Assign matching products (Microsoft · COSMO · third-party) per in-scope feature.' },

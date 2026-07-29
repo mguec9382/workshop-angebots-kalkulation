@@ -50,16 +50,38 @@ export function SummaryPanel() {
   const setFit = (pid: string, n: number) =>
     update((d) => d.environments.forEach((e) => (e.scope.fit[pid] = n)))
 
+  // Optionale (Opt) Positionen je Prozess aggregieren
+  const procName = (pid: string): string => {
+    const p = catalogsForState(state).find((x) => x.id === pid)
+    return p ? (lang === 'de' ? p.nameDE : p.nameEN) : pid
+  }
+  const procIcon = (pid: string): string =>
+    catalogsForState(state).find((x) => x.id === pid)?.icon || '•'
+  const optByProc = (() => {
+    const m = new Map<string, { days: number; cost: number; count: number }>()
+    for (const f of calc.optFeatures) {
+      const agg = m.get(f.processId) || { days: 0, cost: 0, count: 0 }
+      agg.days += f.days
+      agg.cost += f.cost
+      agg.count += 1
+      m.set(f.processId, agg)
+    }
+    return Array.from(m.entries())
+      .map(([id, v]) => ({ id, ...v }))
+      .sort((a, b) => b.cost - a.cost)
+  })()
+
   return (
     <div className="space-y-5">
       <PanelTitle title={t('tab_summary')} intro={t('summary_intro')} />
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-7">
         <Kpi label={t('kpi_investment')} value={formatCurrency(calc.totalPeriod, cur)} sub={`${calc.periodMonths} ${t('months')}`} gold />
         <Kpi label={t('kpi_effort')} value={`${formatDays(calc.serviceDays)} ${t('perDay')}`} sub={`${calc.features.length} Features`} />
         <Kpi label={t('kpi_coverage')} value={`${formatNumber(coverage)} %`} sub={`${calc.scopeStats.in}/${calc.scopeStats.total}`} />
         <Kpi label={t('kpi_fit')} value={`${formatNumber(fitRatio)} %`} sub={`${calc.standardCount} / ${calc.customCount} ${t('fit_custom')}`} />
+        <Kpi label={t('dash_kpi_optional')} value={formatCurrency(calc.optFeatureCost, cur)} sub={`${calc.optFeatures.length} ${calc.optFeatures.length === 1 ? t('feature_singular') : t('feature_plural')} · ${formatDays(calc.optFeatureDays)} ${t('perDay')}`} />
         <Kpi label={t('kpi_duration')} value={durationLabel(state.prospect.projectStart, state.prospect.goLive, t)} sub={state.prospect.goLive || '—'} />
         <Kpi label={t('kpi_countries')} value={`${calc.distinctCountries} / ${state.environments.length}`} sub={calc.distinctCountries > 1 ? t('multi_country') : t('single_country')} />
       </div>
@@ -110,6 +132,49 @@ export function SummaryPanel() {
           ))}
         </div>
       </div>
+
+      {/* Optionale Positionen (Opt) */}
+      {calc.optFeatures.length > 0 && (
+        <div className="cc-card overflow-hidden">
+          <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 bg-amber-50/60 px-4 py-2">
+            <span className="inline-block h-3 w-3 rounded-sm bg-amber-500" />
+            <span className="font-bold text-cosmo-anthracite">{t('summary_optional')}</span>
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+              {calc.optFeatures.length} {calc.optFeatures.length === 1 ? t('feature_singular') : t('feature_plural')} ·{' '}
+              {formatDays(calc.optFeatureDays)} {t('perDay')} · {formatCurrency(calc.optFeatureCost, cur)}
+            </span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[520px]">
+              <thead>
+                <tr className="border-b border-slate-100">
+                  <th className="cc-th">{t('process_col')}</th>
+                  <th className="cc-th text-right">{t('feature_plural')}</th>
+                  <th className="cc-th text-right">{t('perDay')}</th>
+                  <th className="cc-th text-right">{t('cost')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {optByProc.map((pr) => (
+                  <tr key={pr.id} className="border-b border-slate-50">
+                    <td className="cc-td font-semibold">{procIcon(pr.id)} {procName(pr.id)}</td>
+                    <td className="cc-td text-right">{pr.count}</td>
+                    <td className="cc-td text-right">{formatDays(pr.days)}</td>
+                    <td className="cc-td text-right">{formatCurrency(pr.cost, cur)}</td>
+                  </tr>
+                ))}
+                <tr className="bg-amber-50/60 font-bold">
+                  <td className="cc-td">Σ</td>
+                  <td className="cc-td text-right">{calc.optFeatures.length}</td>
+                  <td className="cc-td text-right">{formatDays(calc.optFeatureDays)}</td>
+                  <td className="cc-td text-right text-amber-700">{formatCurrency(calc.optFeatureCost, cur)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="px-4 py-2 text-xs text-slate-400">{t('summary_optional_hint')}</p>
+        </div>
+      )}
 
       {/* Fachliche Bewertung je E2E-Prozess */}
       <div className="cc-card p-5">

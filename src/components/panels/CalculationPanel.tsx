@@ -3,7 +3,7 @@ import { useLang } from '../../i18n/LanguageContext'
 import { featureKey } from '../../data/catalog'
 import { catalogForEnvironment } from '../../lib/mbpcCatalog'
 import { COMPLEXITY_KEYS, CALC_PHASE_KEYS } from '../../types'
-import type { Complexity, PhaseKey } from '../../types'
+import type { Complexity, PhaseKey, ScopeStatus } from '../../types'
 import { effortForComplexity } from '../../data/seed'
 import { activeEnvironment, effectiveFeatureScope, formatCurrency, formatDays } from '../../lib/calc'
 import { EnvSelector } from '../EnvSelector'
@@ -90,22 +90,30 @@ export function CalculationPanel() {
     })
   }
 
-  // In-Scope-Features je Prozess sammeln
-  const rows = !scope
-    ? []
-    : catalogForEnvironment(env).map((proc) => {
+  // Features je Prozess sammeln, gefiltert auf einen Scope-Status (in / opt)
+  function collectRows(target: ScopeStatus) {
+    if (!scope) return []
+    return catalogForEnvironment(env)
+      .map((proc) => {
         const items: { key: string; label: string; areaIdx: number; stepIdx: number }[] = []
         proc.areas.forEach((area, areaIdx) => {
           area.steps.forEach((label, stepIdx) => {
             const key = featureKey(proc.id, areaIdx, stepIdx)
             const fs = scope.feature[key]
             if (!fs) return
-            if (effectiveFeatureScope(scope, proc.id, areaIdx, stepIdx) !== 'in') return
+            if (effectiveFeatureScope(scope, proc.id, areaIdx, stepIdx) !== target) return
             items.push({ key, label: lang === 'de' ? label : area.stepsEN[stepIdx] || label, areaIdx, stepIdx })
           })
         })
         return { proc, items }
-      }).filter((r) => r.items.length > 0)
+      })
+      .filter((r) => r.items.length > 0)
+  }
+
+  // In-Scope-Features je Prozess
+  const rows = collectRows('in')
+  // Optionale (Opt) Features je Prozess – separat ausgewiesen
+  const optRows = collectRows('opt')
 
   const unitLabel = hoursMode ? t('hours') : t('days')
 
@@ -116,6 +124,130 @@ export function CalculationPanel() {
     const msg = t('complexity_confirm_all').replace('{v}', label).replace('{n}', String(allKeys.length))
     if (typeof window !== 'undefined' && !window.confirm(msg)) return
     applyComplexity(allKeys, c)
+  }
+
+  const factor = hoursMode ? params.hoursPerDay || 8 : 1
+
+  // Summen der optionalen Positionen (Tage/Kosten) für die Abschnitts-Überschrift
+  const optFeatureCount = optRows.reduce((s, r) => s + r.items.length, 0)
+  let optTotalDays = 0
+  let optTotalCost = 0
+  optRows.forEach((r) =>
+    r.items.forEach(({ key }) => {
+      const fs = scope?.feature[key]
+      if (!fs) return
+      CALC_PHASE_KEYS.forEach((ph) => {
+        const d = fs.effort[ph] || 0
+        optTotalDays += d
+        optTotalCost += d * roleRate(params.phaseRole[ph])
+      })
+    }),
+  )
+
+  function renderProcessCard(proc: { id: string; icon: string; nameDE: string; nameEN: string }, items: { key: string; label: string }[]) {
+    return (
+      <div key={proc.id} className="cc-card overflow-hidden">
+        <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 bg-slate-50/60 px-4 py-2">
+          <span className="text-lg">{proc.icon}</span>
+          <span className="font-bold text-cosmo-anthracite">{lang === 'de' ? proc.nameDE : proc.nameEN}</span>
+          <div className="ml-auto flex items-center gap-1.5" title={t('complexity_apply_proc')}>
+            <span className="text-[11px] text-slate-400">{t('complexity_col')}:</span>
+            {COMPLEXITY_KEYS.map((c) => (
+              <button
+                key={c}
+                onClick={() => applyComplexity(items.map((i) => i.key), c)}
+                title={t(COMPLEXITY_HINT[c])}
+                className="rounded border border-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-500 transition-colors hover:border-cosmo-gold hover:text-cosmo-gold-dark dark:border-slate-600"
+              >
+                {t(COMPLEXITY_LABEL[c])}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[920px]">
+            <thead>
+              <tr className="border-b border-slate-100">
+                <th className="cc-th w-[24%]">{t('feature_col')}</th>
+                <th className="cc-th text-center">{t('complexity_col')}</th>
+                {CALC_PHASE_KEYS.map((ph) => (
+                  <th key={ph} className="cc-th text-center" title={roleName(params.phaseRole[ph])}>
+                    {t(PHASE_LABEL[ph])}
+                    <div className="text-[10px] font-normal normal-case text-slate-400">
+                      {roleName(params.phaseRole[ph])}
+                    </div>
+                  </th>
+                ))}
+                <th className="cc-th text-center">Σ {unitLabel}</th>
+                <th className="cc-th text-right">{t('cost')}</th>
+                <th className="cc-th text-center">{t('fit_col')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map(({ key, label }) => {
+                const fs = scope!.feature[key]!
+                let days = 0
+                let cost = 0
+                CALC_PHASE_KEYS.forEach((ph) => {
+                  const d = fs.effort[ph] || 0
+                  days += d
+                  cost += d * roleRate(params.phaseRole[ph])
+                })
+                return (
+                  <tr key={key} className="border-b border-slate-50 hover:bg-slate-50/50">
+                    <td className="cc-td">{label}</td>
+                    <td className="cc-td text-center">
+                      <div className="inline-flex overflow-hidden rounded border border-slate-200 dark:border-slate-600">
+                        {COMPLEXITY_KEYS.map((c) => (
+                          <button
+                            key={c}
+                            onClick={() => applyComplexity(key, c)}
+                            title={t(COMPLEXITY_HINT[c])}
+                            className={`px-1.5 py-0.5 text-[11px] font-semibold transition-colors ${
+                              fs.complexity === c
+                                ? 'bg-cosmo-gold text-white'
+                                : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700'
+                            }`}
+                          >
+                            {t(COMPLEXITY_LABEL[c]).charAt(0)}
+                          </button>
+                        ))}
+                      </div>
+                    </td>
+                    {CALC_PHASE_KEYS.map((ph) => (
+                      <td key={ph} className="cc-td text-center">
+                        <input
+                          type="number"
+                          min={0}
+                          step={hoursMode ? 1 : 0.25}
+                          value={+((fs.effort[ph] || 0) * factor).toFixed(2) || ''}
+                          onChange={(e) => setEffort(key, ph, parseFloat(e.target.value) || 0)}
+                          className="w-16 rounded border border-slate-200 px-1.5 py-1 text-center text-xs outline-none focus:border-cosmo-gold dark:border-slate-600 dark:bg-[#232a37] dark:text-slate-100 dark:placeholder:text-slate-500"
+                        />
+                      </td>
+                    ))}
+                    <td className="cc-td text-center font-semibold">{formatDays(days * factor)}</td>
+                    <td className="cc-td text-right font-semibold text-cosmo-anthracite">
+                      {formatCurrency(cost, cur)}
+                    </td>
+                    <td className="cc-td text-center">
+                      <button
+                        onClick={() => toggleStandard(key)}
+                        className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                          fs.standard ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'
+                        }`}
+                      >
+                        {fs.standard ? t('fit_standard') : t('fit_custom')}
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -155,110 +287,25 @@ export function CalculationPanel() {
         </div>
       )}
 
-      {rows.map(({ proc, items }) => (
-        <div key={proc.id} className="cc-card overflow-hidden">
-          <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 bg-slate-50/60 px-4 py-2">
-            <span className="text-lg">{proc.icon}</span>
-            <span className="font-bold text-cosmo-anthracite">{lang === 'de' ? proc.nameDE : proc.nameEN}</span>
-            <div className="ml-auto flex items-center gap-1.5" title={t('complexity_apply_proc')}>
-              <span className="text-[11px] text-slate-400">{t('complexity_col')}:</span>
-              {COMPLEXITY_KEYS.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => applyComplexity(items.map((i) => i.key), c)}
-                  title={t(COMPLEXITY_HINT[c])}
-                  className="rounded border border-slate-200 px-2 py-0.5 text-[11px] font-semibold text-slate-500 transition-colors hover:border-cosmo-gold hover:text-cosmo-gold-dark dark:border-slate-600"
-                >
-                  {t(COMPLEXITY_LABEL[c])}
-                </button>
-              ))}
-            </div>
+      {rows.map(({ proc, items }) => renderProcessCard(proc, items))}
+
+      {/* Optionale (Opt) Positionen – separat ausgewiesen */}
+      {optRows.length > 0 && (
+        <div className="space-y-4 border-t-2 border-dashed border-amber-300 pt-5">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-block h-3 w-3 rounded-sm bg-amber-500" />
+            <h3 className="text-base font-bold text-cosmo-anthracite dark:text-slate-100">
+              {t('calc_optional_section')}
+            </h3>
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+              {optFeatureCount} {optFeatureCount === 1 ? t('feature_singular') : t('feature_plural')} ·{' '}
+              {formatDays(optTotalDays * factor)} {unitLabel} · {formatCurrency(optTotalCost, cur)}
+            </span>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[920px]">
-              <thead>
-                <tr className="border-b border-slate-100">
-                  <th className="cc-th w-[24%]">{t('feature_col')}</th>
-                  <th className="cc-th text-center">{t('complexity_col')}</th>
-                  {CALC_PHASE_KEYS.map((ph) => (
-                    <th key={ph} className="cc-th text-center" title={roleName(params.phaseRole[ph])}>
-                      {t(PHASE_LABEL[ph])}
-                      <div className="text-[10px] font-normal normal-case text-slate-400">
-                        {roleName(params.phaseRole[ph])}
-                      </div>
-                    </th>
-                  ))}
-                  <th className="cc-th text-center">Σ {unitLabel}</th>
-                  <th className="cc-th text-right">{t('cost')}</th>
-                  <th className="cc-th text-center">{t('fit_col')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map(({ key, label }) => {
-                  const fs = scope!.feature[key]!
-                  let days = 0
-                  let cost = 0
-                  CALC_PHASE_KEYS.forEach((ph) => {
-                    const d = fs.effort[ph] || 0
-                    days += d
-                    cost += d * roleRate(params.phaseRole[ph])
-                  })
-                  const factor = hoursMode ? params.hoursPerDay || 8 : 1
-                  return (
-                    <tr key={key} className="border-b border-slate-50 hover:bg-slate-50/50">
-                      <td className="cc-td">{label}</td>
-                      <td className="cc-td text-center">
-                        <div className="inline-flex overflow-hidden rounded border border-slate-200 dark:border-slate-600">
-                          {COMPLEXITY_KEYS.map((c) => (
-                            <button
-                              key={c}
-                              onClick={() => applyComplexity(key, c)}
-                              title={t(COMPLEXITY_HINT[c])}
-                              className={`px-1.5 py-0.5 text-[11px] font-semibold transition-colors ${
-                                fs.complexity === c
-                                  ? 'bg-cosmo-gold text-white'
-                                  : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700'
-                              }`}
-                            >
-                              {t(COMPLEXITY_LABEL[c]).charAt(0)}
-                            </button>
-                          ))}
-                        </div>
-                      </td>
-                      {CALC_PHASE_KEYS.map((ph) => (
-                        <td key={ph} className="cc-td text-center">
-                          <input
-                            type="number"
-                            min={0}
-                            step={hoursMode ? 1 : 0.25}
-                            value={+((fs.effort[ph] || 0) * factor).toFixed(2) || ''}
-                            onChange={(e) => setEffort(key, ph, parseFloat(e.target.value) || 0)}
-                            className="w-16 rounded border border-slate-200 px-1.5 py-1 text-center text-xs outline-none focus:border-cosmo-gold dark:border-slate-600 dark:bg-[#232a37] dark:text-slate-100 dark:placeholder:text-slate-500"
-                          />
-                        </td>
-                      ))}
-                      <td className="cc-td text-center font-semibold">{formatDays(days * factor)}</td>
-                      <td className="cc-td text-right font-semibold text-cosmo-anthracite">
-                        {formatCurrency(cost, cur)}
-                      </td>
-                      <td className="cc-td text-center">
-                        <button
-                          onClick={() => toggleStandard(key)}
-                          className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
-                            fs.standard ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'
-                          }`}
-                        >
-                          {fs.standard ? t('fit_standard') : t('fit_custom')}
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('calc_optional_intro')}</p>
+          {optRows.map(({ proc, items }) => renderProcessCard(proc, items))}
         </div>
-      ))}
+      )}
     </div>
   )
 }

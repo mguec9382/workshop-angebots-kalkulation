@@ -89,6 +89,11 @@ export function DashboardPanel() {
     let standardCount = 0
     let customCount = 0
     const featuresByProc = new Map<string, { days: number; cost: number }>()
+    // optionale (opt) Positionen separat aggregieren
+    let optDays = 0
+    let optCost = 0
+    let optCount = 0
+    const optByProc = new Map<string, { days: number; cost: number; count: number }>()
     for (const e of envs) {
       for (const k of CALC_PHASE_KEYS) phaseDays[k] += e.scope.phaseDays[k]
       scope.in += e.scope.scopeStats.in
@@ -104,10 +109,23 @@ export function DashboardPanel() {
         agg.cost += f.cost
         featuresByProc.set(f.processId, agg)
       }
+      optDays += e.scope.optFeatureDays
+      optCost += e.scope.optFeatureCost
+      optCount += e.scope.optFeatures.length
+      for (const f of e.scope.optFeatures) {
+        const agg = optByProc.get(f.processId) || { days: 0, cost: 0, count: 0 }
+        agg.days += f.days
+        agg.cost += f.cost
+        agg.count += 1
+        optByProc.set(f.processId, agg)
+      }
     }
     const processes = Array.from(featuresByProc.entries())
       .map(([id, v]) => ({ id, ...v }))
       .sort((a, b) => b.days - a.days)
+    const optProcesses = Array.from(optByProc.entries())
+      .map(([id, v]) => ({ id, ...v }))
+      .sort((a, b) => b.cost - a.cost)
 
     const featureCount = envs.reduce((s, e) => s + e.scope.features.length, 0)
     const fit = standardCount + customCount > 0 ? (standardCount / (standardCount + customCount)) * 100 : 0
@@ -115,6 +133,7 @@ export function DashboardPanel() {
     return {
       envs, allSelected, featureCost, licenseMonthly, licensePeriod, overheadDays, overheadCost,
       serviceDays, serviceCost, totalPeriod, phaseDays, scope, processes, featureCount, fit,
+      optDays, optCost, optCount, optProcesses,
     }
   }, [calc, selEnv, selCountry])
 
@@ -194,13 +213,14 @@ export function DashboardPanel() {
       </div>
 
       {/* KPI-Kacheln */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 xl:grid-cols-7">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 xl:grid-cols-8">
         <Kpi label={t('dash_kpi_investment')} value={formatCurrency(view.totalPeriod, cur)} sub={`${calc.periodMonths} ${t('months')}`} gold />
         <Kpi label={t('dash_kpi_service_once')} value={formatCurrency(view.serviceCost, cur)} />
         <Kpi label={t('dash_kpi_license_month')} value={formatCurrency(view.licenseMonthly, cur)} />
         <Kpi label={t('dash_kpi_effort')} value={`${formatDays(view.serviceDays)} ${t('perDay')}`} sub={`${view.featureCount} Features`} />
         <Kpi label={t('dash_kpi_period')} value={`${calc.periodMonths}`} sub={t('months')} />
         <Kpi label={t('dash_kpi_inscope')} value={formatNumber(view.scope.in)} sub={`/ ${formatNumber(view.scope.total)}`} />
+        <Kpi label={t('dash_kpi_optional')} value={formatCurrency(view.optCost, cur)} sub={`${view.optCount} ${view.optCount === 1 ? t('feature_singular') : t('feature_plural')} · ${formatDays(view.optDays)} ${t('perDay')}`} />
         <Kpi label={t('dash_kpi_fit')} value={`${formatNumber(view.fit, 0)} %`} />
       </div>
 
@@ -289,6 +309,50 @@ export function DashboardPanel() {
             {view.processes.length === 0 && <Empty t={t} />}
           </div>
         </div>
+      </div>
+
+      {/* Optionale Positionen (Opt) */}
+      <div className="cc-card p-5">
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <span className="inline-block h-3 w-3 rounded-sm bg-amber-500" />
+          <h3 className="text-sm font-bold text-cosmo-anthracite dark:text-slate-100">{t('dash_optional_dist')}</h3>
+          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+            {view.optCount} {view.optCount === 1 ? t('feature_singular') : t('feature_plural')} ·{' '}
+            {formatDays(view.optDays)} {t('perDay')} · {formatCurrency(view.optCost, cur)}
+          </span>
+        </div>
+        {view.optProcesses.length === 0 ? (
+          <p className="text-sm text-slate-400">{t('dash_optional_none')}</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[480px]">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-700">
+                  <th className="cc-th">{t('process_col')}</th>
+                  <th className="cc-th text-right">{t('feature_plural')}</th>
+                  <th className="cc-th text-right">{t('perDay')}</th>
+                  <th className="cc-th text-right">{t('cost')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {view.optProcesses.map((pr) => (
+                  <tr key={pr.id} className="border-b border-slate-100 dark:border-slate-800">
+                    <td className="cc-td font-medium">{procIcon(pr.id)} {procName(pr.id)}</td>
+                    <td className="cc-td text-right">{pr.count}</td>
+                    <td className="cc-td text-right">{formatDays(pr.days)}</td>
+                    <td className="cc-td text-right">{formatCurrency(pr.cost, cur)}</td>
+                  </tr>
+                ))}
+                <tr className="border-t-2 border-amber-400 font-semibold">
+                  <td className="cc-td">Σ</td>
+                  <td className="cc-td text-right">{view.optCount}</td>
+                  <td className="cc-td text-right">{formatDays(view.optDays)}</td>
+                  <td className="cc-td text-right">{formatCurrency(view.optCost, cur)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Lizenzen je Environment */}

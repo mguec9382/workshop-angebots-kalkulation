@@ -95,12 +95,12 @@ export function WorkshopPanel() {
       }
       if (existing) {
         existing.scope = v
-        // Standard-Aufwandsvorlage anwenden, wenn Feature aufgenommen wird und noch kein Aufwand erfasst ist
-        if (v === 'in' && isEffortEmpty(existing.effort)) existing.effort = seedEffort()
+        // Standard-Aufwandsvorlage anwenden, wenn Feature auf- oder als optional aufgenommen wird und noch kein Aufwand erfasst ist
+        if ((v === 'in' || v === 'opt') && isEffortEmpty(existing.effort)) existing.effort = seedEffort()
       } else {
         e.scope.feature[key] = {
           scope: v,
-          effort: v === 'in' ? seedEffort() : { strategize: 0, initiate: 0, build: 0, prepare: 0, operate: 0 },
+          effort: v === 'in' || v === 'opt' ? seedEffort() : { strategize: 0, initiate: 0, build: 0, prepare: 0, operate: 0 },
           products: [],
           standard: true,
         }
