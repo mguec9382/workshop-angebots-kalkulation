@@ -182,6 +182,10 @@ export function SummaryPanel() {
         <div className="space-y-2">
           {scopedProcesses.map((p) => {
             const fit = aggFit(p.id)
+            const inFeat = calc.features.filter((f) => f.processId === p.id)
+            const inDays = inFeat.reduce((s, f) => s + f.days, 0)
+            const optFeat = calc.optFeatures.filter((f) => f.processId === p.id)
+            const optDays = optFeat.reduce((s, f) => s + f.days, 0)
             return (
               <div key={p.id} className="flex items-center gap-3">
                 <span className="text-lg">{p.icon}</span>
@@ -201,9 +205,15 @@ export function SummaryPanel() {
                 <span className="ml-2 text-sm text-slate-500">
                   {t('fit_score')}: <b>{fit}/5</b>
                 </span>
-                <span className="ml-auto text-xs text-slate-400">
-                  {calc.features.filter((f) => f.processId === p.id).length} Features ·{' '}
-                  {formatDays(calc.features.filter((f) => f.processId === p.id).reduce((s, f) => s + f.days, 0))} {t('perDay')}
+                <span className="ml-auto text-right text-xs text-slate-400">
+                  <span className="block">
+                    {inFeat.length} Features · {formatDays(inDays)} {t('perDay')}
+                  </span>
+                  {optFeat.length > 0 && (
+                    <span className="block font-semibold text-amber-600 dark:text-amber-400">
+                      + {optFeat.length} {t('scope_opt_label')} · {formatDays(optDays)} {t('perDay')}
+                    </span>
+                  )}
                 </span>
               </div>
             )
