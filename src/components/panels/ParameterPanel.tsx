@@ -1,5 +1,6 @@
 import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
+import { formatCurrency } from '../../lib/calc'
 import { CALC_PHASE_KEYS } from '../../types'
 import type { Industry, OverheadRole, PhaseKey } from '../../types'
 import { ARCHETYPES, CATALOG, INDUSTRIES } from '../../data/catalog'
@@ -203,6 +204,111 @@ export function ParameterPanel() {
               {params.overhead.map((oh, i) => (
                 <OverheadRow key={oh.id} oh={oh} onChange={(fn) => update((d) => fn(d.parameters.overhead[i]))} onRemove={() => update((d) => d.parameters.overhead.splice(i, 1))} t={t} />
               ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Bereichsübergreifende Dienstleistungen */}
+      <div className="cc-card overflow-hidden">
+        <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/60 px-4 py-2">
+          <span className="font-bold text-cosmo-anthracite">{t('cross_services')}</span>
+          <button
+            className="cc-btn-ghost"
+            onClick={() =>
+              update((d) => {
+                if (!Array.isArray(d.parameters.crossServices)) d.parameters.crossServices = []
+                d.parameters.crossServices.push({
+                  id: uid('cs'),
+                  name: t('new_service'),
+                  days: 1,
+                  roleId: d.parameters.roles[0]?.id ?? '',
+                  active: true,
+                })
+              })
+            }
+          >
+            ＋ {t('add')}
+          </button>
+        </div>
+        <div className="px-4 py-3 text-sm text-slate-500">{t('cross_services_hint')}</div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[720px]">
+            <thead>
+              <tr className="border-b border-slate-100">
+                <th className="cc-th">{t('cross_services')}</th>
+                <th className="cc-th w-28 text-right">{t('days_pt')}</th>
+                <th className="cc-th w-52">{t('service_role')}</th>
+                <th className="cc-th w-36 text-right">{t('cost')} ({params.currency})</th>
+                <th className="cc-th w-20 text-center">{t('active')}</th>
+                <th className="cc-th w-12"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {(params.crossServices ?? []).map((cs, i) => {
+                const rate = params.roles.find((r) => r.id === cs.roleId)?.rate ?? 0
+                const cost = cs.active ? (cs.days || 0) * rate : 0
+                return (
+                  <tr key={cs.id} className="border-b border-slate-50">
+                    <td className="cc-td">
+                      <input
+                        className="w-full rounded border border-transparent px-2 py-1 hover:border-slate-200 focus:border-cosmo-gold focus:outline-none dark:bg-transparent dark:text-slate-100 dark:hover:border-slate-600"
+                        value={cs.name}
+                        onChange={(e) => update((d) => (d.parameters.crossServices[i].name = e.target.value))}
+                      />
+                    </td>
+                    <td className="cc-td text-right">
+                      <input
+                        type="number"
+                        min={0}
+                        step={0.5}
+                        className="w-24 rounded border border-slate-200 px-2 py-1 text-right focus:border-cosmo-gold focus:outline-none dark:border-slate-600 dark:bg-[#232a37] dark:text-slate-100"
+                        value={cs.days}
+                        onChange={(e) => update((d) => (d.parameters.crossServices[i].days = Math.max(0, parseFloat(e.target.value) || 0)))}
+                      />
+                    </td>
+                    <td className="cc-td">
+                      <select
+                        className="cc-input"
+                        value={cs.roleId}
+                        onChange={(e) => update((d) => (d.parameters.crossServices[i].roleId = e.target.value))}
+                      >
+                        {params.roles.map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.name}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="cc-td text-right font-semibold text-cosmo-anthracite dark:text-slate-100">
+                      {formatCurrency(cost, params.currency)}
+                    </td>
+                    <td className="cc-td text-center">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 accent-cosmo-gold"
+                        checked={cs.active}
+                        onChange={(e) => update((d) => (d.parameters.crossServices[i].active = e.target.checked))}
+                      />
+                    </td>
+                    <td className="cc-td text-center">
+                      <button
+                        className="text-slate-300 hover:text-rose-500"
+                        onClick={() => update((d) => d.parameters.crossServices.splice(i, 1))}
+                      >
+                        ✕
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
+              {(params.crossServices ?? []).length === 0 && (
+                <tr>
+                  <td className="cc-td text-slate-400" colSpan={6}>
+                    —
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

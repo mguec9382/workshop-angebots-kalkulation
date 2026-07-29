@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { ProjectState } from '../types'
-import { emptyProject, pharmaExample } from '../data/seed'
+import { emptyProject, normalizeState, pharmaExample } from '../data/seed'
 import { calculate } from './calc'
 import {
   deleteProject as idbDeleteProject,
@@ -50,7 +50,7 @@ function load(): ProjectState {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
       const parsed = JSON.parse(raw) as ProjectState
-      if (isValid(parsed)) return parsed
+      if (isValid(parsed)) return normalizeState(parsed)
     }
   } catch {
     /* localStorage nicht verfügbar */
@@ -153,8 +153,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           // aktives Projekt aus der Bibliothek laden (falls anderes als Cache)
           const rec = await getProject(id)
           if (rec && !cancelled) {
-            setState(rec.state)
-            savedRef.current = JSON.stringify(rec.state)
+            const normalized = normalizeState(rec.state)
+            setState(normalized)
+            savedRef.current = JSON.stringify(normalized)
           }
           await refreshVersions(id)
         }
@@ -210,8 +211,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const replace = useCallback((next: ProjectState) => {
-    setState(next)
-    savedRef.current = JSON.stringify(next)
+    const normalized = normalizeState(next)
+    setState(normalized)
+    savedRef.current = JSON.stringify(normalized)
     setDirty(false)
   }, [])
 

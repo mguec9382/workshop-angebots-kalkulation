@@ -180,12 +180,17 @@ export const T: Dict = {
   complexity_confirm_all: { de: 'Aufwands-Vorlage „{v}“ auf alle {n} In-Scope-Features anwenden? Bereits erfasste Aufwände werden überschrieben.', en: 'Apply effort template “{v}” to all {n} in-scope features? Existing efforts will be overwritten.' },
 
   // Parameters
-  param_intro: { de: 'Dienstleistungssätze je Rolle, Rollenzuordnung je SbD-Phase sowie fachübergreifende Overhead-Rollen.', en: 'Service rates per role, role mapping per SbD phase, and cross-functional overhead roles.' },
+  param_intro: { de: 'Dienstleistungssätze je Rolle, Rollenzuordnung je SbD-Phase, fachübergreifende Overhead-Rollen sowie bereichsübergreifende Dienstleistungen.', en: 'Service rates per role, role mapping per SbD phase, cross-functional overhead roles, and cross-area services.' },
   roles: { de: 'Rollen & Tagessätze', en: 'Roles & daily rates' },
   role: { de: 'Rolle', en: 'Role' },
   rate: { de: 'Tagessatz', en: 'Daily rate' },
   phase_roles: { de: 'Rolle je Phase', en: 'Role per phase' },
   overhead: { de: 'Fachübergreifende Rollen (Overhead)', en: 'Cross-functional roles (overhead)' },
+  cross_services: { de: 'Bereichsübergreifende Dienstleistungen', en: 'Cross-area services' },
+  cross_services_hint: { de: 'Projektweite Dienstleistungen wie Projekt-Setup (Pauschale), Belegdesign-Unterstützung und Datenmigration. Kosten = Personentage × Tagessatz der Dienstleistungsrolle. Alle Werte frei bearbeitbar.', en: 'Project-wide services such as project setup (flat rate), document design support, and data migration. Cost = person-days × daily rate of the service role. All values editable.' },
+  service_role: { de: 'Dienstleistungsrolle', en: 'Service role' },
+  days_pt: { de: 'Aufwand (PT)', en: 'Effort (PD)' },
+  new_service: { de: 'Neue Dienstleistung', en: 'New service' },
   mode: { de: 'Modus', en: 'Mode' },
   value: { de: 'Wert', en: 'Value' },
   crossCountry: { de: 'Nur länderübergreifend', en: 'Cross-country only' },

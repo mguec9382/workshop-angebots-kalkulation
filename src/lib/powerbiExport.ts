@@ -56,6 +56,8 @@ export async function exportPowerBiWorkbook(
     { Kennzahl: 'Feature-Aufwand', Wert: round(calc.featureDays), Einheit: 'PT' },
     { Kennzahl: 'Projekt-Overhead', Wert: round(calc.overheadDays), Einheit: 'PT' },
     { Kennzahl: 'Overhead-Kosten', Wert: round(calc.overheadCost), Einheit: cur },
+    { Kennzahl: 'Bereichsübergreifende Dienstleistungen', Wert: round(calc.crossServiceDays), Einheit: 'PT' },
+    { Kennzahl: 'Dienstleistungen (bereichsübergreifend) Kosten', Wert: round(calc.crossServiceCost), Einheit: cur },
     { Kennzahl: 'Lizenzen pro Monat', Wert: round(calc.licenseMonthly), Einheit: cur },
     { Kennzahl: 'Lizenzen pro Jahr', Wert: round(calc.licenseYearly), Einheit: cur },
     { Kennzahl: 'Lizenzen Zeitraum', Wert: round(calc.licensePeriod), Einheit: cur },
@@ -174,6 +176,15 @@ export async function exportPowerBiWorkbook(
     Hinweis: o.reason || '',
   }))
 
+  // ── Sheet: Bereichsübergreifende Dienstleistungen ──────────────────────
+  const crossServices = calc.crossServiceLines.map((c) => ({
+    Position: c.name,
+    'Aufwand PT': round(c.days),
+    'Tagessatz': round(c.rate),
+    Kosten: round(c.cost),
+    Angewendet: c.applied ? 'Ja' : 'Nein',
+  }))
+
   // ── Sheet: Scope (Verteilung je Environment) ───────────────────────────
   const scope = calc.perEnvironment.map((e) => ({
     EnvironmentId: e.id,
@@ -207,6 +218,7 @@ export async function exportPowerBiWorkbook(
   add('Phasen', phasen)
   add('Lizenzen', lizenzen)
   add('Overhead', overhead)
+  add('Dienstleistungen', crossServices)
   add('Scope', scope)
 
   const safe = (p.company || 'Interessent').replace(/[^\p{L}\p{N}\-_ ]/gu, '').trim() || 'Interessent'

@@ -116,6 +116,15 @@ export function SummaryPanel() {
             {t('services')}: {formatCurrency(calc.serviceCostOneTime, cur)}
           </span>
         </div>
+        {calc.crossServiceDays > 0 && (
+          <div className="mt-2 flex justify-between text-sm text-slate-500">
+            <span>
+              {t('cross_services')}:{' '}
+              <b className="text-cosmo-anthracite">{formatDays(calc.crossServiceDays)} {t('perDay')}</b> ·{' '}
+              {formatCurrency(calc.crossServiceCost, cur)}
+            </span>
+          </div>
+        )}
         {/* Overhead-Details */}
         <div className="mt-2 flex flex-wrap gap-2">
           {calc.overheadLines.map((o) => (
@@ -128,6 +137,16 @@ export function SummaryPanel() {
             >
               {o.name}: {formatCurrency(o.cost, cur)}
               {o.reason && !o.applied ? ` (${o.reason})` : ''}
+            </span>
+          ))}
+          {calc.crossServiceLines.map((c) => (
+            <span
+              key={c.name}
+              className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                c.applied ? 'bg-cosmo-gold/10 text-cosmo-gold-dark' : 'bg-slate-100 text-slate-400 line-through'
+              }`}
+            >
+              {c.name}: {formatCurrency(c.cost, cur)}
             </span>
           ))}
         </div>

@@ -81,6 +81,9 @@ export interface CalcResult {
   overheadDays: number
   overheadCost: number
   overheadLines: { name: string; days: number; cost: number; applied: boolean; reason?: string }[]
+  crossServiceDays: number
+  crossServiceCost: number
+  crossServiceLines: { name: string; days: number; rate: number; cost: number; applied: boolean }[]
   serviceDays: number
   serviceCostOneTime: number
   // Lizenzen
@@ -307,8 +310,23 @@ export function calculate(state: ProjectState): CalcResult {
     })
   }
 
-  const serviceDays = featureDays + overheadDays
-  const serviceCostOneTime = featureCost + overheadCost
+  // Bereichsübergreifende Dienstleistungen (Projektebene, PT × Dienstleistungsrolle)
+  const crossServiceLines: CalcResult['crossServiceLines'] = []
+  let crossServiceDays = 0
+  let crossServiceCost = 0
+  for (const cs of params.crossServices ?? []) {
+    const rate = roleRate(params, cs.roleId)
+    const days = cs.active ? cs.days || 0 : 0
+    const cost = days * rate
+    if (cs.active) {
+      crossServiceDays += days
+      crossServiceCost += cost
+    }
+    crossServiceLines.push({ name: cs.name, days, rate, cost, applied: cs.active })
+  }
+
+  const serviceDays = featureDays + overheadDays + crossServiceDays
+  const serviceCostOneTime = featureCost + overheadCost + crossServiceCost
 
   // Lizenzen
   const licenseMonthly = perEnvironment.reduce((s, e) => s + e.licenseMonthly, 0)
@@ -332,6 +350,9 @@ export function calculate(state: ProjectState): CalcResult {
     overheadDays,
     overheadCost,
     overheadLines,
+    crossServiceDays,
+    crossServiceCost,
+    crossServiceLines,
     serviceDays,
     serviceCostOneTime,
     licenseMonthly,

@@ -78,8 +78,10 @@ export function DashboardPanel() {
     const licensePeriod = sum((e) => e.licensePeriod)
     const overheadDays = allSelected ? calc.overheadDays : 0
     const overheadCost = allSelected ? calc.overheadCost : 0
-    const serviceDays = featureDays + overheadDays
-    const serviceCost = featureCost + overheadCost
+    const crossServiceDays = allSelected ? calc.crossServiceDays : 0
+    const crossServiceCost = allSelected ? calc.crossServiceCost : 0
+    const serviceDays = featureDays + overheadDays + crossServiceDays
+    const serviceCost = featureCost + overheadCost + crossServiceCost
     const totalPeriod = serviceCost + licensePeriod
 
     const phaseDays: Record<PhaseKey, number> = {

@@ -141,6 +141,20 @@ export interface OverheadRole {
   active: boolean
 }
 
+/**
+ * Bereichsübergreifende Dienstleistung (Projekt-Setup, Belegdesign, Datenmigration …).
+ * Kosten = Aufwand (Personentage) × Tagessatz der zugeordneten Dienstleistungsrolle.
+ */
+export interface CrossService {
+  id: string
+  name: string
+  /** Aufwand in Personentagen (frei bearbeitbar, ggf. als Pauschale vorbelegt) */
+  days: number
+  /** Dienstleistungsrolle (Role.id), deren Tagessatz angesetzt wird */
+  roleId: string
+  active: boolean
+}
+
 export interface Parameters {
   currency: string
   hoursPerDay: number
@@ -148,6 +162,8 @@ export interface Parameters {
   roles: Role[]
   phaseRole: PhaseRoleMap
   overhead: OverheadRole[]
+  /** bereichsübergreifende Dienstleistungen (Projekt-Setup, Belegdesign, Datenmigration …) */
+  crossServices: CrossService[]
   /** benutzerdefinierte Branchen (unter Parameter gepflegt, im Interessenten-Register auswählbar) */
   customIndustries: Industry[]
   /** angepasste Prozess-Overlays für Standard-Branchen (industryId -> Prozess-IDs) */

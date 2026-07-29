@@ -1,6 +1,7 @@
 import { archetypeById, areaKey, featureKey } from './catalog'
 import type {
   Complexity,
+  CrossService,
   Environment,
   FeatureState,
   Mandant,
@@ -75,6 +76,15 @@ function feature(
   }
 }
 
+/* ---------- Bereichsübergreifende Dienstleistungen (Standard-Vorbelegung) ---------- */
+export function defaultCrossServices(): CrossService[] {
+  return [
+    { id: 'cs-setup', name: 'Projekt-Setup (Pauschale)', days: 5, roleId: 'pm', active: true },
+    { id: 'cs-belegdesign', name: 'Belegdesign-Unterstützung', days: 3, roleId: 'consultant', active: true },
+    { id: 'cs-migration', name: 'Datenmigration', days: 5, roleId: 'consultant', active: true },
+  ]
+}
+
 /* ---------- Parameter-Register (Standard-Sätze) ---------- */
 export function defaultParameters(): Parameters {
   return {
@@ -103,6 +113,7 @@ export function defaultParameters(): Parameters {
       { id: 'oh-swa', name: 'Software Architect', mode: 'percent', value: 5, rate: 1600, crossCountryOnly: false, active: true },
       { id: 'oh-pgm', name: 'Programm-Manager (länderübergreifend)', mode: 'percent', value: 6, rate: 1800, crossCountryOnly: true, active: true },
     ],
+    crossServices: defaultCrossServices(),
     customIndustries: [],
     industryOverlays: {},
   }
@@ -312,4 +323,15 @@ export function pharmaExample(): ProjectState {
     periodMonths: 36,
     updatedAt: new Date().toISOString(),
   }
+}
+
+/**
+ * Ergänzt fehlende Felder aus älteren gespeicherten Ständen (Schema-Migration).
+ * Aktuell: bereichsübergreifende Dienstleistungen (crossServices) nachrüsten.
+ */
+export function normalizeState(s: ProjectState): ProjectState {
+  if (s?.parameters && !Array.isArray(s.parameters.crossServices)) {
+    s.parameters.crossServices = defaultCrossServices()
+  }
+  return s
 }
