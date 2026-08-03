@@ -3,7 +3,9 @@ import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
 import { catalogsForState } from '../../lib/mbpcCatalog'
 import { archetypeById, findIndustry, GROUP_LABEL, processById } from '../../data/catalog'
-import { calculate, formatCurrency, formatDays, formatNumber } from '../../lib/calc'
+import { calculate, formatDays, formatNumber } from '../../lib/calc'
+import { useCurrencyView } from '../../lib/currencyView'
+import { CurrencyToggle } from '../CurrencyToggle'
 import { CALC_PHASE_KEYS } from '../../types'
 import type { PhaseKey } from '../../types'
 import { PanelTitle } from './ProspectPanel'
@@ -26,7 +28,9 @@ const PHASE_LABEL: Record<PhaseKey, string> = {
 export function DashboardPanel() {
   const { t, lang } = useLang()
   const { state, currentProjectId } = useStore()
-  const cur = state.parameters.currency
+  const view0 = useCurrencyView()
+  const cur = view0.cur
+  const formatCurrency = (value: number, _currency?: string) => view0.fmt(value)
   const calc = useMemo(() => calculate(state), [state])
 
   // Prozess-Namensauflösung
@@ -177,6 +181,7 @@ export function DashboardPanel() {
       <div className="cc-no-print flex flex-wrap items-start justify-between gap-3">
         <PanelTitle title={t('tab_dashboard')} intro={t('dash_intro')} />
         <div className="flex flex-wrap gap-2">
+          <CurrencyToggle />
           <button className="cc-btn-ghost" onClick={() => window.print()}>
             🖨️ {t('dash_print')}
           </button>

@@ -157,6 +157,30 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
       a.stepIdx - b.stepIdx,
   )
 
+  /* ---------- Optionale (Opt) Positionen über alle Environments ---------- */
+  const optRows: Row[] = []
+  for (const env of calc.perEnvironment) {
+    for (const f of env.scope.optFeatures) {
+      optRows.push({
+        env: env.name,
+        processId: f.processId,
+        areaIdx: f.areaIdx,
+        stepIdx: f.stepIdx,
+        label: f.label,
+        scope: f.scope,
+        standard: f.standard,
+        phaseDays: f.phaseDays,
+      })
+    }
+  }
+  optRows.sort(
+    (a, b) =>
+      a.env.localeCompare(b.env) ||
+      procName(a.processId).localeCompare(procName(b.processId)) ||
+      a.areaIdx - b.areaIdx ||
+      a.stepIdx - b.stepIdx,
+  )
+
   /* ═════════════════════════════════════════════════════════════════════
      8 · PARAMETER  (zuerst: liefert die Bezüge für alle Kostenformeln)
      ═════════════════════════════════════════════════════════════════════ */
@@ -425,6 +449,96 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
       color: { argb: `FF${CI.gold}` },
     } as never],
   })
+
+  /* ---------- Optionale (Opt) Positionen – separat, nicht in der Investition ---------- */
+  if (optRows.length > 0) {
+    r = scopeTotalRow + 2
+    r = section(wsA, r, 'Optionale Positionen', 14,
+      'Optionale (Opt) Positionen – informativ ausgewiesen und NICHT in der Angebotssumme/Investition enthalten.')
+    const optHead = r
+    r = tableHeader(wsA, r,
+      ['Environment', 'Prozess', 'Prozessbereich', 'Feature / Prozessschritt', 'Scope', 'Typ',
+        ...CALC_PHASE_KEYS.map((p) => PHASE_LABEL[p]), 'Aufwand PT', 'Stunden', `Kosten (${cur})`, 'Bemerkung'],
+      [20, 22, 24, 34, 11, 13, 10, 10, 10, 10, 12, 15, 15, 26],
+      ['left', 'left', 'left', 'left', 'center', 'center', 'right', 'right', 'right', 'right', 'right', 'right', 'right', 'left'])
+    const optFirst = r
+    for (const f of optRows) {
+      wsA.getCell(r, 1).value = f.env
+      wsA.getCell(r, 1).font = font(9)
+      wsA.getCell(r, 2).value = procName(f.processId)
+      wsA.getCell(r, 2).font = font(9)
+      wsA.getCell(r, 3).value = areaName(f.processId, f.areaIdx)
+      wsA.getCell(r, 3).font = font(9, false, CI.slate600)
+      const label = wsA.getCell(r, 4)
+      label.value = f.label
+      label.font = font(9.5, true)
+      label.alignment = align('left', 1)
+      const sc = wsA.getCell(r, 5)
+      sc.value = 'Optional'
+      sc.alignment = align('center')
+      sc.font = font(9, true, CI.orange)
+      sc.dataValidation = { type: 'list', allowBlank: false, formulae: ['"In,Optional,Out"'] }
+      const typ = wsA.getCell(r, 6)
+      typ.value = f.standard ? 'Standard' : 'Customizing'
+      typ.alignment = align('center')
+      typ.font = font(9, false, f.standard ? CI.slate600 : CI.red)
+      typ.dataValidation = { type: 'list', allowBlank: false, formulae: ['"Standard,Customizing"'] }
+      CALC_PHASE_KEYS.forEach((p, i) => {
+        const cell = wsA.getCell(r, 7 + i)
+        cell.value = f.phaseDays[p] || null
+        cell.numFmt = fmt.days2
+        cell.alignment = align('right')
+        cell.font = font(9.5)
+        cell.fill = fill(CI.gold10)
+      })
+      const days = CALC_PHASE_KEYS.reduce((s, p) => s + (f.phaseDays[p] || 0), 0)
+      const cost = CALC_PHASE_KEYS.reduce(
+        (s, p) => s + (f.phaseDays[p] || 0) * (params.roles.find((x) => x.id === params.phaseRole[p])?.rate ?? 0), 0)
+      const total = wsA.getCell(r, 11)
+      total.value = formula(`SUM(G${r}:J${r})`, days)
+      total.numFmt = fmt.days
+      total.font = font(9.5, true)
+      total.alignment = align('right')
+      const hours = wsA.getCell(r, 12)
+      hours.value = formula(`K${r}*${R_HOURS}`, days * (params.hoursPerDay || 8))
+      hours.numFmt = fmt.hours
+      hours.font = font(9, false, CI.slate600)
+      hours.alignment = align('right')
+      const costCell = wsA.getCell(r, 13)
+      costCell.value = formula(
+        CALC_PHASE_KEYS.map((p, i) => `${col(7 + i)}${r}*${phaseRateRef[p]}`).join('+'), cost)
+      costCell.numFmt = EUR
+      costCell.font = font(9.5, true)
+      costCell.alignment = align('right')
+      wsA.getCell(r, 14).value = 'Optional – auf Kundenwunsch beauftragbar'
+      wsA.getCell(r, 14).font = font(8.5, false, CI.orange, true)
+      r++
+    }
+    const optLast = r - 1
+    zebraGrid(wsA, optFirst, optLast, 1, 14)
+    addAutoFilter(wsA, optHead, optLast, 14)
+    wsA.getCell(r, 1).value = 'Summe optionale Positionen'
+    wsA.getCell(r, 1).alignment = align('left', 1)
+    wsA.getCell(r, 4).value = `${optRows.length} Positionen`
+    wsA.getCell(r, 4).alignment = align('left', 1)
+    CALC_PHASE_KEYS.forEach((p, i) => {
+      const c = wsA.getCell(r, 7 + i)
+      c.value = formula(`SUM(${col(7 + i)}${optFirst}:${col(7 + i)}${optLast})`, calc.optPhaseDays[p])
+      c.numFmt = fmt.days
+      c.alignment = align('right')
+    })
+    wsA.getCell(r, 11).value = formula(`SUM(K${optFirst}:K${optLast})`, calc.optFeatureDays)
+    wsA.getCell(r, 11).numFmt = fmt.days
+    wsA.getCell(r, 11).alignment = align('right')
+    wsA.getCell(r, 12).value = formula(`SUM(L${optFirst}:L${optLast})`, calc.optFeatureDays * (params.hoursPerDay || 8))
+    wsA.getCell(r, 12).numFmt = fmt.hours
+    wsA.getCell(r, 12).alignment = align('right')
+    wsA.getCell(r, 13).value = formula(`SUM(M${optFirst}:M${optLast})`, calc.optFeatureCost)
+    wsA.getCell(r, 13).numFmt = EUR
+    wsA.getCell(r, 13).alignment = align('right')
+    totalsRow(wsA, r, 1, 14)
+  }
+
   printSetup(wsA, { titleRow: scopeHead })
 
   const R_FEATURE_DAYS = ref(SHEET.scope, abs(11, scopeTotalRow))

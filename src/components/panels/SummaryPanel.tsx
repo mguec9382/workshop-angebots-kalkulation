@@ -4,7 +4,9 @@ import { useLang } from '../../i18n/LanguageContext'
 import { catalogsForState } from '../../lib/mbpcCatalog'
 import { CALC_PHASE_KEYS } from '../../types'
 import type { PhaseKey } from '../../types'
-import { calculate, formatCurrency, formatDays, formatNumber } from '../../lib/calc'
+import { calculate, formatDays, formatNumber } from '../../lib/calc'
+import { useCurrencyView } from '../../lib/currencyView'
+import { CurrencyToggle } from '../CurrencyToggle'
 import { PanelTitle } from './ProspectPanel'
 
 const PHASE_LABEL: Record<PhaseKey, string> = {
@@ -21,7 +23,9 @@ export function SummaryPanel() {
   const { t, lang } = useLang()
   const { state, update } = useStore()
   const calc = useMemo(() => calculate(state), [state])
-  const cur = state.parameters.currency
+  const view = useCurrencyView()
+  const cur = view.cur
+  const formatCurrency = (value: number, _currency?: string) => view.fmt(value)
 
   const coverage = calc.scopeStats.total ? (calc.scopeStats.in / calc.scopeStats.total) * 100 : 0
   const fitRatio =
@@ -73,7 +77,10 @@ export function SummaryPanel() {
 
   return (
     <div className="space-y-5">
-      <PanelTitle title={t('tab_summary')} intro={t('summary_intro')} />
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <PanelTitle title={t('tab_summary')} intro={t('summary_intro')} />
+        <CurrencyToggle />
+      </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-7">

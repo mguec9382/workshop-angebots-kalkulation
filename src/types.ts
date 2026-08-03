@@ -157,6 +157,8 @@ export interface CrossService {
 
 export interface Parameters {
   currency: string
+  /** Umrechnungskurs Basiswährung → CHF (CHF je 1 Basiswährungs-Einheit) für die CHF-Ansicht */
+  chfRate?: number
   hoursPerDay: number
   unit: 'days' | 'hours'
   roles: Role[]

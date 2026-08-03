@@ -1,12 +1,13 @@
-import { useStore } from '../lib/store'
 import { useLang } from '../i18n/LanguageContext'
 import type { CalcResult } from '../lib/calc'
-import { formatCurrency, formatDays } from '../lib/calc'
+import { formatDays } from '../lib/calc'
+import { useCurrencyView } from '../lib/currencyView'
 
 export function Sidebar({ calc }: { calc: CalcResult }) {
   const { t } = useLang()
-  const { state } = useStore()
-  const cur = state.parameters.currency
+  const view = useCurrencyView()
+  const cur = view.cur
+  const formatCurrency = (value: number, _currency?: string) => view.fmt(value)
 
   return (
     <aside className="cc-no-print hidden w-72 shrink-0 xl:block">

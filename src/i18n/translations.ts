@@ -122,6 +122,12 @@ export const T: Dict = {
   total_period: { de: 'Gesamt im Zeitraum', en: 'Total for period' },
   in_scope: { de: 'In Scope', en: 'In scope' },
 
+  // CHF-Ansicht
+  chf_view_on: { de: 'CHF-Ansicht', en: 'CHF view' },
+  chf_toggle_hint: { de: 'Beträge in CHF anzeigen · 1 {cur} ≈ {rate} CHF', en: 'Show amounts in CHF · 1 {cur} ≈ {rate} CHF' },
+  chf_rate: { de: 'Kurs {cur} → CHF', en: 'Rate {cur} → CHF' },
+  chf_rate_hint: { de: 'Umrechnungskurs für die CHF-Ansicht (nur bei Schweizer Interessenten).', en: 'Exchange rate for the CHF view (only for Swiss prospects).' },
+
   // Prospect
   company: { de: 'Firma', en: 'Company' },
   contact: { de: 'Ansprechpartner', en: 'Contact' },

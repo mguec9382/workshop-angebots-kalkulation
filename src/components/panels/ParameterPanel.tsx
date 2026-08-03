@@ -52,7 +52,7 @@ export function ParameterPanel() {
 
       {/* Grunddaten */}
       <div className="cc-card p-5">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
           <label className="block">
             <span className="cc-label">{t('currency')}</span>
             <select
@@ -64,6 +64,18 @@ export function ParameterPanel() {
               <option value="CHF">CHF</option>
               <option value="USD">USD</option>
             </select>
+          </label>
+          <label className="block">
+            <span className="cc-label">{t('chf_rate').replace('{cur}', params.currency)}</span>
+            <input
+              type="number"
+              step={0.01}
+              min={0}
+              className="cc-input"
+              value={params.chfRate ?? 0.95}
+              onChange={(e) => update((d) => (d.parameters.chfRate = parseFloat(e.target.value) || 0))}
+              title={t('chf_rate_hint')}
+            />
           </label>
           <label className="block">
             <span className="cc-label">{t('hoursPerDay')}</span>

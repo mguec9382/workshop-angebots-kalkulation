@@ -5,7 +5,9 @@ import { catalogForEnvironment } from '../../lib/mbpcCatalog'
 import { COMPLEXITY_KEYS, CALC_PHASE_KEYS } from '../../types'
 import type { Complexity, PhaseKey, ScopeStatus } from '../../types'
 import { effortForComplexity } from '../../data/seed'
-import { activeEnvironment, effectiveFeatureScope, formatCurrency, formatDays } from '../../lib/calc'
+import { activeEnvironment, effectiveFeatureScope, formatDays } from '../../lib/calc'
+import { useCurrencyView } from '../../lib/currencyView'
+import { CurrencyToggle } from '../CurrencyToggle'
 import { EnvSelector } from '../EnvSelector'
 import { PanelTitle } from './ProspectPanel'
 
@@ -34,7 +36,7 @@ export function CalculationPanel() {
   const { state, update } = useStore()
   const params = state.parameters
   const hoursMode = params.unit === 'hours'
-  const cur = params.currency
+  const { fmt } = useCurrencyView()
   const env = activeEnvironment(state)
   const scope = env?.scope
 
@@ -228,7 +230,7 @@ export function CalculationPanel() {
                     ))}
                     <td className="cc-td text-center font-semibold">{formatDays(days * factor)}</td>
                     <td className="cc-td text-right font-semibold text-cosmo-anthracite">
-                      {formatCurrency(cost, cur)}
+                      {fmt(cost)}
                     </td>
                     <td className="cc-td text-center">
                       <button
@@ -254,9 +256,12 @@ export function CalculationPanel() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <PanelTitle title={t('tab_calculation')} intro={t('calc_intro')} />
-        <button className="cc-btn-ghost" onClick={toggleUnit}>
-          {t('unit_toggle')}: <b className="ml-1">{hoursMode ? t('hours') : t('days')}</b>
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <CurrencyToggle />
+          <button className="cc-btn-ghost" onClick={toggleUnit}>
+            {t('unit_toggle')}: <b className="ml-1">{hoursMode ? t('hours') : t('days')}</b>
+          </button>
+        </div>
       </div>
 
       <EnvSelector />
@@ -299,7 +304,7 @@ export function CalculationPanel() {
             </h3>
             <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
               {optFeatureCount} {optFeatureCount === 1 ? t('feature_singular') : t('feature_plural')} ·{' '}
-              {formatDays(optTotalDays * factor)} {unitLabel} · {formatCurrency(optTotalCost, cur)}
+              {formatDays(optTotalDays * factor)} {unitLabel} · {fmt(optTotalCost)}
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">{t('calc_optional_intro')}</p>

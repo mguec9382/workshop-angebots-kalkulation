@@ -2,7 +2,9 @@ import { useMemo, useState } from 'react'
 import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
 import { archetypeById, findIndustry } from '../../data/catalog'
-import { calculate, formatCurrency, formatDays } from '../../lib/calc'
+import { calculate, formatDays } from '../../lib/calc'
+import { useCurrencyView } from '../../lib/currencyView'
+import { CurrencyToggle } from '../CurrencyToggle'
 import { exportExcelQuote } from '../../lib/excelExport'
 import { PanelTitle } from './ProspectPanel'
 
@@ -10,7 +12,9 @@ export function ExportPanel() {
   const { t, lang } = useLang()
   const { state } = useStore()
   const calc = useMemo(() => calculate(state), [state])
-  const cur = state.parameters.currency
+  const view = useCurrencyView()
+  const cur = view.cur
+  const formatCurrency = (value: number, _currency?: string) => view.fmt(value)
   const p = state.prospect
   const [excelBusy, setExcelBusy] = useState(false)
 
@@ -31,6 +35,7 @@ export function ExportPanel() {
       <div className="cc-no-print flex flex-wrap items-start justify-between gap-3">
         <PanelTitle title={t('tab_export')} intro={t('export_intro')} />
         <div className="flex flex-wrap gap-2">
+          <CurrencyToggle />
           <button className="cc-btn-ghost" onClick={handleExcelExport} disabled={excelBusy}>
             📊 {excelBusy ? t('export_excel_busy') : t('export_excel')}
           </button>

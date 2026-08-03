@@ -89,6 +89,7 @@ export function defaultCrossServices(): CrossService[] {
 export function defaultParameters(): Parameters {
   return {
     currency: 'EUR',
+    chfRate: 0.95,
     hoursPerDay: 8,
     unit: 'days',
     roles: [
@@ -332,6 +333,9 @@ export function pharmaExample(): ProjectState {
 export function normalizeState(s: ProjectState): ProjectState {
   if (s?.parameters && !Array.isArray(s.parameters.crossServices)) {
     s.parameters.crossServices = defaultCrossServices()
+  }
+  if (s?.parameters && typeof s.parameters.chfRate !== 'number') {
+    s.parameters.chfRate = 0.95
   }
   return s
 }

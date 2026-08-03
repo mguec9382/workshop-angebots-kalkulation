@@ -1,28 +1,33 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 
 const CALC_KEY = 'cc-workshop-show-livecalc'
+const CHF_KEY = 'cc-workshop-show-chf'
 
 interface UiPrefs {
   /** Live-Kalkulation (Sidebar) sichtbar? false = Kundenansicht */
   showLiveCalc: boolean
   toggleLiveCalc: () => void
+  /** Beträge in Schweizer Franken (CHF) anzeigen (nur bei Schweizer Interessenten wirksam) */
+  showCHF: boolean
+  toggleCHF: () => void
 }
 
 const UiPrefsContext = createContext<UiPrefs | null>(null)
 
-function getInitialShowLiveCalc(): boolean {
+function getInitialBool(key: string, fallback: boolean): boolean {
   try {
-    const stored = localStorage.getItem(CALC_KEY)
+    const stored = localStorage.getItem(key)
     if (stored === 'true') return true
     if (stored === 'false') return false
   } catch {
     /* ignore */
   }
-  return true
+  return fallback
 }
 
 export function UiPrefsProvider({ children }: { children: ReactNode }) {
-  const [showLiveCalc, setShowLiveCalc] = useState<boolean>(getInitialShowLiveCalc)
+  const [showLiveCalc, setShowLiveCalc] = useState<boolean>(() => getInitialBool(CALC_KEY, true))
+  const [showCHF, setShowCHF] = useState<boolean>(() => getInitialBool(CHF_KEY, false))
 
   useEffect(() => {
     try {
@@ -32,10 +37,19 @@ export function UiPrefsProvider({ children }: { children: ReactNode }) {
     }
   }, [showLiveCalc])
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(CHF_KEY, String(showCHF))
+    } catch {
+      /* ignore */
+    }
+  }, [showCHF])
+
   const toggleLiveCalc = useCallback(() => setShowLiveCalc((v) => !v), [])
+  const toggleCHF = useCallback(() => setShowCHF((v) => !v), [])
 
   return (
-    <UiPrefsContext.Provider value={{ showLiveCalc, toggleLiveCalc }}>
+    <UiPrefsContext.Provider value={{ showLiveCalc, toggleLiveCalc, showCHF, toggleCHF }}>
       {children}
     </UiPrefsContext.Provider>
   )
