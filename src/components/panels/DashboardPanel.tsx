@@ -427,14 +427,23 @@ export function DashboardPanel() {
               </span>
             )}
           </button>
-          {versions.length > 0 && showVersions && (
+          <div className="flex items-center gap-2">
+            {versions.length > 0 && showVersions && (
+              <button
+                className="cc-btn-ghost cc-no-print"
+                onClick={() => exportVersionComparison(p.company, versions)}
+              >
+                ⭳ {t('dash_export_versions')}
+              </button>
+            )}
             <button
               className="cc-btn-ghost cc-no-print"
-              onClick={() => exportVersionComparison(p.company, versions)}
+              onClick={() => setShowVersions((v) => !v)}
+              aria-expanded={showVersions}
             >
-              ⭳ {t('dash_export_versions')}
+              {showVersions ? `▾ ${t('dash_versions_hide')}` : `▸ ${t('dash_versions_show')}`}
             </button>
-          )}
+          </div>
         </div>
         {showVersions && (
           <>
