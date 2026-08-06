@@ -1665,19 +1665,55 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   return wb
 }
 
+/** Optionen für den Excel-Export. */
+export interface ExcelQuoteOptions {
+  /** Arbeitsmappe in CHF ausgeben (alle monetären Eingaben werden umgerechnet). */
+  chf?: boolean
+  /** Umrechnungskurs Basiswährung → CHF (Standard aus parameters.chfRate). */
+  rate?: number
+}
+
+/**
+ * Erzeugt eine CHF-Kopie des States: alle monetären Eingaben (Tagessätze,
+ * Overhead-Sätze, Lizenzpreise) werden mit dem Kurs multipliziert und die
+ * Währung auf CHF gesetzt. Da die Mappe ein lineares Rechenmodell ist, laufen
+ * alle Formeln damit konsistent in CHF.
+ */
+function toChfState(state: ProjectState, rate: number): ProjectState {
+  const clone: ProjectState =
+    typeof structuredClone === 'function'
+      ? structuredClone(state)
+      : (JSON.parse(JSON.stringify(state)) as ProjectState)
+  clone.parameters.currency = 'CHF'
+  clone.parameters.roles.forEach((r) => (r.rate = r.rate * rate))
+  clone.parameters.overhead.forEach((o) => (o.rate = o.rate * rate))
+  clone.environments.forEach((env) =>
+    env.licenses.forEach((l) => (l.unitPriceMonthly = l.unitPriceMonthly * rate)),
+  )
+  return clone
+}
+
 /** Baut die Angebots-Arbeitsmappe und startet den Download im Browser. */
-export async function exportExcelQuote(state: ProjectState, lang: Lang = 'de'): Promise<void> {
-  const wb = await buildQuoteWorkbook(state, lang)
+export async function exportExcelQuote(
+  state: ProjectState,
+  lang: Lang = 'de',
+  options: ExcelQuoteOptions = {},
+): Promise<void> {
+  const useChf = !!options.chf && state.parameters.currency !== 'CHF'
+  const rate = options.rate ?? state.parameters.chfRate ?? 0.95
+  const exportState = useChf ? toChfState(state, rate) : state
+  const wb = await buildQuoteWorkbook(exportState, lang)
   const buffer = await wb.xlsx.writeBuffer()
   const blob = new Blob([buffer], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   })
   const safe =
     (state.prospect.company || 'Interessent').replace(/[^\p{L}\p{N}\-_ ]/gu, '').trim() || 'Interessent'
+  const suffix = useChf ? ' (CHF)' : ''
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `${safe} — Angebotskalkulation.xlsx`
+  a.download = `${safe} — Angebotskalkulation${suffix}.xlsx`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)

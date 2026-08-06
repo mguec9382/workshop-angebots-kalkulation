@@ -145,6 +145,7 @@ export function DashboardPanel() {
 
   // ── Versionen (Verlauf) ────────────────────────────────────────────────
   const [versions, setVersions] = useState<VersionMeta[]>([])
+  const [showVersions, setShowVersions] = useState(true)
   useEffect(() => {
     let alive = true
     if (idbAvailable() && currentProjectId) {
@@ -164,7 +165,7 @@ export function DashboardPanel() {
   const doExport = async () => {
     setBusy(true)
     try {
-      await exportExcelQuote(state, lang)
+      await exportExcelQuote(state, lang, { chf: view0.active, rate: view0.rate })
     } finally {
       setBusy(false)
     }
@@ -412,8 +413,21 @@ export function DashboardPanel() {
       {/* Versionsvergleich */}
       <div className="cc-card p-5">
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h3 className="text-sm font-bold text-cosmo-anthracite dark:text-slate-100">{t('dash_versions')}</h3>
-          {versions.length > 0 && (
+          <button
+            className="flex items-center gap-2 text-sm font-bold text-cosmo-anthracite dark:text-slate-100"
+            onClick={() => setShowVersions((v) => !v)}
+            aria-expanded={showVersions}
+            title={showVersions ? t('dash_versions_hide') : t('dash_versions_show')}
+          >
+            <span className={`text-cosmo-gold transition-transform ${showVersions ? 'rotate-90' : ''}`}>▸</span>
+            {t('dash_versions')}
+            {versions.length > 0 && (
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500 dark:bg-slate-700 dark:text-slate-300">
+                {versions.length}
+              </span>
+            )}
+          </button>
+          {versions.length > 0 && showVersions && (
             <button
               className="cc-btn-ghost cc-no-print"
               onClick={() => exportVersionComparison(p.company, versions)}
@@ -422,52 +436,56 @@ export function DashboardPanel() {
             </button>
           )}
         </div>
-        {versions.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400">{t('dash_versions_none')}</p>
-        ) : (
+        {showVersions && (
           <>
-            <div className="mb-4 space-y-2">
-              {(() => {
-                const maxV = Math.max(1, ...versions.map((v) => v.kpis.totalPeriod))
-                return versions.map((v) => (
-                  <BarRow
-                    key={v.id}
-                    label={v.label}
-                    pct={(v.kpis.totalPeriod / maxV) * 100}
-                    value={formatCurrency(v.kpis.totalPeriod, cur)}
-                    sub={new Date(v.createdAt).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US')}
-                    color={GOLD}
-                  />
-                ))
-              })()}
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[560px]">
-                <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-700">
-                    <th className="cc-th">Version</th>
-                    <th className="cc-th text-right">{t('perDay')}</th>
-                    <th className="cc-th text-right">{t('dash_license_month')}</th>
-                    <th className="cc-th text-right">{t('dash_kpi_investment')}</th>
-                    <th className="cc-th text-right">In Scope</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {versions.map((v) => (
-                    <tr key={v.id} className="border-b border-slate-100 dark:border-slate-800">
-                      <td className="cc-td font-medium">{v.label}</td>
-                      <td className="cc-td text-right">{formatDays(v.kpis.serviceDays)}</td>
-                      <td className="cc-td text-right">{formatCurrency(v.kpis.licenseMonthly, cur)}</td>
-                      <td className="cc-td text-right">{formatCurrency(v.kpis.totalPeriod, cur)}</td>
-                      <td className="cc-td text-right">{v.kpis.inScope}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {versions.length === 0 ? (
+              <p className="text-sm text-slate-500 dark:text-slate-400">{t('dash_versions_none')}</p>
+            ) : (
+              <>
+                <div className="mb-4 space-y-2">
+                  {(() => {
+                    const maxV = Math.max(1, ...versions.map((v) => v.kpis.totalPeriod))
+                    return versions.map((v) => (
+                      <BarRow
+                        key={v.id}
+                        label={v.label}
+                        pct={(v.kpis.totalPeriod / maxV) * 100}
+                        value={formatCurrency(v.kpis.totalPeriod, cur)}
+                        sub={new Date(v.createdAt).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US')}
+                        color={GOLD}
+                      />
+                    ))
+                  })()}
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[560px]">
+                    <thead>
+                      <tr className="border-b border-slate-200 dark:border-slate-700">
+                        <th className="cc-th">Version</th>
+                        <th className="cc-th text-right">{t('perDay')}</th>
+                        <th className="cc-th text-right">{t('dash_license_month')}</th>
+                        <th className="cc-th text-right">{t('dash_kpi_investment')}</th>
+                        <th className="cc-th text-right">In Scope</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {versions.map((v) => (
+                        <tr key={v.id} className="border-b border-slate-100 dark:border-slate-800">
+                          <td className="cc-td font-medium">{v.label}</td>
+                          <td className="cc-td text-right">{formatDays(v.kpis.serviceDays)}</td>
+                          <td className="cc-td text-right">{formatCurrency(v.kpis.licenseMonthly, cur)}</td>
+                          <td className="cc-td text-right">{formatCurrency(v.kpis.totalPeriod, cur)}</td>
+                          <td className="cc-td text-right">{v.kpis.inScope}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
+            <p className="mt-3 text-xs text-slate-400">{t('dash_versions_hint')}</p>
           </>
         )}
-        <p className="mt-3 text-xs text-slate-400">{t('dash_versions_hint')}</p>
       </div>
     </div>
   )

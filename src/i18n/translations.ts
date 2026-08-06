@@ -50,6 +50,8 @@ export const T: Dict = {
   dash_license_period: { de: 'Zeitraum', en: 'period' },
   dash_prospect: { de: 'Interessent & Projekt-Eckdaten', en: 'Prospect & project facts' },
   dash_versions: { de: 'Versions- & Angebotsvergleich', en: 'Version & quote comparison' },
+  dash_versions_show: { de: 'Versionen einblenden', en: 'Show versions' },
+  dash_versions_hide: { de: 'Versionen ausblenden', en: 'Hide versions' },
   dash_versions_none: { de: 'Noch keine gespeicherten Versionen vorhanden. Speichere im Tab „Versionen & Angebote" eine Version, um den Verlauf zu vergleichen.', en: 'No saved versions yet. Save a version in the "Versions & quotes" tab to compare history.' },
   dash_versions_hint: { de: 'Gesamtinvestition je gespeicherter Angebotsversion (Zeitraum).', en: 'Total investment per saved quote version (period).' },
   dash_export_versions: { de: 'Versionen exportieren', en: 'Export versions' },
