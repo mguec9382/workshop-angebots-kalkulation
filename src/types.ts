@@ -206,6 +206,8 @@ export interface Environment {
   /** je Environment ein eigenes Scoping-Ergebnis (MBPC-Workshop) */
   scope: ScopeState
   licenses: LicenseLine[]
+  /** optionale Lizenzen – gleiche Struktur wie gescopete Lizenzen, separat ausgewiesen (nicht in der Gesamtinvestition) */
+  optionalLicenses: LicenseLine[]
   /**
    * Katalogquelle des Workshops:
    * 'standard' = COSMO Standard-MBPC (statischer Seed),

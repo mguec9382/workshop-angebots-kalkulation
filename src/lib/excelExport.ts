@@ -730,6 +730,82 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   wsL.getCell(r, 8).numFmt = EUR
   wsL.getCell(r, 8).alignment = align('right')
   totalsRow(wsL, r, 1, 8)
+  r++
+
+  // Optionale Lizenzen – separat ausgewiesen, nicht in der Gesamtinvestition enthalten
+  const hasOptLicenses = state.environments.some((env) => (env.optionalLicenses ?? []).length > 0)
+  if (hasOptLicenses) {
+    r++
+    r = section(wsL, r, 'Optionale Lizenzen', 8,
+      'Zusätzlich anbietbar – gleiche Struktur, separat ausgewiesen und nicht in der Gesamtinvestition enthalten.')
+    const optHead = r
+    r = tableHeader(wsL, r,
+      ['Environment', 'Produkt', 'Anbieter', `Preis/Monat (${cur})`, 'Menge', `Summe/Monat (${cur})`,
+        `Summe/Jahr (${cur})`, `Summe ${period} Mon. (${cur})`],
+      [26, 40, 16, 18, 12, 20, 20, 24],
+      ['left', 'left', 'center', 'right', 'right', 'right', 'right', 'right'])
+    const optFirst = r
+    for (const env of state.environments) {
+      for (const lic of env.optionalLicenses ?? []) {
+        wsL.getCell(r, 1).value = env.name
+        wsL.getCell(r, 1).font = font(9, false, CI.slate600)
+        wsL.getCell(r, 2).value = lic.product
+        wsL.getCell(r, 2).font = font(9.5, true)
+        wsL.getCell(r, 2).alignment = align('left', 1)
+        const vendor = vendorOf(lic.product)
+        const vc = wsL.getCell(r, 3)
+        vc.value = vendor
+        vc.alignment = align('center')
+        vc.font = font(9, true, vendor === 'COSMO' ? CI.goldDark : vendor === 'Microsoft' ? CI.anthracite : CI.slate600)
+        const price = wsL.getCell(r, 4)
+        price.value = lic.unitPriceMonthly
+        price.numFmt = EUR2
+        price.alignment = align('right')
+        price.fill = fill(CI.gold10)
+        price.font = font(9.5)
+        const qty = wsL.getCell(r, 5)
+        qty.value = lic.quantity
+        qty.numFmt = fmt.int
+        qty.alignment = align('right')
+        qty.fill = fill(CI.gold10)
+        qty.font = font(9.5)
+        const monthly = wsL.getCell(r, 6)
+        monthly.value = formula(`D${r}*E${r}`, lic.unitPriceMonthly * lic.quantity)
+        monthly.numFmt = EUR
+        monthly.alignment = align('right')
+        monthly.font = font(9.5, true)
+        const yearly = wsL.getCell(r, 7)
+        yearly.value = formula(`F${r}*12`, lic.unitPriceMonthly * lic.quantity * 12)
+        yearly.numFmt = EUR
+        yearly.alignment = align('right')
+        yearly.font = font(9.5)
+        const periodCell = wsL.getCell(r, 8)
+        periodCell.value = formula(`F${r}*${R_PERIOD}`, lic.unitPriceMonthly * lic.quantity * period)
+        periodCell.numFmt = EUR
+        periodCell.alignment = align('right')
+        periodCell.font = font(9.5, true)
+        r++
+      }
+    }
+    const optLast = Math.max(optFirst, r - 1)
+    zebraGrid(wsL, optFirst, optLast, 1, 8)
+    addAutoFilter(wsL, optHead, optLast, 8)
+    wsL.getCell(r, 1).value = 'Gesamt optionale Lizenzen'
+    wsL.getCell(r, 1).alignment = align('left', 1)
+    wsL.getCell(r, 5).value = formula(`SUM(E${optFirst}:E${optLast})`)
+    wsL.getCell(r, 5).numFmt = fmt.int
+    wsL.getCell(r, 5).alignment = align('right')
+    wsL.getCell(r, 6).value = formula(`SUM(F${optFirst}:F${optLast})`, calc.optionalLicenseMonthly)
+    wsL.getCell(r, 6).numFmt = EUR
+    wsL.getCell(r, 6).alignment = align('right')
+    wsL.getCell(r, 7).value = formula(`SUM(G${optFirst}:G${optLast})`, calc.optionalLicenseYearly)
+    wsL.getCell(r, 7).numFmt = EUR
+    wsL.getCell(r, 7).alignment = align('right')
+    wsL.getCell(r, 8).value = formula(`SUM(H${optFirst}:H${optLast})`, calc.optionalLicensePeriod)
+    wsL.getCell(r, 8).numFmt = EUR
+    wsL.getCell(r, 8).alignment = align('right')
+    totalsRow(wsL, r, 1, 8)
+  }
   printSetup(wsL)
 
   /* ═════════════════════════════════════════════════════════════════════
@@ -1863,6 +1939,9 @@ function toChfState(state: ProjectState, rate: number): ProjectState {
   clone.parameters.overhead.forEach((o) => (o.rate = o.rate * rate))
   clone.environments.forEach((env) =>
     env.licenses.forEach((l) => (l.unitPriceMonthly = l.unitPriceMonthly * rate)),
+  )
+  clone.environments.forEach((env) =>
+    (env.optionalLicenses ?? []).forEach((l) => (l.unitPriceMonthly = l.unitPriceMonthly * rate)),
   )
   return clone
 }

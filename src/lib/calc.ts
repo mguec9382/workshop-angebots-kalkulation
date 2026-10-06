@@ -100,6 +100,10 @@ export interface CalcResult {
   licenseMonthly: number
   licenseYearly: number
   licensePeriod: number
+  /** optionale Lizenzen (über alle Environments) – separat ausgewiesen, nicht in totalPeriod */
+  optionalLicenseMonthly: number
+  optionalLicenseYearly: number
+  optionalLicensePeriod: number
   perEnvironment: EnvironmentCalc[]
   // Gesamt
   periodMonths: number
@@ -134,6 +138,10 @@ export interface EnvironmentCalc {
   licenseMonthly: number
   licenseYearly: number
   licensePeriod: number
+  /** optionale Lizenzen – separat ausgewiesen, nicht in totalPeriod enthalten */
+  optionalLicenseMonthly: number
+  optionalLicenseYearly: number
+  optionalLicensePeriod: number
   /** Dienstleistung (einmalig) + Lizenzen (Periode) – ohne Projekt-Overhead */
   totalPeriod: number
 }
@@ -242,6 +250,7 @@ export function calcEnvironment(env: Environment, params: Parameters, periodMont
   const scope = calcScope(env.scope, params, catalogForEnvironment(env))
   const monthly = env.licenses.reduce((sum, l) => sum + l.unitPriceMonthly * l.quantity, 0)
   const licensePeriod = monthly * periodMonths
+  const optMonthly = (env.optionalLicenses ?? []).reduce((sum, l) => sum + l.unitPriceMonthly * l.quantity, 0)
   return {
     id: env.id,
     name: env.name,
@@ -253,6 +262,9 @@ export function calcEnvironment(env: Environment, params: Parameters, periodMont
     licenseMonthly: monthly,
     licenseYearly: monthly * 12,
     licensePeriod,
+    optionalLicenseMonthly: optMonthly,
+    optionalLicenseYearly: optMonthly * 12,
+    optionalLicensePeriod: optMonthly * periodMonths,
     totalPeriod: scope.featureCost + licensePeriod,
   }
 }
@@ -375,6 +387,9 @@ export function calculate(state: ProjectState): CalcResult {
   const licenseMonthly = perEnvironment.reduce((s, e) => s + e.licenseMonthly, 0)
   const licenseYearly = licenseMonthly * 12
   const licensePeriod = licenseMonthly * periodMonths
+  const optionalLicenseMonthly = perEnvironment.reduce((s, e) => s + e.optionalLicenseMonthly, 0)
+  const optionalLicenseYearly = optionalLicenseMonthly * 12
+  const optionalLicensePeriod = optionalLicenseMonthly * periodMonths
 
   const totalPeriod = serviceCostOneTime + licensePeriod
   const totalMonthlyRunRate = licenseMonthly
@@ -408,6 +423,9 @@ export function calculate(state: ProjectState): CalcResult {
     licenseMonthly,
     licenseYearly,
     licensePeriod,
+    optionalLicenseMonthly,
+    optionalLicenseYearly,
+    optionalLicensePeriod,
     perEnvironment,
     periodMonths,
     totalPeriod,

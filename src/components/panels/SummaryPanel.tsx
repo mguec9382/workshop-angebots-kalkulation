@@ -311,6 +311,13 @@ export function SummaryPanel() {
           <span className="text-slate-500">
             {t('license_monthly')}: <b className="text-cosmo-anthracite">{formatCurrency(calc.licenseMonthly, cur)}</b>
           </span>
+          {calc.optionalLicenseMonthly > 0 && (
+            <span className="text-slate-500">
+              {t('optional_licenses')}:{' '}
+              <b className="text-cosmo-gold-dark">{formatCurrency(calc.optionalLicenseMonthly, cur)}</b>{' '}
+              {t('dash_license_month')}
+            </span>
+          )}
           <span className="font-bold text-cosmo-gold">
             {t('kpi_investment')}: {formatCurrency(calc.totalPeriod, cur)}
           </span>

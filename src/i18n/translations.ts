@@ -243,6 +243,13 @@ export const T: Dict = {
   quantity: { de: 'Menge', en: 'Qty' },
   add_env: { de: 'Environment hinzufügen', en: 'Add environment' },
   add_license: { de: 'Lizenz hinzufügen', en: 'Add license' },
+  optional_licenses: { de: 'Optionale Lizenzen', en: 'Optional licenses' },
+  optional_licenses_intro: {
+    de: 'Zusätzlich anbietbare Lizenzen – gleiche Struktur wie die gescopeten Lizenzen, separat ausgewiesen und nicht in der Gesamtinvestition enthalten.',
+    en: 'Additionally offerable licenses – same structure as the scoped licenses, shown separately and not included in the total investment.',
+  },
+  add_optional_license: { de: 'Optionale Lizenz hinzufügen', en: 'Add optional license' },
+  dash_optional_licenses: { de: 'Optionale Lizenzen je Environment', en: 'Optional licenses by environment' },
   period: { de: 'Betrachtungszeitraum', en: 'Period' },
   months: { de: 'Monate', en: 'months' },
   // Mandanten & Lizenzimport

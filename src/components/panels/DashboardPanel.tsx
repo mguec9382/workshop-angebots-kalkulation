@@ -82,6 +82,8 @@ export function DashboardPanel() {
     const featureCost = sum((e) => e.serviceCostOneTime)
     const licenseMonthly = sum((e) => e.licenseMonthly)
     const licensePeriod = sum((e) => e.licensePeriod)
+    const optionalLicenseMonthly = sum((e) => e.optionalLicenseMonthly)
+    const optionalLicensePeriod = sum((e) => e.optionalLicensePeriod)
     const overheadDays = allSelected ? calc.overheadDays : 0
     const overheadCost = allSelected ? calc.overheadCost : 0
     const crossServiceDays = allSelected ? calc.crossServiceDays : 0
@@ -145,6 +147,7 @@ export function DashboardPanel() {
       envs, allSelected, featureCost, licenseMonthly, licensePeriod, overheadDays, overheadCost,
       serviceDays, serviceCost, totalPeriod, phaseDays, scope, processes, featureCount, fit,
       optDays, optCost, optCount, optProcesses, interfaceDays, interfaceCost,
+      optionalLicenseMonthly, optionalLicensePeriod,
     }
   }, [calc, selEnv, selCountry])
 
@@ -404,6 +407,41 @@ export function DashboardPanel() {
           </tbody>
         </table>
       </div>
+
+      {/* Optionale Lizenzen je Environment */}
+      {view.optionalLicenseMonthly > 0 && (
+        <div className="cc-card overflow-x-auto p-5">
+          <h3 className="mb-3 text-sm font-bold text-cosmo-gold-dark">{t('dash_optional_licenses')}</h3>
+          <table className="w-full min-w-[560px]">
+            <thead>
+              <tr className="border-b border-slate-200 dark:border-slate-700">
+                <th className="cc-th">Environment</th>
+                <th className="cc-th text-right">{t('dash_license_month')}</th>
+                <th className="cc-th text-right">{t('dash_license_year')}</th>
+                <th className="cc-th text-right">{t('dash_license_period')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {view.envs
+                .filter((e) => e.optionalLicenseMonthly > 0)
+                .map((e) => (
+                  <tr key={e.id} className="border-b border-slate-100 dark:border-slate-800">
+                    <td className="cc-td font-medium">{e.name}</td>
+                    <td className="cc-td text-right">{formatCurrency(e.optionalLicenseMonthly, cur)}</td>
+                    <td className="cc-td text-right">{formatCurrency(e.optionalLicenseYearly, cur)}</td>
+                    <td className="cc-td text-right">{formatCurrency(e.optionalLicensePeriod, cur)}</td>
+                  </tr>
+                ))}
+              <tr className="border-t-2 border-cosmo-gold font-semibold text-cosmo-gold-dark">
+                <td className="cc-td">Σ</td>
+                <td className="cc-td text-right">{formatCurrency(view.optionalLicenseMonthly, cur)}</td>
+                <td className="cc-td text-right">{formatCurrency(view.optionalLicenseMonthly * 12, cur)}</td>
+                <td className="cc-td text-right">{formatCurrency(view.optionalLicensePeriod, cur)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Interessent & Projekt-Eckdaten */}
       <div className="cc-card p-5">

@@ -623,6 +623,132 @@ export function EnvironmentPanel() {
                   <b className="text-cosmo-gold">{formatCurrency(c.totalPeriod, cur)}</b>
                 </span>
               </div>
+
+              {/* Optionale Lizenzen (separat, nicht in der Gesamtinvestition) */}
+              <div className="mt-4 border-t border-dashed border-slate-200 pt-3 dark:border-slate-700">
+                <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <span className="text-sm font-semibold text-cosmo-gold-dark">{t('optional_licenses')}</span>
+                    <div className="mt-0.5 max-w-2xl text-xs text-slate-400">{t('optional_licenses_intro')}</div>
+                  </div>
+                  <button
+                    className="cc-btn-ghost"
+                    onClick={() =>
+                      update((d) =>
+                        d.environments[ei].optionalLicenses.push({
+                          id: uid('lic'),
+                          product: 'Business Central',
+                          unitPriceMonthly: 0,
+                          quantity: 1,
+                        }),
+                      )
+                    }
+                  >
+                    ＋ {t('add_optional_license')}
+                  </button>
+                </div>
+
+                {/* Katalog-Picker (optionale Lizenzen) */}
+                <CatalogPicker
+                  catalog={catalog}
+                  onPick={(item) =>
+                    update((d) =>
+                      d.environments[ei].optionalLicenses.push({
+                        id: uid('lic'),
+                        product: item.description,
+                        unitPriceMonthly: Math.round(item.monthlyPrice * 100) / 100,
+                        quantity: 1,
+                        code: item.code,
+                      }),
+                    )
+                  }
+                />
+
+                {env.optionalLicenses.length === 0 ? null : (
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-slate-100">
+                        <th className="cc-th">{t('product')}</th>
+                        <th className="cc-th w-32 text-right">{t('unitPrice')}</th>
+                        <th className="cc-th w-24 text-right">{t('quantity')}</th>
+                        <th className="cc-th w-32 text-right">{t('monthly')}</th>
+                        <th className="cc-th w-10"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {env.optionalLicenses.map((lic, li) => (
+                        <tr key={lic.id} className="border-b border-slate-50">
+                          <td className="cc-td">
+                            <input
+                              className="w-full rounded border border-transparent px-2 py-1 hover:border-slate-200 focus:border-cosmo-gold focus:outline-none dark:bg-transparent dark:text-slate-100 dark:hover:border-slate-600"
+                              value={lic.product}
+                              onChange={(e) =>
+                                update((d) => (d.environments[ei].optionalLicenses[li].product = e.target.value))
+                              }
+                            />
+                            {lic.code && <div className="px-2 text-[10px] text-slate-400">{lic.code}</div>}
+                          </td>
+                          <td className="cc-td text-right">
+                            <input
+                              type="number"
+                              step={0.5}
+                              className="w-24 rounded border border-slate-200 px-2 py-1 text-right focus:border-cosmo-gold focus:outline-none dark:bg-[#232a37]"
+                              value={lic.unitPriceMonthly}
+                              onChange={(e) =>
+                                update(
+                                  (d) =>
+                                    (d.environments[ei].optionalLicenses[li].unitPriceMonthly =
+                                      parseFloat(e.target.value) || 0),
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="cc-td text-right">
+                            <input
+                              type="number"
+                              className="w-20 rounded border border-slate-200 px-2 py-1 text-right focus:border-cosmo-gold focus:outline-none dark:bg-[#232a37]"
+                              value={lic.quantity}
+                              onChange={(e) =>
+                                update(
+                                  (d) =>
+                                    (d.environments[ei].optionalLicenses[li].quantity = parseInt(e.target.value) || 0),
+                                )
+                              }
+                            />
+                          </td>
+                          <td className="cc-td text-right font-semibold">
+                            {formatCurrency(lic.unitPriceMonthly * lic.quantity, cur)}
+                          </td>
+                          <td className="cc-td text-center">
+                            <button
+                              className="text-slate-300 hover:text-rose-500"
+                              onClick={() => update((d) => d.environments[ei].optionalLicenses.splice(li, 1))}
+                            >
+                              ✕
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+                {env.optionalLicenses.length > 0 && (
+                  <div className="mt-2 flex flex-wrap justify-end gap-6 border-t border-dashed border-slate-200 pt-2 text-sm dark:border-slate-700">
+                    <span className="text-slate-500">
+                      {t('monthly')}:{' '}
+                      <b className="text-cosmo-gold-dark">{formatCurrency(c.optionalLicenseMonthly, cur)}</b>
+                    </span>
+                    <span className="text-slate-500">
+                      {t('yearly')}:{' '}
+                      <b className="text-cosmo-gold-dark">{formatCurrency(c.optionalLicenseYearly, cur)}</b>
+                    </span>
+                    <span className="text-slate-500">
+                      {t('total_period')} ({state.periodMonths} {t('months')}):{' '}
+                      <b className="text-cosmo-gold-dark">{formatCurrency(c.optionalLicensePeriod, cur)}</b>
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )

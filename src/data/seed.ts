@@ -234,6 +234,7 @@ function pharmaEnvironments(): Environment[] {
         { id: uid('lic'), product: 'COSMO Life Science Pack', unitPriceMonthly: 20, quantity: 45 },
         { id: uid('lic'), product: 'Continia Document Capture', unitPriceMonthly: 9, quantity: 25 },
       ],
+      optionalLicenses: [],
     },
     {
       id: uid('env'),
@@ -253,6 +254,7 @@ function pharmaEnvironments(): Environment[] {
         { id: uid('lic'), product: 'COSMO Advanced Manufacturing Pack', unitPriceMonthly: 22, quantity: 18 },
         { id: uid('lic'), product: 'COSMO Quality Management Pack', unitPriceMonthly: 18, quantity: 18 },
       ],
+      optionalLicenses: [],
     },
   ]
 }
@@ -270,6 +272,7 @@ export function newEnvironment(name: string, archetypeId = 'all', country = 'DE'
     mandanten: [],
     scope: emptyScope(),
     licenses: [],
+    optionalLicenses: [],
     catalogSource: 'standard',
     workloads: [],
   }
@@ -341,6 +344,11 @@ export function normalizeState(s: ProjectState): ProjectState {
   }
   if (s && !Array.isArray(s.interfaces)) {
     s.interfaces = []
+  }
+  if (Array.isArray(s?.environments)) {
+    for (const env of s.environments) {
+      if (env && !Array.isArray(env.optionalLicenses)) env.optionalLicenses = []
+    }
   }
   return s
 }
