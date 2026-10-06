@@ -2,16 +2,16 @@
    Angebots-Arbeitsmappe (XLSX) im COSMO-CI
 
    Erzeugt aus dem aktuellen Projekt-State eine formatierte, rechnende
-   Excel-Datei mit elf Blättern:
+   Excel-Datei mit zwölf Blättern:
 
      Deckblatt · 1 Angebot · 2 Aufwand & Scope · 3 Phasen · 4 Prozesse & Fit
-     5 Lizenzen · 6 Overhead · 7 Environments · 8 Parameter · 9 MBPC-Katalog
-     10 CI-Styleguide
+     5 Schnittstellen · 6 Lizenzen · 7 Overhead · 8 Environments · 9 Parameter
+     10 MBPC-Katalog · 11 CI-Styleguide
 
    Die Mappe ist kein Wertabzug, sondern ein Rechenmodell: Aufwände,
    Tagessätze, Zuschläge, Lizenzpreise und Mengen sind Eingabefelder
    (gold hinterlegt); alle Kosten, Summen und Kennzahlen sind Excel-Formeln.
-   Ändert man auf „8 · Parameter“ einen Tagessatz, läuft das bis zur
+   Ändert man auf „9 · Parameter“ einen Tagessatz, läuft das bis zur
    Gesamtinvestition auf „1 · Angebot“ durch.
 
    ExcelJS statt SheetJS: die Community-Version von `xlsx` kann keine
@@ -41,7 +41,7 @@ import {
   totalsRow,
   zebraGrid,
 } from './excelTheme'
-import type { CatalogProcess, Lang, PhaseKey, ProjectState } from '../types'
+import type { CatalogProcess, Complexity, InterfaceDirection, Lang, PhaseKey, ProjectState } from '../types'
 import { CALC_PHASE_KEYS } from '../types'
 
 const SHEET = {
@@ -50,13 +50,26 @@ const SHEET = {
   scope: '2 · Aufwand & Scope',
   phases: '3 · Phasen',
   processes: '4 · Prozesse & Fit',
-  licenses: '5 · Lizenzen',
-  overhead: '6 · Overhead',
-  environments: '7 · Environments',
-  parameters: '8 · Parameter',
-  catalog: '9 · MBPC-Katalog',
-  styleguide: '10 · CI-Styleguide',
+  interfaces: '5 · Schnittstellen',
+  licenses: '6 · Lizenzen',
+  overhead: '7 · Overhead',
+  environments: '8 · Environments',
+  parameters: '9 · Parameter',
+  catalog: '10 · MBPC-Katalog',
+  styleguide: '11 · CI-Styleguide',
 } as const
+
+const DIRECTION_LABEL: Record<InterfaceDirection, string> = {
+  in: 'Eingehend',
+  out: 'Ausgehend',
+  both: 'Bidirektional',
+}
+
+const COMPLEXITY_LABEL: Record<Complexity, string> = {
+  small: 'Small',
+  medium: 'Middle',
+  complex: 'Komplex',
+}
 
 const PHASE_LABEL: Record<PhaseKey, string> = {
   strategize: 'Strategize',
@@ -74,7 +87,7 @@ const PHASE_DESC: Record<PhaseKey, string> = {
   operate: 'Go-Live-Begleitung, Hypercare',
 }
 
-/** Absoluter Zellbezug auf ein anderes Blatt, z. B. `'8 · Parameter'!$B$10`. */
+/** Absoluter Zellbezug auf ein anderes Blatt, z. B. `'9 · Parameter'!$B$10`. */
 const ref = (sheet: string, cell: string) => `'${sheet}'!${cell}`
 const abs = (colIdx: number, row: number) => `$${col(colIdx)}$${row}`
 const range = (sheet: string, colIdx: number, r0: number, r1: number) =>
@@ -182,7 +195,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   )
 
   /* ═════════════════════════════════════════════════════════════════════
-     8 · PARAMETER  (zuerst: liefert die Bezüge für alle Kostenformeln)
+     9 · PARAMETER  (zuerst: liefert die Bezüge für alle Kostenformeln)
      ═════════════════════════════════════════════════════════════════════ */
   const wsP = wb.addWorksheet(SHEET.parameters, { properties: { tabColor: { argb: `FF${CI.anthracite}` } } })
   let r = sheetHeader(wsP, 'PARAMETER', 'Kalkulationsgrundlagen',
@@ -353,7 +366,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   r = sheetHeader(wsA, 'KALKULATION', 'Aufwand & Scope je Feature',
     'Aufwandsschätzung je In-Scope-Feature über die vier kalkulationsrelevanten Success-by-Design-Phasen', 14)
   r = section(wsA, r, 'In-Scope-Features', 14,
-    'Aufwand in Personentagen (PT). Kosten = Σ (Phasenaufwand × Tagessatz der Phasenrolle) laut Blatt „8 · Parameter“.')
+    'Aufwand in Personentagen (PT). Kosten = Σ (Phasenaufwand × Tagessatz der Phasenrolle) laut Blatt „9 · Parameter“.')
   const scopeHead = r
   r = tableHeader(wsA, r,
     ['Environment', 'Prozess', 'Prozessbereich', 'Feature / Prozessschritt', 'Scope', 'Typ',
@@ -631,7 +644,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   printSetup(wsPh)
 
   /* ═════════════════════════════════════════════════════════════════════
-     5 · LIZENZEN
+     6 · LIZENZEN
      ═════════════════════════════════════════════════════════════════════ */
   const wsL = wb.addWorksheet(SHEET.licenses, { properties: { tabColor: { argb: `FF${CI.gold}` } } })
   r = sheetHeader(wsL, 'LIZENZEN', 'Lizenzaufstellung je Environment',
@@ -720,13 +733,13 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   printSetup(wsL)
 
   /* ═════════════════════════════════════════════════════════════════════
-     6 · OVERHEAD
+     7 · OVERHEAD
      ═════════════════════════════════════════════════════════════════════ */
   const wsO = wb.addWorksheet(SHEET.overhead, { properties: { tabColor: { argb: `FF${CI.gold}` } } })
   r = sheetHeader(wsO, 'PROJEKT-OVERHEAD', 'Fachübergreifende Rollen',
     'Zuschläge auf den Feature-Aufwand – Steuerung, Architektur und Programm-Management', 8)
   r = section(wsO, r, 'Overhead-Positionen', 8,
-    'Berechnungsbasis: Feature-Aufwand gesamt (Blatt „2 · Aufwand & Scope“). Die Anzahl Länder wird aus Blatt „7 · Environments“ ermittelt.')
+    'Berechnungsbasis: Feature-Aufwand gesamt (Blatt „2 · Aufwand & Scope“). Die Anzahl Länder wird aus Blatt „8 · Environments“ ermittelt.')
   const ohHead = r
   r = tableHeader(wsO, r,
     ['Position', 'Modus', 'Wert', `Tagessatz (${cur})`, 'Nur länderübergreifend', 'Angewendet', 'Aufwand PT', `Kosten (${cur})`],
@@ -908,7 +921,119 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   printSetup(wsPr)
 
   /* ═════════════════════════════════════════════════════════════════════
-     7 · ENVIRONMENTS
+     5 · SCHNITTSTELLEN
+     ═════════════════════════════════════════════════════════════════════ */
+  const wsIf = wb.addWorksheet(SHEET.interfaces, { properties: { tabColor: { argb: `FF${CI.gold}` } } })
+  r = sheetHeader(wsIf, 'INTEGRATION', 'Schnittstellen & Datenobjekte',
+    'Systemübergreifende Schnittstellen – Aufwand ausschließlich in Initiate & Scoping', 13)
+  r = section(wsIf, r, 'Schnittstellen-Register', 13,
+    'Aufwand in Personentagen (PT). Kosten = Aufwand × Tagessatz der Initiate-&-Scoping-Rolle laut Blatt „9 · Parameter“. Nur In-Scope-Schnittstellen fließen in die Angebotssumme.')
+  const ifHead = r
+  r = tableHeader(wsIf, r,
+    ['Scope', 'Schnittstelle', 'Anforderungen', 'Quelle', 'Ziel', 'Richtung', 'Datenobjekte',
+      'Technik', 'Integrationsplattform', 'Komplexität', 'Aufwand PT', `Tagessatz (${cur})`, `Kosten (${cur})`],
+    [11, 26, 18, 18, 18, 14, 28, 16, 22, 13, 12, 16, 16],
+    ['center', 'left', 'left', 'left', 'left', 'center', 'left', 'left', 'left', 'center', 'right', 'right', 'right'])
+  const ifFirst = r
+  const interfaces = state.interfaces ?? []
+  for (const it of interfaces) {
+    const sc = wsIf.getCell(r, 1)
+    sc.value = it.scope === 'in' ? 'In' : it.scope === 'opt' ? 'Optional' : 'Out'
+    sc.alignment = align('center')
+    sc.font = font(9, true, it.scope === 'in' ? CI.green : it.scope === 'opt' ? CI.orange : CI.slate400)
+    sc.dataValidation = { type: 'list', allowBlank: false, formulae: ['"In,Optional,Out"'] }
+    const name = wsIf.getCell(r, 2)
+    name.value = it.name
+    name.font = font(9.5, true)
+    name.alignment = align('left', 1)
+    wsIf.getCell(r, 3).value = it.reqs || ''
+    wsIf.getCell(r, 3).font = font(8.5, false, CI.slate400)
+    wsIf.getCell(r, 3).alignment = align('left', 1)
+    wsIf.getCell(r, 4).value = it.source
+    wsIf.getCell(r, 4).font = font(9)
+    wsIf.getCell(r, 5).value = it.target
+    wsIf.getCell(r, 5).font = font(9)
+    wsIf.getCell(r, 6).value = DIRECTION_LABEL[it.direction]
+    wsIf.getCell(r, 6).alignment = align('center')
+    wsIf.getCell(r, 6).font = font(9, false, CI.slate600)
+    wsIf.getCell(r, 7).value = it.objects
+    wsIf.getCell(r, 7).font = font(9, false, CI.slate600)
+    wsIf.getCell(r, 7).alignment = align('left', 1)
+    wsIf.getCell(r, 8).value = it.technology
+    wsIf.getCell(r, 8).font = font(9, false, CI.slate600)
+    wsIf.getCell(r, 9).value = it.platform
+    wsIf.getCell(r, 9).font = font(9, false, CI.slate600)
+    const cx = wsIf.getCell(r, 10)
+    cx.value = it.complexity ? COMPLEXITY_LABEL[it.complexity] : '—'
+    cx.alignment = align('center')
+    cx.font = font(9, false, CI.slate600)
+    const days = wsIf.getCell(r, 11)
+    days.value = it.days || null
+    days.numFmt = fmt.days2
+    days.alignment = align('right')
+    days.font = font(9.5, true)
+    days.fill = fill(CI.gold10)
+    const rate = wsIf.getCell(r, 12)
+    rate.value = formula(phaseRateRef.initiate, calc.interfaceRate)
+    rate.numFmt = EUR
+    rate.alignment = align('right')
+    rate.font = font(9.5)
+    const cost = wsIf.getCell(r, 13)
+    cost.value = formula(`K${r}*L${r}`, (it.days || 0) * calc.interfaceRate)
+    cost.numFmt = EUR
+    cost.alignment = align('right')
+    cost.font = font(9.5, true, it.scope === 'in' ? CI.anthracite : CI.slate400)
+    r++
+  }
+  if (interfaces.length === 0) {
+    wsIf.getCell(r, 1).value = 'Keine Schnittstellen erfasst'
+    wsIf.getCell(r, 1).font = font(9, false, CI.slate400, true)
+    wsIf.getCell(r, 1).alignment = align('left', 1)
+    r++
+  }
+  const ifLast = Math.max(ifFirst, r - 1)
+  zebraGrid(wsIf, ifFirst, ifLast, 1, 13)
+  addAutoFilter(wsIf, ifHead, ifLast, 13)
+
+  const RG_IF_SCOPE = `$A$${ifFirst}:$A$${ifLast}`
+  const RG_IF_DAYS = `$K$${ifFirst}:$K$${ifLast}`
+  const RG_IF_COST = `$M$${ifFirst}:$M$${ifLast}`
+
+  wsIf.getCell(r, 1).value = 'Σ In-Scope-Schnittstellen'
+  wsIf.getCell(r, 1).alignment = align('left', 1)
+  wsIf.getCell(r, 11).value = formula(`SUMIF(${RG_IF_SCOPE},"In",${RG_IF_DAYS})`, calc.interfaceDays)
+  wsIf.getCell(r, 11).numFmt = fmt.days
+  wsIf.getCell(r, 11).alignment = align('right')
+  wsIf.getCell(r, 13).value = formula(`SUMIF(${RG_IF_SCOPE},"In",${RG_IF_COST})`, calc.interfaceCost)
+  wsIf.getCell(r, 13).numFmt = EUR
+  wsIf.getCell(r, 13).alignment = align('right')
+  totalsRow(wsIf, r, 1, 13)
+  r++
+
+  wsIf.getCell(r, 1).value = 'Σ Optionale Schnittstellen'
+  wsIf.getCell(r, 1).alignment = align('left', 1)
+  wsIf.getCell(r, 1).font = font(9, true, CI.orange)
+  wsIf.getCell(r, 11).value = formula(`SUMIF(${RG_IF_SCOPE},"Optional",${RG_IF_DAYS})`, calc.optInterfaceDays)
+  wsIf.getCell(r, 11).numFmt = fmt.days
+  wsIf.getCell(r, 11).alignment = align('right')
+  wsIf.getCell(r, 11).font = font(9, false, CI.orange)
+  wsIf.getCell(r, 13).value = formula(`SUMIF(${RG_IF_SCOPE},"Optional",${RG_IF_COST})`, calc.optInterfaceCost)
+  wsIf.getCell(r, 13).numFmt = EUR
+  wsIf.getCell(r, 13).alignment = align('right')
+  wsIf.getCell(r, 13).font = font(9, false, CI.orange)
+
+  wsIf.addConditionalFormatting({
+    ref: `K${ifFirst}:K${ifLast}`,
+    rules: [{
+      type: 'dataBar', priority: 1, gradient: true, showValue: true,
+      cfvo: [{ type: 'num', value: 0 }, { type: 'max' }],
+      color: { argb: `FF${CI.gold}` },
+    } as never],
+  })
+  printSetup(wsIf)
+
+  /* ═════════════════════════════════════════════════════════════════════
+     8 · ENVIRONMENTS
      ═════════════════════════════════════════════════════════════════════ */
   const wsE = wb.addWorksheet(SHEET.environments, { properties: { tabColor: { argb: `FF${CI.gold}` } } })
   r = sheetHeader(wsE, 'STRUKTUR', 'Environments & Mandanten',
@@ -1378,7 +1503,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   printSetup(wsQ, { landscape: false })
 
   /* ═════════════════════════════════════════════════════════════════════
-     9 · MBPC-KATALOG
+     10 · MBPC-KATALOG
      ═════════════════════════════════════════════════════════════════════ */
   const wsK = wb.addWorksheet(SHEET.catalog, { properties: { tabColor: { argb: `FF${CI.anthracite80}` } } })
   r = sheetHeader(wsK, 'REFERENZ', 'Microsoft Business Process Catalog',
@@ -1426,7 +1551,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   printSetup(wsK, { titleRow: catHead })
 
   /* ═════════════════════════════════════════════════════════════════════
-     10 · CI-STYLEGUIDE
+     11 · CI-STYLEGUIDE
      ═════════════════════════════════════════════════════════════════════ */
   const wsS = wb.addWorksheet(SHEET.styleguide, { properties: { tabColor: { argb: `FF${CI.gold}` } } })
   r = sheetHeader(wsS, 'STYLEGUIDE', 'COSMO CONSULT · Corporate Design',
@@ -1521,7 +1646,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   const rules = [
     'Jedes Blatt beginnt mit einem Anthrazit-Kopfband (Zeilen 1–4) und einer goldenen Trennlinie; ab Zeile 6 sind die Fenster fixiert.',
     'Gold hinterlegte Zellen (10 % Gold) sind Eingabefelder. Alle übrigen Werte sind Formeln und sollten nicht überschrieben werden.',
-    'Kosten entstehen ausschließlich aus Aufwand × Tagessatz der Phasenrolle (Blatt „8 · Parameter“).',
+    'Kosten entstehen ausschließlich aus Aufwand × Tagessatz der Phasenrolle (Blatt „9 · Parameter“).',
     'Summenzeilen tragen eine doppelte Goldlinie; die Gesamtinvestition steht auf Anthrazit mit goldenem Wert.',
     'Statusfarben: Grün = In Scope / aktiv, Orange = Optional, Rot = Customizing bzw. Gap.',
     'Gitternetzlinien sind deaktiviert; Struktur entsteht ausschließlich über Zellrahmen in Slate 200.',
@@ -1682,13 +1807,13 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   r++
   wsC.mergeCells(r, 2, r, 9)
   wsC.getCell(r, 2).value =
-    'Alle gold hinterlegten Felder sind Eingabefelder. Kosten, Summen und Kennzahlen berechnen sich automatisch über Formeln aus dem Blatt „8 · Parameter“.'
+    'Alle gold hinterlegten Felder sind Eingabefelder. Kosten, Summen und Kennzahlen berechnen sich automatisch über Formeln aus dem Blatt „9 · Parameter“.'
   wsC.getCell(r, 2).font = font(8.5, false, CI.slate600, true)
   printSetup(wsC, { landscape: false })
 
   /* ---------- Blattreihenfolge & benannte Bezüge ---------- */
-  const order = [SHEET.cover, SHEET.quote, SHEET.scope, SHEET.phases, SHEET.processes, SHEET.licenses,
-    SHEET.overhead, SHEET.environments, SHEET.parameters, SHEET.catalog, SHEET.styleguide]
+  const order = [SHEET.cover, SHEET.quote, SHEET.scope, SHEET.phases, SHEET.processes, SHEET.interfaces,
+    SHEET.licenses, SHEET.overhead, SHEET.environments, SHEET.parameters, SHEET.catalog, SHEET.styleguide]
   order.forEach((name, i) => {
     const sheet = wb.getWorksheet(name) as (Worksheet & { orderNo: number }) | undefined
     // `orderNo` steuert die Registerreihenfolge in ExcelJS (nicht in den Typings enthalten).
