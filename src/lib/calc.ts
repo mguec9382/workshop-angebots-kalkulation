@@ -84,6 +84,16 @@ export interface CalcResult {
   crossServiceDays: number
   crossServiceCost: number
   crossServiceLines: { name: string; days: number; rate: number; cost: number; applied: boolean }[]
+  /** Schnittstellen (in Scope) – Aufwand ausschließlich in Initiate & Scoping */
+  interfaceLines: InterfaceCalc[]
+  interfaceDays: number
+  interfaceCost: number
+  /** optionale Schnittstellen – separat ausgewiesen, nicht in der Dienstleistung enthalten */
+  optInterfaceLines: InterfaceCalc[]
+  optInterfaceDays: number
+  optInterfaceCost: number
+  /** Tagessatz der Initiate-&-Scoping-Rolle */
+  interfaceRate: number
   serviceDays: number
   serviceCostOneTime: number
   // Lizenzen
@@ -100,6 +110,16 @@ export interface CalcResult {
   distinctCountries: number
   standardCount: number
   customCount: number
+}
+
+export interface InterfaceCalc {
+  id: string
+  name: string
+  source: string
+  target: string
+  platform: string
+  days: number
+  cost: number
 }
 
 export interface EnvironmentCalc {
@@ -325,8 +345,31 @@ export function calculate(state: ProjectState): CalcResult {
     crossServiceLines.push({ name: cs.name, days, rate, cost, applied: cs.active })
   }
 
-  const serviceDays = featureDays + overheadDays + crossServiceDays
-  const serviceCostOneTime = featureCost + overheadCost + crossServiceCost
+  // Schnittstellen (Projektebene) – nur Initiate & Scoping, Tagessatz der Initiate-Rolle
+  const interfaceRate = roleRate(params, params.phaseRole.initiate)
+  const interfaceLines: InterfaceCalc[] = []
+  const optInterfaceLines: InterfaceCalc[] = []
+  for (const it of state.interfaces ?? []) {
+    if (it.scope !== 'in' && it.scope !== 'opt') continue
+    const days = Math.max(0, it.days || 0)
+    const line: InterfaceCalc = {
+      id: it.id,
+      name: it.name,
+      source: it.source,
+      target: it.target,
+      platform: it.platform,
+      days,
+      cost: days * interfaceRate,
+    }
+    ;(it.scope === 'in' ? interfaceLines : optInterfaceLines).push(line)
+  }
+  const interfaceDays = interfaceLines.reduce((s, l) => s + l.days, 0)
+  const interfaceCost = interfaceLines.reduce((s, l) => s + l.cost, 0)
+  const optInterfaceDays = optInterfaceLines.reduce((s, l) => s + l.days, 0)
+  const optInterfaceCost = optInterfaceLines.reduce((s, l) => s + l.cost, 0)
+
+  const serviceDays = featureDays + overheadDays + crossServiceDays + interfaceDays
+  const serviceCostOneTime = featureCost + overheadCost + crossServiceCost + interfaceCost
 
   // Lizenzen
   const licenseMonthly = perEnvironment.reduce((s, e) => s + e.licenseMonthly, 0)
@@ -353,6 +396,13 @@ export function calculate(state: ProjectState): CalcResult {
     crossServiceDays,
     crossServiceCost,
     crossServiceLines,
+    interfaceLines,
+    interfaceDays,
+    interfaceCost,
+    optInterfaceLines,
+    optInterfaceDays,
+    optInterfaceCost,
+    interfaceRate,
     serviceDays,
     serviceCostOneTime,
     licenseMonthly,

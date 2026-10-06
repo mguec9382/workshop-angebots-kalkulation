@@ -1171,6 +1171,54 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   totalsRow(wsQ, r, 1, 7)
   r += 2
 
+  r = section(wsQ, r, 'C2 · Schnittstellen (Initiate & Scoping)', 7)
+  r = tableHeader(wsQ, r,
+    ['Schnittstelle', 'Quelle → Ziel', `Tagessatz (${cur})`, 'Aufwand PT', `Betrag (${cur})`, 'Scope', 'Integrationsplattform'],
+    undefined,
+    ['left', 'left', 'right', 'right', 'right', 'center', 'left'])
+  const qIfFirst = r
+  calc.interfaceLines.forEach((it) => {
+    wsQ.getCell(r, 1).value = it.name
+    wsQ.getCell(r, 1).font = font(9.5, true)
+    wsQ.getCell(r, 1).alignment = align('left', 1)
+    wsQ.getCell(r, 2).value = `${it.source} → ${it.target}`
+    wsQ.getCell(r, 2).font = font(9, false, CI.slate600)
+    const rate = wsQ.getCell(r, 3)
+    rate.value = calc.interfaceRate
+    rate.numFmt = EUR
+    rate.alignment = align('right')
+    rate.font = font(9.5)
+    const days = wsQ.getCell(r, 4)
+    days.value = it.days
+    days.numFmt = fmt.days2
+    days.alignment = align('right')
+    days.font = font(9.5, true)
+    const amount = wsQ.getCell(r, 5)
+    amount.value = formula(`C${r}*D${r}`, it.cost)
+    amount.numFmt = EUR
+    amount.alignment = align('right')
+    amount.font = font(9.5, true)
+    wsQ.getCell(r, 6).value = 'in'
+    wsQ.getCell(r, 6).alignment = align('center')
+    wsQ.getCell(r, 6).font = font(9, true, CI.green)
+    wsQ.getCell(r, 7).value = it.platform
+    wsQ.getCell(r, 7).font = font(8.5, false, CI.slate600)
+    r++
+  })
+  const qIfLast = Math.max(qIfFirst, r - 1)
+  zebraGrid(wsQ, qIfFirst, qIfLast, 1, 7)
+  const qIfSubtotal = r
+  wsQ.getCell(r, 1).value = 'Zwischensumme Schnittstellen'
+  wsQ.getCell(r, 1).alignment = align('left', 1)
+  wsQ.getCell(r, 4).value = formula(`SUM(D${qIfFirst}:D${qIfLast})`, calc.interfaceDays)
+  wsQ.getCell(r, 4).numFmt = fmt.days
+  wsQ.getCell(r, 4).alignment = align('right')
+  wsQ.getCell(r, 5).value = formula(`SUM(E${qIfFirst}:E${qIfLast})`, calc.interfaceCost)
+  wsQ.getCell(r, 5).numFmt = EUR
+  wsQ.getCell(r, 5).alignment = align('right')
+  totalsRow(wsQ, r, 1, 7)
+  r += 2
+
   r = section(wsQ, r, 'D · Lizenzen (Subskription)', 7)
   r = tableHeader(wsQ, r,
     ['Position', 'Environment', 'Menge', `je Monat (${cur})`, `Zeitraum (${cur})`, 'Monate', 'Hinweis'],
@@ -1232,6 +1280,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
     ['Dienstleistung – Features', `E${qFeatureSubtotal}`, `D${qFeatureSubtotal}`, calc.featureCost, calc.featureDays],
     ['Dienstleistung – Projekt-Overhead', `E${qOhSubtotal}`, `D${qOhSubtotal}`, calc.overheadCost, calc.overheadDays],
     ['Dienstleistung – Bereichsübergreifend', `E${qCsSubtotal}`, `D${qCsSubtotal}`, calc.crossServiceCost, calc.crossServiceDays],
+    ['Dienstleistung – Schnittstellen (Initiate & Scoping)', `E${qIfSubtotal}`, `D${qIfSubtotal}`, calc.interfaceCost, calc.interfaceDays],
     ['Dienstleistung gesamt (einmalig)', null, null, calc.serviceCostOneTime, calc.serviceDays],
     [`Lizenzen · ${period} Monate`, `E${qLicSubtotal}`, null, calc.licensePeriod, undefined],
     ['Lizenzen je Monat (Run-Rate)', `D${qLicSubtotal}`, null, calc.licenseMonthly, undefined],
@@ -1243,15 +1292,15 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
     a.font = font(10, true)
     a.alignment = align('left', 1)
     a.fill = fill(CI.anthracite5)
-    const isServiceTotal = i === 3
+    const isServiceTotal = i === 4
     if (isServiceTotal) {
       const d = wsQ.getCell(row, 4)
-      d.value = formula(`D${row - 3}+D${row - 2}+D${row - 1}`, days)
+      d.value = formula(`D${row - 4}+D${row - 3}+D${row - 2}+D${row - 1}`, days)
       d.numFmt = fmt.days
       d.alignment = align('right')
       d.font = font(10, true)
       const v = wsQ.getCell(row, 5)
-      v.value = formula(`E${row - 3}+E${row - 2}+E${row - 1}`, amount)
+      v.value = formula(`E${row - 4}+E${row - 3}+E${row - 2}+E${row - 1}`, amount)
       v.numFmt = EUR
       v.alignment = align('right')
       v.font = font(11, true, CI.goldDark)
@@ -1273,8 +1322,8 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
     for (let c = 1; c <= 7; c++) wsQ.getCell(row, c).border = cellBorder()
     wsQ.getRow(row).height = 19
   })
-  const serviceTotalRow = sumFirst + 3
-  const licPeriodRow = sumFirst + 4
+  const serviceTotalRow = sumFirst + 4
+  const licPeriodRow = sumFirst + 5
   const grandTotalRow = sumFirst + summary.length + 1
 
   wsQ.mergeCells(grandTotalRow, 1, grandTotalRow, 3)

@@ -7,6 +7,7 @@ import type { PhaseKey } from '../../types'
 import { calculate, formatDays, formatNumber } from '../../lib/calc'
 import { useCurrencyView } from '../../lib/currencyView'
 import { CurrencyToggle } from '../CurrencyToggle'
+import { InterfaceCostCard } from '../InterfaceCostCard'
 import { PanelTitle } from './ProspectPanel'
 
 const PHASE_LABEL: Record<PhaseKey, string> = {
@@ -132,6 +133,15 @@ export function SummaryPanel() {
             </span>
           </div>
         )}
+        {calc.interfaceDays > 0 && (
+          <div className="mt-2 flex justify-between text-sm text-slate-500">
+            <span>
+              {t('tab_interfaces')} ({t('phase_initiate')}):{' '}
+              <b className="text-cosmo-anthracite">{formatDays(calc.interfaceDays)} {t('perDay')}</b> ·{' '}
+              {formatCurrency(calc.interfaceCost, cur)}
+            </span>
+          </div>
+        )}
         {/* Overhead-Details */}
         <div className="mt-2 flex flex-wrap gap-2">
           {calc.overheadLines.map((o) => (
@@ -158,6 +168,11 @@ export function SummaryPanel() {
           ))}
         </div>
       </div>
+
+      {/* Schnittstellen (Initiate & Scoping) */}
+      {(calc.interfaceLines.length > 0 || calc.optInterfaceLines.length > 0) && (
+        <InterfaceCostCard calc={calc} t={t} formatCurrency={(v) => formatCurrency(v, cur)} />
+      )}
 
       {/* Optionale Positionen (Opt) */}
       {calc.optFeatures.length > 0 && (

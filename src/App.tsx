@@ -11,6 +11,7 @@ import { ProspectPanel } from './components/panels/ProspectPanel'
 import { WorkshopPanel } from './components/panels/WorkshopPanel'
 import { MappingPanel } from './components/panels/MappingPanel'
 import { CalculationPanel } from './components/panels/CalculationPanel'
+import { InterfacePanel } from './components/panels/InterfacePanel'
 import { ParameterPanel } from './components/panels/ParameterPanel'
 import { EnvironmentPanel } from './components/panels/EnvironmentPanel'
 import { SummaryPanel } from './components/panels/SummaryPanel'
@@ -36,6 +37,7 @@ export default function App() {
           {tab === 'workshop' && <WorkshopPanel />}
           {tab === 'mapping' && <MappingPanel />}
           {tab === 'calculation' && <CalculationPanel />}
+          {tab === 'interfaces' && <InterfacePanel />}
           {tab === 'parameters' && <ParameterPanel />}
           {tab === 'environments' && <EnvironmentPanel />}
           {tab === 'summary' && <SummaryPanel />}

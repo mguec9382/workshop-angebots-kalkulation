@@ -19,6 +19,9 @@ export function Sidebar({ calc }: { calc: CalcResult }) {
 
           <Row label={t('effort_total')} value={`${formatDays(calc.serviceDays)} ${t('perDay')}`} />
           <Row label={t('service_onetime')} value={formatCurrency(calc.serviceCostOneTime, cur)} strong />
+          {calc.interfaceCost > 0 && (
+            <Row label={`↳ ${t('tab_interfaces')}`} value={formatCurrency(calc.interfaceCost, cur)} />
+          )}
           <div className="my-2 border-t border-slate-100" />
           <Row label={t('license_monthly')} value={formatCurrency(calc.licenseMonthly, cur)} />
           <Row label={t('yearly')} value={formatCurrency(calc.licenseYearly, cur)} />

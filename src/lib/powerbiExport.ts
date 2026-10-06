@@ -58,6 +58,8 @@ export async function exportPowerBiWorkbook(
     { Kennzahl: 'Overhead-Kosten', Wert: round(calc.overheadCost), Einheit: cur },
     { Kennzahl: 'Bereichsübergreifende Dienstleistungen', Wert: round(calc.crossServiceDays), Einheit: 'PT' },
     { Kennzahl: 'Dienstleistungen (bereichsübergreifend) Kosten', Wert: round(calc.crossServiceCost), Einheit: cur },
+    { Kennzahl: 'Schnittstellen (Initiate & Scoping)', Wert: round(calc.interfaceDays), Einheit: 'PT' },
+    { Kennzahl: 'Schnittstellen Kosten', Wert: round(calc.interfaceCost), Einheit: cur },
     { Kennzahl: 'Lizenzen pro Monat', Wert: round(calc.licenseMonthly), Einheit: cur },
     { Kennzahl: 'Lizenzen pro Jahr', Wert: round(calc.licenseYearly), Einheit: cur },
     { Kennzahl: 'Lizenzen Zeitraum', Wert: round(calc.licensePeriod), Einheit: cur },

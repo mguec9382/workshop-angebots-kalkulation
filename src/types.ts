@@ -240,12 +240,46 @@ export interface LicenseCatalog {
   scannedCount?: number
 }
 
+/* ---------- Schnittstellen-Register ---------- */
+
+export type InterfaceDirection = 'in' | 'out' | 'both'
+
+export interface InterfaceItem {
+  id: string
+  name: string
+  /** Quellsystem */
+  source: string
+  /** Zielsystem */
+  target: string
+  direction: InterfaceDirection
+  /** ausgetauschte Datenobjekte */
+  objects: string
+  /** Übertragungstechnik (REST-API, Datei, Web Service …) */
+  technology: string
+  /** Integrationsplattform (Standard: COSMO Anyfy) */
+  platform: string
+  complexity?: Complexity
+  /** Aufwand in Personentagen – kalkuliert ausschließlich in Initiate & Scoping */
+  days: number
+  scope: ScopeStatus
+  /** Referenzen auf Anforderungen (z. B. ANF-043) */
+  reqs?: string
+  note?: string
+}
+
+/** Vorschlagsaufwand Initiate & Scoping je Schnittstellen-Komplexität (PT, frei überschreibbar). */
+export const INTERFACE_EFFORT: Record<Complexity, number> = { small: 1, medium: 2, complex: 4 }
+
+export const DEFAULT_INTEGRATION_PLATFORM = 'COSMO Anyfy'
+
 /* ---------- Gesamter Projekt-State ---------- */
 
 export interface ProjectState {
   prospect: Prospect
   parameters: Parameters
   environments: Environment[]
+  /** Schnittstellen auf Projektebene (Register „Schnittstellen") */
+  interfaces: InterfaceItem[]
   /** aktuell im Workshop bearbeitetes Environment */
   activeEnvironmentId: string
   /** Betrachtungszeitraum in Monaten für die Gesamtkostenrechnung */

@@ -297,6 +297,7 @@ export function emptyProject(): ProjectState {
     },
     parameters: defaultParameters(),
     environments: [env],
+    interfaces: [],
     activeEnvironmentId: env.id,
     periodMonths: 36,
     updatedAt: new Date().toISOString(),
@@ -320,6 +321,7 @@ export function pharmaExample(): ProjectState {
     },
     parameters: defaultParameters(),
     environments,
+    interfaces: [],
     activeEnvironmentId: environments[0].id,
     periodMonths: 36,
     updatedAt: new Date().toISOString(),
@@ -336,6 +338,9 @@ export function normalizeState(s: ProjectState): ProjectState {
   }
   if (s?.parameters && typeof s.parameters.chfRate !== 'number') {
     s.parameters.chfRate = 0.95
+  }
+  if (s && !Array.isArray(s.interfaces)) {
+    s.interfaces = []
   }
   return s
 }

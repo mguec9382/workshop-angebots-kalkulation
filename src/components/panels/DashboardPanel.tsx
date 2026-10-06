@@ -6,6 +6,7 @@ import { archetypeById, findIndustry, GROUP_LABEL, processById } from '../../dat
 import { calculate, formatDays, formatNumber } from '../../lib/calc'
 import { useCurrencyView } from '../../lib/currencyView'
 import { CurrencyToggle } from '../CurrencyToggle'
+import { InterfaceCostCard } from '../InterfaceCostCard'
 import { CALC_PHASE_KEYS } from '../../types'
 import type { PhaseKey } from '../../types'
 import { PanelTitle } from './ProspectPanel'
@@ -84,8 +85,11 @@ export function DashboardPanel() {
     const overheadCost = allSelected ? calc.overheadCost : 0
     const crossServiceDays = allSelected ? calc.crossServiceDays : 0
     const crossServiceCost = allSelected ? calc.crossServiceCost : 0
-    const serviceDays = featureDays + overheadDays + crossServiceDays
-    const serviceCost = featureCost + overheadCost + crossServiceCost
+    // Schnittstellen liegen auf Projektebene und zählen nur in der Gesamtsicht
+    const interfaceDays = allSelected ? calc.interfaceDays : 0
+    const interfaceCost = allSelected ? calc.interfaceCost : 0
+    const serviceDays = featureDays + overheadDays + crossServiceDays + interfaceDays
+    const serviceCost = featureCost + overheadCost + crossServiceCost + interfaceCost
     const totalPeriod = serviceCost + licensePeriod
 
     const phaseDays: Record<PhaseKey, number> = {
@@ -139,7 +143,7 @@ export function DashboardPanel() {
     return {
       envs, allSelected, featureCost, licenseMonthly, licensePeriod, overheadDays, overheadCost,
       serviceDays, serviceCost, totalPeriod, phaseDays, scope, processes, featureCount, fit,
-      optDays, optCost, optCount, optProcesses,
+      optDays, optCost, optCount, optProcesses, interfaceDays, interfaceCost,
     }
   }, [calc, selEnv, selCountry])
 
@@ -221,10 +225,11 @@ export function DashboardPanel() {
       </div>
 
       {/* KPI-Kacheln */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 xl:grid-cols-8">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5 xl:grid-cols-9">
         <Kpi label={t('dash_kpi_investment')} value={formatCurrency(view.totalPeriod, cur)} sub={`${calc.periodMonths} ${t('months')}`} gold />
         <Kpi label={t('dash_kpi_service_once')} value={formatCurrency(view.serviceCost, cur)} />
         <Kpi label={t('dash_kpi_license_month')} value={formatCurrency(view.licenseMonthly, cur)} />
+        <Kpi label={t('tab_interfaces')} value={formatCurrency(view.interfaceCost, cur)} sub={`${calc.interfaceLines.length} · ${formatDays(view.interfaceDays)} ${t('perDay')}`} />
         <Kpi label={t('dash_kpi_effort')} value={`${formatDays(view.serviceDays)} ${t('perDay')}`} sub={`${view.featureCount} Features`} />
         <Kpi label={t('dash_kpi_period')} value={`${calc.periodMonths}`} sub={t('months')} />
         <Kpi label={t('dash_kpi_inscope')} value={formatNumber(view.scope.in)} sub={`/ ${formatNumber(view.scope.total)}`} />
@@ -318,6 +323,11 @@ export function DashboardPanel() {
           </div>
         </div>
       </div>
+
+      {/* Schnittstellen (Initiate & Scoping) */}
+      {view.allSelected && (calc.interfaceLines.length > 0 || calc.optInterfaceLines.length > 0) && (
+        <InterfaceCostCard calc={calc} t={t} formatCurrency={(v) => formatCurrency(v, cur)} />
+      )}
 
       {/* Optionale Positionen (Opt) */}
       <div className="cc-card p-5">
