@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
 import { archetypeById, findIndustry } from '../../data/catalog'
-import { calculate, formatDays } from '../../lib/calc'
+import { formatDays } from '../../lib/calc'
+import { useCalc } from '../../lib/calcContext'
 import { useCurrencyView } from '../../lib/currencyView'
 import { CurrencyToggle } from '../CurrencyToggle'
 import { exportExcelQuote } from '../../lib/excelExport'
@@ -11,7 +12,7 @@ import { PanelTitle } from './ProspectPanel'
 export function ExportPanel() {
   const { t, lang } = useLang()
   const { state } = useStore()
-  const calc = useMemo(() => calculate(state), [state])
+  const calc = useCalc()
   const view = useCurrencyView()
   const cur = view.cur
   const formatCurrency = (value: number, _currency?: string) => view.fmt(value)

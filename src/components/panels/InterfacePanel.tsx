@@ -1,7 +1,7 @@
-import { useMemo } from 'react'
 import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
-import { calculate, formatDays } from '../../lib/calc'
+import { formatDays } from '../../lib/calc'
+import { useCalc } from '../../lib/calcContext'
 import { useCurrencyView } from '../../lib/currencyView'
 import { uid } from '../../data/seed'
 import { COMPLEXITY_KEYS, DEFAULT_INTEGRATION_PLATFORM, INTERFACE_EFFORT } from '../../types'
@@ -29,7 +29,7 @@ export function InterfacePanel() {
   const { t } = useLang()
   const { state, update } = useStore()
   const { fmt } = useCurrencyView()
-  const calc = useMemo(() => calculate(state), [state])
+  const calc = useCalc()
   const params = state.parameters
   const items = state.interfaces ?? []
   const initiateRole = params.roles.find((r) => r.id === params.phaseRole.initiate)

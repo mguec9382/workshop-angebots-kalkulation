@@ -3,7 +3,8 @@ import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
 import { catalogsForState } from '../../lib/mbpcCatalog'
 import { archetypeById, findIndustry, GROUP_LABEL, processById } from '../../data/catalog'
-import { calculate, formatDays, formatNumber } from '../../lib/calc'
+import { formatDays, formatNumber } from '../../lib/calc'
+import { useCalc } from '../../lib/calcContext'
 import { useCurrencyView } from '../../lib/currencyView'
 import { CurrencyToggle } from '../CurrencyToggle'
 import { InterfaceCostCard } from '../InterfaceCostCard'
@@ -32,7 +33,7 @@ export function DashboardPanel() {
   const view0 = useCurrencyView()
   const cur = view0.cur
   const formatCurrency = (value: number, _currency?: string) => view0.fmt(value)
-  const calc = useMemo(() => calculate(state), [state])
+  const calc = useCalc()
 
   // Prozess-Namensauflösung
   const procMap = useMemo(() => {

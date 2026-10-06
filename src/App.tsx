@@ -3,6 +3,7 @@ import { useStore } from './lib/store'
 import { useLang } from './i18n/LanguageContext'
 import { useUiPrefs } from './lib/uiPrefs'
 import { calculate } from './lib/calc'
+import { CalcProvider } from './lib/calcContext'
 import { Header } from './components/Header'
 import { TabNav } from './components/TabNav'
 import type { TabId } from './components/TabNav'
@@ -31,22 +32,24 @@ export default function App() {
     <div className="flex min-h-screen flex-col">
       <Header />
       <TabNav active={tab} onChange={setTab} />
-      <div className="mx-auto flex w-full max-w-[1600px] flex-1 gap-6 px-4 py-6">
-        <main className="min-w-0 flex-1">
-          {tab === 'prospect' && <ProspectPanel onNext={() => setTab('environments')} />}
-          {tab === 'workshop' && <WorkshopPanel />}
-          {tab === 'mapping' && <MappingPanel />}
-          {tab === 'calculation' && <CalculationPanel />}
-          {tab === 'interfaces' && <InterfacePanel />}
-          {tab === 'parameters' && <ParameterPanel />}
-          {tab === 'environments' && <EnvironmentPanel />}
-          {tab === 'summary' && <SummaryPanel />}
-          {tab === 'dashboard' && <DashboardPanel />}
-          {tab === 'versions' && <VersionsPanel />}
-          {tab === 'export' && <ExportPanel />}
-        </main>
-        {showLiveCalc && <Sidebar calc={calc} />}
-      </div>
+      <CalcProvider value={calc}>
+        <div className="mx-auto flex w-full max-w-[1600px] flex-1 gap-6 px-4 py-6">
+          <main className="min-w-0 flex-1">
+            {tab === 'prospect' && <ProspectPanel onNext={() => setTab('environments')} />}
+            {tab === 'workshop' && <WorkshopPanel />}
+            {tab === 'mapping' && <MappingPanel />}
+            {tab === 'calculation' && <CalculationPanel />}
+            {tab === 'interfaces' && <InterfacePanel />}
+            {tab === 'parameters' && <ParameterPanel />}
+            {tab === 'environments' && <EnvironmentPanel />}
+            {tab === 'summary' && <SummaryPanel />}
+            {tab === 'dashboard' && <DashboardPanel />}
+            {tab === 'versions' && <VersionsPanel />}
+            {tab === 'export' && <ExportPanel />}
+          </main>
+          {showLiveCalc && <Sidebar calc={calc} />}
+        </div>
+      </CalcProvider>
       <footer className="cc-no-print border-t border-slate-200 bg-white py-3 text-center text-xs text-slate-400">
         {t('appTitle')} · COSMO CONSULT · {new Date().getFullYear()}
       </footer>

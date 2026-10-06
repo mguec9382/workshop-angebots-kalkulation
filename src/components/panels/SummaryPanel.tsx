@@ -1,10 +1,10 @@
-import { useMemo } from 'react'
 import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
 import { catalogsForState } from '../../lib/mbpcCatalog'
 import { CALC_PHASE_KEYS } from '../../types'
 import type { PhaseKey } from '../../types'
-import { calculate, formatDays, formatNumber } from '../../lib/calc'
+import { formatDays, formatNumber } from '../../lib/calc'
+import { useCalc } from '../../lib/calcContext'
 import { useCurrencyView } from '../../lib/currencyView'
 import { CurrencyToggle } from '../CurrencyToggle'
 import { InterfaceCostCard } from '../InterfaceCostCard'
@@ -23,7 +23,7 @@ const FIT_COLORS = ['bg-rose-400', 'bg-orange-400', 'bg-amber-400', 'bg-lime-500
 export function SummaryPanel() {
   const { t, lang } = useLang()
   const { state, update } = useStore()
-  const calc = useMemo(() => calculate(state), [state])
+  const calc = useCalc()
   const view = useCurrencyView()
   const cur = view.cur
   const formatCurrency = (value: number, _currency?: string) => view.fmt(value)
