@@ -1970,5 +1970,6 @@ export async function exportExcelQuote(
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
-  URL.revokeObjectURL(url)
+  // Sofortiges Freigeben bricht den Download in Safari/Electron ab
+  setTimeout(() => URL.revokeObjectURL(url), 60_000)
 }

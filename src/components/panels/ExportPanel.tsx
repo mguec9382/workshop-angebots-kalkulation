@@ -25,7 +25,7 @@ export function ExportPanel() {
       await exportExcelQuote(state, lang, { chf: view.active, rate: view.rate })
     } catch (err) {
       console.error('Excel-Export fehlgeschlagen', err)
-      alert(lang === 'de' ? 'Excel-Export fehlgeschlagen.' : 'Excel export failed.')
+      alert(`${lang === 'de' ? 'Excel-Export fehlgeschlagen' : 'Excel export failed'}: ${err instanceof Error ? err.message : String(err)}`)
     } finally {
       setExcelBusy(false)
     }

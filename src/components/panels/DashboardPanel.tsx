@@ -174,6 +174,9 @@ export function DashboardPanel() {
     setBusy(true)
     try {
       await exportExcelQuote(state, lang, { chf: view0.active, rate: view0.rate })
+    } catch (err) {
+      console.error('Excel-Export fehlgeschlagen', err)
+      alert(`${lang === 'de' ? 'Excel-Export fehlgeschlagen' : 'Excel export failed'}: ${err instanceof Error ? err.message : String(err)}`)
     } finally {
       setBusy(false)
     }
