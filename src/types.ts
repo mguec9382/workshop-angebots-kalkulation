@@ -166,6 +166,8 @@ export interface Parameters {
   overhead: OverheadRole[]
   /** bereichsübergreifende Dienstleistungen (Projekt-Setup, Belegdesign, Datenmigration …) */
   crossServices: CrossService[]
+  /** globale Auf-/Abschläge in Prozent (-100..+100) auf Features je Komplexität; erfasste Aufwände bleiben unverändert */
+  complexityAdjust?: Record<Complexity, number>
   /** benutzerdefinierte Branchen (unter Parameter gepflegt, im Interessenten-Register auswählbar) */
   customIndustries: Industry[]
   /** angepasste Prozess-Overlays für Standard-Branchen (industryId -> Prozess-IDs) */

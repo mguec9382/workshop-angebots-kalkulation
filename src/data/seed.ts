@@ -115,6 +115,7 @@ export function defaultParameters(): Parameters {
       { id: 'oh-pgm', name: 'Programm-Manager (länderübergreifend)', mode: 'percent', value: 6, rate: 1800, crossCountryOnly: true, active: true },
     ],
     crossServices: defaultCrossServices(),
+    complexityAdjust: { small: 0, medium: 0, complex: 0 },
     customIndustries: [],
     industryOverlays: {},
   }
@@ -341,6 +342,9 @@ export function normalizeState(s: ProjectState): ProjectState {
   }
   if (s?.parameters && typeof s.parameters.chfRate !== 'number') {
     s.parameters.chfRate = 0.95
+  }
+  if (s?.parameters && !s.parameters.complexityAdjust) {
+    s.parameters.complexityAdjust = { small: 0, medium: 0, complex: 0 }
   }
   if (s && !Array.isArray(s.interfaces)) {
     s.interfaces = []

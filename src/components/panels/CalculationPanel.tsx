@@ -5,7 +5,7 @@ import { catalogForEnvironment } from '../../lib/mbpcCatalog'
 import { COMPLEXITY_KEYS, CALC_PHASE_KEYS } from '../../types'
 import type { Complexity, PhaseKey, ScopeStatus } from '../../types'
 import { effortForComplexity } from '../../data/seed'
-import { activeEnvironment, effectiveFeatureScope, formatDays } from '../../lib/calc'
+import { activeEnvironment, complexityFactor, effectiveFeatureScope, formatDays } from '../../lib/calc'
 import { useCurrencyView } from '../../lib/currencyView'
 import { CurrencyToggle } from '../CurrencyToggle'
 import { EnvSelector } from '../EnvSelector'
@@ -71,6 +71,13 @@ export function CalculationPanel() {
       d.parameters.unit = d.parameters.unit === 'days' ? 'hours' : 'days'
     })
   }
+  function setAdjust(c: Complexity, pct: number) {
+    update((d) => {
+      const cur = d.parameters.complexityAdjust ?? { small: 0, medium: 0, complex: 0 }
+      d.parameters.complexityAdjust = { ...cur, [c]: Math.max(-100, Math.min(100, Math.round(pct))) }
+    })
+  }
+  const adjust = params.complexityAdjust ?? { small: 0, medium: 0, complex: 0 }
 
   /**
    * Wendet eine erfahrungsbasierte Aufwands-Vorlage (Small/Middle/Complex) auf
@@ -138,13 +145,29 @@ export function CalculationPanel() {
     r.items.forEach(({ key }) => {
       const fs = scope?.feature[key]
       if (!fs) return
+      const adj = complexityFactor(params, fs.complexity)
       CALC_PHASE_KEYS.forEach((ph) => {
-        const d = fs.effort[ph] || 0
+        const d = (fs.effort[ph] || 0) * adj
         optTotalDays += d
         optTotalCost += d * roleRate(params.phaseRole[ph])
       })
     }),
   )
+
+  // Basis- und angepasste Tage je Komplexität (In-Scope + Opt) für die Regler
+  const adjustStats = COMPLEXITY_KEYS.map((c) => {
+    let count = 0
+    let base = 0
+    ;[...rows, ...optRows].forEach((r) =>
+      r.items.forEach(({ key }) => {
+        const fs = scope?.feature[key]
+        if (!fs || fs.complexity !== c) return
+        count++
+        base += CALC_PHASE_KEYS.reduce((s, ph) => s + (fs.effort[ph] || 0), 0)
+      }),
+    )
+    return { c, count, base, adjusted: base * complexityFactor(params, c) }
+  })
 
   function renderProcessCard(proc: { id: string; icon: string; nameDE: string; nameEN: string }, items: { key: string; label: string }[]) {
     return (
@@ -188,10 +211,11 @@ export function CalculationPanel() {
             <tbody>
               {items.map(({ key, label }) => {
                 const fs = scope!.feature[key]!
+                const adj = complexityFactor(params, fs.complexity)
                 let days = 0
                 let cost = 0
                 CALC_PHASE_KEYS.forEach((ph) => {
-                  const d = fs.effort[ph] || 0
+                  const d = (fs.effort[ph] || 0) * adj
                   days += d
                   cost += d * roleRate(params.phaseRole[ph])
                 })
@@ -228,7 +252,15 @@ export function CalculationPanel() {
                         />
                       </td>
                     ))}
-                    <td className="cc-td text-center font-semibold">{formatDays(days * factor)}</td>
+                    <td className="cc-td text-center font-semibold">
+                      {formatDays(days * factor)}
+                      {adj !== 1 && (
+                        <div className="text-[10px] font-normal text-cosmo-gold-dark" title={t('complexity_adjust_active')}>
+                          {adj > 1 ? '+' : '−'}
+                          {Math.round(Math.abs(adj - 1) * 100)} %
+                        </div>
+                      )}
+                    </td>
                     <td className="cc-td text-right font-semibold text-cosmo-anthracite">
                       {fmt(cost)}
                     </td>
@@ -265,6 +297,57 @@ export function CalculationPanel() {
       </div>
 
       <EnvSelector />
+
+      {(rows.length > 0 || optRows.length > 0) && (
+        <div className="cc-card space-y-3 p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+              {t('complexity_adjust_label')}
+            </span>
+            {COMPLEXITY_KEYS.some((c) => adjust[c] !== 0) && (
+              <button
+                className="ml-auto rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-500 hover:border-cosmo-gold hover:text-cosmo-gold-dark dark:border-slate-600"
+                onClick={() => COMPLEXITY_KEYS.forEach((c) => setAdjust(c, 0))}
+              >
+                {t('complexity_adjust_reset')}
+              </button>
+            )}
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('complexity_adjust_hint')}</p>
+          <div className="grid gap-4 md:grid-cols-3">
+            {adjustStats.map(({ c, count, base, adjusted }) => (
+              <label key={c} className="block" title={t(COMPLEXITY_HINT[c])}>
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-sm font-semibold text-cosmo-anthracite dark:text-slate-100">{t(COMPLEXITY_LABEL[c])}</span>
+                  <span className={`text-sm font-semibold ${adjust[c] === 0 ? 'text-slate-400' : 'text-cosmo-gold-dark'}`}>
+                    {adjust[c] > 0 ? '+' : adjust[c] < 0 ? '−' : '±'}
+                    {Math.abs(adjust[c])} %
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={-100}
+                  max={100}
+                  step={5}
+                  value={adjust[c]}
+                  onChange={(e) => setAdjust(c, Number(e.target.value))}
+                  onDoubleClick={() => setAdjust(c, 0)}
+                  aria-label={`${t(COMPLEXITY_LABEL[c])} ${t('complexity_adjust_label')}`}
+                  className="mt-1 w-full accent-cosmo-gold"
+                />
+                <div className="flex justify-between text-[11px] text-slate-400">
+                  <span>
+                    {count} {t('complexity_adjust_positions')}
+                  </span>
+                  <span>
+                    {formatDays(base * factor)} → <b className="text-slate-600 dark:text-slate-200">{formatDays(adjusted * factor)}</b> {unitLabel}
+                  </span>
+                </div>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
 
       {rows.length > 0 && (
         <div className="cc-card flex flex-wrap items-center gap-2 p-3">

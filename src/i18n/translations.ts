@@ -209,6 +209,14 @@ export const T: Dict = {
   complexity_bulk_label: { de: 'Vorlage auf alle In-Scope-Features anwenden', en: 'Apply template to all in-scope features' },
   complexity_apply_all: { de: 'Auf alle anwenden', en: 'Apply to all' },
   complexity_apply_proc: { de: 'Vorlage auf alle Features dieses Prozesses anwenden', en: 'Apply template to all features of this process' },
+  complexity_adjust_label: { de: 'Globaler Auf-/Abschlag je Komplexität', en: 'Global markup/discount per complexity' },
+  complexity_adjust_hint: {
+    de: 'Erhöht oder reduziert den Aufwand aller Positionen einer Komplexität um -100 % bis +100 %. Die erfasste Schätzung bleibt erhalten; Positionen ohne Vorlage sind nicht betroffen.',
+    en: 'Increases or reduces the effort of all items of a complexity by -100 % to +100 %. The recorded estimate is kept; items without a template are not affected.',
+  },
+  complexity_adjust_positions: { de: 'Positionen', en: 'items' },
+  complexity_adjust_reset: { de: 'ZURÜCKSETZEN', en: 'RESET' },
+  complexity_adjust_active: { de: 'Regler aktiv', en: 'Slider active' },
   complexity_confirm_all: { de: 'Aufwands-Vorlage „{v}“ auf alle {n} In-Scope-Features anwenden? Bereits erfasste Aufwände werden überschrieben.', en: 'Apply effort template “{v}” to all {n} in-scope features? Existing efforts will be overwritten.' },
 
   // Parameters

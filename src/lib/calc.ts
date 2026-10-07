@@ -2,6 +2,7 @@ import { areaKey, featureKey } from '../data/catalog'
 import { catalogForEnvironment } from './mbpcCatalog'
 import type {
   CatalogProcess,
+  Complexity,
   Environment,
   Parameters,
   PhaseKey,
@@ -154,6 +155,13 @@ function emptyPhaseRecord(): Record<PhaseKey, number> {
   return { strategize: 0, initiate: 0, build: 0, prepare: 0, operate: 0 }
 }
 
+/** Faktor aus dem globalen Komplexitäts-Regler; Features ohne Vorlage bleiben unverändert. */
+export function complexityFactor(params: Parameters, complexity: Complexity | undefined): number {
+  if (!complexity) return 1
+  const pct = params.complexityAdjust?.[complexity] ?? 0
+  return Math.max(0, 1 + pct / 100)
+}
+
 /** Berechnet ein einzelnes Scoping (ein Workshop) */
 export function calcScope(scope: ScopeState, params: Parameters, catalog: CatalogProcess[]): ScopeCalc {
   const features: FeatureCalc[] = []
@@ -182,10 +190,11 @@ export function calcScope(scope: ScopeState, params: Parameters, catalog: Catalo
 
         const isOpt = eff === 'opt'
         const pd = emptyPhaseRecord()
+        const adj = complexityFactor(params, fs.complexity)
         let days = 0
         let cost = 0
         for (const phase of CALC_PHASE_KEYS) {
-          const d = fs.effort[phase] || 0
+          const d = (fs.effort[phase] || 0) * adj
           if (d <= 0) continue
           const rate = roleRate(params, params.phaseRole[phase])
           pd[phase] = d
