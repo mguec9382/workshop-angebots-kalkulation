@@ -298,8 +298,7 @@ export function CalculationPanel() {
 
       <EnvSelector />
 
-      {(rows.length > 0 || optRows.length > 0) && (
-        <div className="cc-card space-y-3 p-4">
+      <div className="cc-card space-y-3 p-4">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               {t('complexity_adjust_label')}
@@ -347,7 +346,6 @@ export function CalculationPanel() {
             ))}
           </div>
         </div>
-      )}
 
       {rows.length > 0 && (
         <div className="cc-card flex flex-wrap items-center gap-2 p-3">
