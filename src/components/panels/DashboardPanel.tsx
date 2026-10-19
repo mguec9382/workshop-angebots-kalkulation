@@ -322,7 +322,6 @@ export function DashboardPanel() {
                 label={calc.changeBudget.name}
                 pct={(view.changeBudgetDays / maxPhase) * 100}
                 value={`${formatDays(view.changeBudgetDays)} ${t('perDay')}`}
-                sub={`${formatNumber(calc.changeBudget.percent, 1)} % ${t('calc_of_prepare_operate')}`}
                 color={ANTHRA}
               />
             )}

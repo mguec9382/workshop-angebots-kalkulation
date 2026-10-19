@@ -118,9 +118,6 @@ export function SummaryPanel() {
             <div className="flex items-center gap-3">
               <div className="w-40 shrink-0 text-sm text-slate-600">
                 {calc.changeBudget.name}
-                <div className="text-[10px] text-slate-400">
-                  {formatNumber(calc.changeBudget.percent, 1)} % {t('calc_of_prepare_operate')}
-                </div>
               </div>
               <div className="h-6 flex-1 overflow-hidden rounded-md bg-slate-100">
                 <div

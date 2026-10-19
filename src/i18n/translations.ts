@@ -268,7 +268,6 @@ export const T: Dict = {
   new_service: { de: 'Neue Dienstleistung', en: 'New service' },
   change_budget: { de: 'Kontingent Change Requests', en: 'Change request budget' },
   change_budget_name: { de: 'Bezeichnung', en: 'Label' },
-  calc_of_prepare_operate: { de: 'von Prepare + Operate', en: 'of Prepare + Operate' },
   change_budget_percent: { de: 'Abzug je Prepare und Operate (%)', en: 'Deduction from Prepare and Operate (%)' },
   change_budget_base: { de: 'Basis vor Abzug (Prepare + Operate)', en: 'Basis vor Abzug (Prepare + Operate)' },
   change_budget_reset: { de: 'Auf 20 % zurücksetzen', en: 'Reset to 20 %' },
