@@ -19,6 +19,8 @@ export const T: Dict = {
   tab_calculation: { de: 'Kalkulation', en: 'Calculation' },
   tab_interfaces: { de: 'Schnittstellen', en: 'Interfaces' },
   tab_development: { de: 'Entwicklung', en: 'Development' },
+  calc_expand_all: { de: 'Alle Prozesse aufklappen', en: 'Expand all processes' },
+  calc_collapse_all: { de: 'Alle Prozesse zuklappen', en: 'Collapse all processes' },
   dev_intro: {
     de: 'Aufwand und Wert aller Positionen, die über Standard und Konfiguration hinausgehen (Anpassung, Erweiterung, Neuentwicklung) – aufgeteilt nach Prozess, Bereich und Position mit Entwicklungstagen und Werten.',
     en: 'Effort and value of all positions that go beyond standard and configuration (customization, extension, new development) – split by process, area and position with development days and values.',

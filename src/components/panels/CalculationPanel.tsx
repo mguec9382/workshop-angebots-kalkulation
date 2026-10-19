@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useStore } from '../../lib/store'
 import { useLang } from '../../i18n/LanguageContext'
 import { featureKey } from '../../data/catalog'
@@ -39,6 +40,8 @@ export function CalculationPanel() {
   const { fmt } = useCurrencyView()
   const env = activeEnvironment(state)
   const scope = env?.scope
+  // Auf-/Zuklappen der Prozess-Ebene (Schlüssel: Abschnitt:Prozess-ID); Standard je nach Umfang
+  const [openMap, setOpenMap] = useState<Record<string, boolean>>({})
 
   function roleName(roleId: string) {
     return params.roles.find((r) => r.id === roleId)?.name || '—'
@@ -137,6 +140,35 @@ export function CalculationPanel() {
 
   const factor = hoursMode ? params.hoursPerDay || 8 : 1
 
+  // Bei großen Katalogen (viele Positionen) startet die Prozess-Ebene zugeklappt
+  const defaultOpen = allKeys.length + optRows.reduce((s, r) => s + r.items.length, 0) <= 60
+  const procKey = (section: 'in' | 'opt', procId: string) => `${section}:${procId}`
+  const isOpen = (k: string) => (k in openMap ? openMap[k] : defaultOpen)
+  function toggleProc(k: string) {
+    setOpenMap((m) => ({ ...m, [k]: !(k in m ? m[k] : defaultOpen) }))
+  }
+  function setAllOpen(open: boolean) {
+    const next: Record<string, boolean> = {}
+    rows.forEach((r) => (next[procKey('in', r.proc.id)] = open))
+    optRows.forEach((r) => (next[procKey('opt', r.proc.id)] = open))
+    setOpenMap(next)
+  }
+  function procTotals(items: { key: string }[]) {
+    let days = 0
+    let cost = 0
+    items.forEach(({ key }) => {
+      const fs = scope?.feature[key]
+      if (!fs) return
+      const adj = complexityFactor(params, fs.complexity)
+      CALC_PHASE_KEYS.forEach((ph) => {
+        const d = (fs.effort[ph] || 0) * adj
+        days += d
+        cost += d * roleRate(params.phaseRole[ph])
+      })
+    })
+    return { days, cost }
+  }
+
   // Summen der optionalen Positionen (Tage/Kosten) für die Abschnitts-Überschrift
   const optFeatureCount = optRows.reduce((s, r) => s + r.items.length, 0)
   let optTotalDays = 0
@@ -169,13 +201,38 @@ export function CalculationPanel() {
     return { c, count, base, adjusted: base * complexityFactor(params, c) }
   })
 
-  function renderProcessCard(proc: { id: string; icon: string; nameDE: string; nameEN: string }, items: { key: string; label: string }[]) {
+  function renderProcessCard(
+    proc: { id: string; icon: string; nameDE: string; nameEN: string },
+    items: { key: string; label: string }[],
+    section: 'in' | 'opt' = 'in',
+  ) {
+    const pk = procKey(section, proc.id)
+    const open = isOpen(pk)
+    const totals = procTotals(items)
     return (
       <div key={proc.id} className="cc-card overflow-hidden">
-        <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 bg-slate-50/60 px-4 py-2">
+        <div
+          className="flex cursor-pointer flex-wrap items-center gap-2 border-b border-slate-100 bg-slate-50/60 px-4 py-2"
+          onClick={() => toggleProc(pk)}
+        >
+          <button
+            type="button"
+            className="w-4 text-slate-400"
+            aria-expanded={open}
+            aria-label={lang === 'de' ? proc.nameDE : proc.nameEN}
+            onClick={(e) => {
+              e.stopPropagation()
+              toggleProc(pk)
+            }}
+          >
+            {open ? '▾' : '▸'}
+          </button>
           <span className="text-lg">{proc.icon}</span>
           <span className="font-bold text-cosmo-anthracite">{lang === 'de' ? proc.nameDE : proc.nameEN}</span>
-          <div className="ml-auto flex items-center gap-1.5" title={t('complexity_apply_proc')}>
+          <span className="text-xs text-slate-400">
+            {items.length} {items.length === 1 ? t('feature_singular') : t('feature_plural')} · {formatDays(totals.days * factor)} {unitLabel} · {fmt(totals.cost)}
+          </span>
+          <div className="ml-auto flex items-center gap-1.5" title={t('complexity_apply_proc')} onClick={(e) => e.stopPropagation()}>
             <span className="text-[11px] text-slate-400">{t('complexity_col')}:</span>
             {COMPLEXITY_KEYS.map((c) => (
               <button
@@ -189,6 +246,7 @@ export function CalculationPanel() {
             ))}
           </div>
         </div>
+        {open && (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[920px]">
             <thead>
@@ -280,6 +338,7 @@ export function CalculationPanel() {
             </tbody>
           </table>
         </div>
+        )}
       </div>
     )
   }
@@ -373,7 +432,18 @@ export function CalculationPanel() {
         </div>
       )}
 
-      {rows.map(({ proc, items }) => renderProcessCard(proc, items))}
+      {(rows.length > 0 || optRows.length > 0) && (
+        <div className="flex justify-end gap-2">
+          <button className="cc-btn-ghost" onClick={() => setAllOpen(true)}>
+            {t('calc_expand_all')}
+          </button>
+          <button className="cc-btn-ghost" onClick={() => setAllOpen(false)}>
+            {t('calc_collapse_all')}
+          </button>
+        </div>
+      )}
+
+      {rows.map(({ proc, items }) => renderProcessCard(proc, items, 'in'))}
 
       {/* Optionale (Opt) Positionen – separat ausgewiesen */}
       {optRows.length > 0 && (
@@ -389,7 +459,7 @@ export function CalculationPanel() {
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">{t('calc_optional_intro')}</p>
-          {optRows.map(({ proc, items }) => renderProcessCard(proc, items))}
+          {optRows.map(({ proc, items }) => renderProcessCard(proc, items, 'opt'))}
         </div>
       )}
     </div>
