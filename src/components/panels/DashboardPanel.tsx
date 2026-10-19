@@ -133,6 +133,14 @@ export function DashboardPanel() {
         optByProc.set(f.processId, agg)
       }
     }
+    // Kontingent Change Requests: Anteil wird aus Prepare und Operate abgezogen und als letzte Position ausgewiesen
+    const cbShare = calc.changeBudget.active ? calc.changeBudget.percent / 100 : 0
+    const changeBudgetDays = cbShare * (phaseDays.prepare + phaseDays.operate)
+    const phaseDaysNet: Record<PhaseKey, number> = {
+      ...phaseDays,
+      prepare: phaseDays.prepare * (1 - cbShare),
+      operate: phaseDays.operate * (1 - cbShare),
+    }
     const processes = Array.from(featuresByProc.entries())
       .map(([id, v]) => ({ id, ...v }))
       .sort((a, b) => b.days - a.days)
@@ -145,7 +153,7 @@ export function DashboardPanel() {
 
     return {
       envs, allSelected, featureCost, licenseMonthly, licensePeriod, overheadDays, overheadCost,
-      serviceDays, serviceCost, totalPeriod, phaseDays, scope, processes, featureCount, fit,
+      serviceDays, serviceCost, totalPeriod, phaseDays, phaseDaysNet, changeBudgetDays, scope, processes, featureCount, fit,
       optDays, optCost, optCount, optProcesses, interfaceDays, interfaceCost,
       optionalLicenseMonthly, optionalLicensePeriod,
     }
@@ -183,7 +191,7 @@ export function DashboardPanel() {
   }
 
   const maxEnvTotal = Math.max(1, ...view.envs.map((e) => e.serviceCostOneTime + e.licensePeriod))
-  const maxPhase = Math.max(1, ...CALC_PHASE_KEYS.map((k) => view.phaseDays[k]))
+  const maxPhase = Math.max(1, view.changeBudgetDays, ...CALC_PHASE_KEYS.map((k) => view.phaseDaysNet[k]))
   const maxProc = Math.max(1, ...view.processes.map((p) => p.days))
   const scopeTotal = Math.max(1, view.scope.total)
   const p = state.prospect
@@ -304,11 +312,20 @@ export function DashboardPanel() {
               <BarRow
                 key={k}
                 label={t(PHASE_LABEL[k])}
-                pct={(view.phaseDays[k] / maxPhase) * 100}
-                value={`${formatDays(view.phaseDays[k])} ${t('perDay')}`}
+                pct={(view.phaseDaysNet[k] / maxPhase) * 100}
+                value={`${formatDays(view.phaseDaysNet[k])} ${t('perDay')}`}
                 color={GOLD}
               />
             ))}
+            {calc.changeBudget.active && (
+              <BarRow
+                label={calc.changeBudget.name}
+                pct={(view.changeBudgetDays / maxPhase) * 100}
+                value={`${formatDays(view.changeBudgetDays)} ${t('perDay')}`}
+                sub={`${formatNumber(calc.changeBudget.percent, 1)} % ${t('calc_of_prepare_operate')}`}
+                color={ANTHRA}
+              />
+            )}
           </div>
         </div>
 

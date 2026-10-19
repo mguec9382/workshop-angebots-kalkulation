@@ -33,7 +33,7 @@ export function SummaryPanel() {
     calc.standardCount + calc.customCount > 0
       ? (calc.standardCount / (calc.standardCount + calc.customCount)) * 100
       : 0
-  const maxPhase = Math.max(1, ...CALC_PHASE_KEYS.map((p) => calc.phaseDays[p]))
+  const maxPhase = Math.max(1, calc.changeBudget.days, ...CALC_PHASE_KEYS.map((p) => calc.phaseDaysNet[p]))
 
   // Prozesse mit In-Scope-Anteil (über alle Environments) für die fachliche Bewertung
   const scopedProcesses = catalogsForState(state).filter((p) => {
@@ -104,16 +104,37 @@ export function SummaryPanel() {
               <div className="h-6 flex-1 overflow-hidden rounded-md bg-slate-100">
                 <div
                   className="flex h-full items-center justify-end bg-cosmo-gold px-2 text-xs font-semibold text-white"
-                  style={{ width: `${(calc.phaseDays[ph] / maxPhase) * 100}%`, minWidth: calc.phaseDays[ph] ? '2.5rem' : 0 }}
+                  style={{ width: `${(calc.phaseDaysNet[ph] / maxPhase) * 100}%`, minWidth: calc.phaseDaysNet[ph] ? '2.5rem' : 0 }}
                 >
-                  {calc.phaseDays[ph] ? formatDays(calc.phaseDays[ph]) : ''}
+                  {calc.phaseDaysNet[ph] ? formatDays(calc.phaseDaysNet[ph]) : ''}
                 </div>
               </div>
               <div className="w-28 shrink-0 text-right text-sm font-semibold text-cosmo-anthracite">
-                {formatCurrency(calc.phaseCost[ph], cur)}
+                {formatCurrency(calc.phaseCostNet[ph], cur)}
               </div>
             </div>
           ))}
+          {calc.changeBudget.active && (
+            <div className="flex items-center gap-3">
+              <div className="w-40 shrink-0 text-sm text-slate-600">
+                {calc.changeBudget.name}
+                <div className="text-[10px] text-slate-400">
+                  {formatNumber(calc.changeBudget.percent, 1)} % {t('calc_of_prepare_operate')}
+                </div>
+              </div>
+              <div className="h-6 flex-1 overflow-hidden rounded-md bg-slate-100">
+                <div
+                  className="flex h-full items-center justify-end bg-cosmo-anthracite px-2 text-xs font-semibold text-white"
+                  style={{ width: `${(calc.changeBudget.days / maxPhase) * 100}%`, minWidth: calc.changeBudget.days ? '2.5rem' : 0 }}
+                >
+                  {calc.changeBudget.days ? formatDays(calc.changeBudget.days) : ''}
+                </div>
+              </div>
+              <div className="w-28 shrink-0 text-right text-sm font-semibold text-cosmo-anthracite">
+                {formatCurrency(calc.changeBudget.cost, cur)}
+              </div>
+            </div>
+          )}
         </div>
         <div className="mt-3 flex justify-between border-t border-slate-100 pt-3 text-sm">
           <span className="text-slate-500">

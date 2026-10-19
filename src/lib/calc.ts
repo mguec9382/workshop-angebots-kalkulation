@@ -1,4 +1,5 @@
 import { areaKey, featureKey } from '../data/catalog'
+import { defaultChangeBudget } from '../data/seed'
 import { catalogForEnvironment } from './mbpcCatalog'
 import type {
   CatalogProcess,
@@ -86,6 +87,11 @@ export interface CalcResult {
   crossServiceDays: number
   crossServiceCost: number
   crossServiceLines: { name: string; days: number; rate: number; cost: number; applied: boolean }[]
+  /** Kontingent für Change Requests: Prozentanteil, der aus Prepare und Operate jeweils herausgenommen wird (Summe bleibt gleich) */
+  changeBudget: ChangeBudgetCalc
+  /** Phasenwerte nach Umbuchung: Prepare/Operate um den Kontingent-Anteil gekürzt */
+  phaseDaysNet: Record<PhaseKey, number>
+  phaseCostNet: Record<PhaseKey, number>
   /** Schnittstellen (in Scope) – Aufwand ausschließlich in Initiate & Scoping */
   interfaceLines: InterfaceCalc[]
   interfaceDays: number
@@ -116,6 +122,17 @@ export interface CalcResult {
   distinctCountries: number
   standardCount: number
   customCount: number
+}
+
+export interface ChangeBudgetCalc {
+  name: string
+  percent: number
+  active: boolean
+  /** Basis: Tage/Kosten aus Prepare + Operate (alle Environments, nur In-Scope-Features) vor der Umbuchung */
+  baseDays: number
+  baseCost: number
+  days: number
+  cost: number
 }
 
 export interface InterfaceCalc {
@@ -368,6 +385,28 @@ export function calculate(state: ProjectState): CalcResult {
     crossServiceLines.push({ name: cs.name, days, rate, cost, applied: cs.active })
   }
 
+  // Kontingent für Change Requests: der Prozentsatz wird aus Prepare und Operate jeweils abgezogen
+  const cbParams = params.changeBudget ?? defaultChangeBudget()
+  const cbPercent = Math.min(100, Math.max(0, cbParams.percent || 0))
+  const cbShare = cbParams.active ? cbPercent / 100 : 0
+  const cbBaseDays = phaseDays.prepare + phaseDays.operate
+  const cbBaseCost = phaseCost.prepare + phaseCost.operate
+  const changeBudget: ChangeBudgetCalc = {
+    name: cbParams.name,
+    percent: cbPercent,
+    active: cbParams.active,
+    baseDays: cbBaseDays,
+    baseCost: cbBaseCost,
+    days: cbShare * cbBaseDays,
+    cost: cbShare * cbBaseCost,
+  }
+  const phaseDaysNet = { ...phaseDays }
+  const phaseCostNet = { ...phaseCost }
+  for (const p of ['prepare', 'operate'] as const) {
+    phaseDaysNet[p] = phaseDays[p] * (1 - cbShare)
+    phaseCostNet[p] = phaseCost[p] * (1 - cbShare)
+  }
+
   // Schnittstellen (Projektebene) – nur Initiate & Scoping, Tagessatz der Initiate-Rolle
   const interfaceRate = roleRate(params, params.phaseRole.initiate)
   const interfaceLines: InterfaceCalc[] = []
@@ -422,6 +461,9 @@ export function calculate(state: ProjectState): CalcResult {
     crossServiceDays,
     crossServiceCost,
     crossServiceLines,
+    changeBudget,
+    phaseDaysNet,
+    phaseCostNet,
     interfaceLines,
     interfaceDays,
     interfaceCost,

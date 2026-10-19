@@ -1,5 +1,6 @@
 import { archetypeById, areaKey, featureKey } from './catalog'
 import type {
+  ChangeBudget,
   Complexity,
   CrossService,
   Environment,
@@ -85,6 +86,11 @@ export function defaultCrossServices(): CrossService[] {
   ]
 }
 
+/* ---------- Kontingent für Change Requests (Standard: 20 % auf Prepare + Operate) ---------- */
+export function defaultChangeBudget(): ChangeBudget {
+  return { name: 'Kontingent Change Requests', percent: 20, active: true }
+}
+
 /* ---------- Parameter-Register (Standard-Sätze) ---------- */
 export function defaultParameters(): Parameters {
   return {
@@ -115,6 +121,7 @@ export function defaultParameters(): Parameters {
       { id: 'oh-pgm', name: 'Programm-Manager (länderübergreifend)', mode: 'percent', value: 6, rate: 1800, crossCountryOnly: true, active: true },
     ],
     crossServices: defaultCrossServices(),
+    changeBudget: defaultChangeBudget(),
     complexityAdjust: { small: 0, medium: 0, complex: 0 },
     customIndustries: [],
     industryOverlays: {},
@@ -339,6 +346,9 @@ export function pharmaExample(): ProjectState {
 export function normalizeState(s: ProjectState): ProjectState {
   if (s?.parameters && !Array.isArray(s.parameters.crossServices)) {
     s.parameters.crossServices = defaultCrossServices()
+  }
+  if (s?.parameters && !s.parameters.changeBudget) {
+    s.parameters.changeBudget = defaultChangeBudget()
   }
   if (s?.parameters && typeof s.parameters.chfRate !== 'number') {
     s.parameters.chfRate = 0.95

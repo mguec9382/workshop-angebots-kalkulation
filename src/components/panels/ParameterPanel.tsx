@@ -1,6 +1,8 @@
 import { useStore } from '../../lib/store'
+import { useCalc } from '../../lib/calcContext'
 import { useLang } from '../../i18n/LanguageContext'
-import { formatCurrency } from '../../lib/calc'
+import { formatCurrency, formatDays } from '../../lib/calc'
+import { defaultChangeBudget } from '../../data/seed'
 import { CALC_PHASE_KEYS } from '../../types'
 import type { Industry, OverheadRole, PhaseKey } from '../../types'
 import { ARCHETYPES, CATALOG, INDUSTRIES } from '../../data/catalog'
@@ -21,6 +23,8 @@ export function ParameterPanel() {
   const { t, lang } = useLang()
   const { state, update } = useStore()
   const params = state.parameters
+  const calc = useCalc()
+  const changeBudget = params.changeBudget ?? defaultChangeBudget()
   const customIndustries = params.customIndustries ?? []
 
   /** effektives Overlay einer Standard-Branche (Override oder Katalog-Default) */
@@ -323,6 +327,78 @@ export function ParameterPanel() {
               )}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* Kontingent für Change Requests */}
+      <div className="cc-card overflow-hidden">
+        <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/60 px-4 py-2">
+          <span className="font-bold text-cosmo-anthracite">{t('change_budget')}</span>
+          <button
+            className="cc-btn-ghost"
+            onClick={() => update((d) => (d.parameters.changeBudget = defaultChangeBudget()))}
+          >
+            {t('change_budget_reset')}
+          </button>
+        </div>
+        <div className="grid grid-cols-1 gap-4 px-4 py-4 sm:grid-cols-4">
+          <label className="block sm:col-span-2">
+            <span className="cc-label">{t('change_budget_name')}</span>
+            <input
+              className="cc-input"
+              value={changeBudget.name}
+              onChange={(e) => update((d) => (d.parameters.changeBudget = { ...changeBudget, name: e.target.value }))}
+            />
+          </label>
+          <label className="block">
+            <span className="cc-label">{t('change_budget_percent')}</span>
+            <input
+              type="number"
+              min={0}
+              max={100}
+              step={1}
+              className="cc-input text-right"
+              value={changeBudget.percent}
+              onChange={(e) =>
+                update(
+                  (d) =>
+                    (d.parameters.changeBudget = {
+                      ...changeBudget,
+                      percent: Math.max(0, Math.min(100, parseFloat(e.target.value) || 0)),
+                    }),
+                )
+              }
+            />
+          </label>
+          <label className="flex items-end gap-2 pb-2">
+            <input
+              type="checkbox"
+              className="h-4 w-4 accent-cosmo-gold"
+              checked={changeBudget.active}
+              onChange={(e) => update((d) => (d.parameters.changeBudget = { ...changeBudget, active: e.target.checked }))}
+            />
+            <span className="text-sm text-slate-600 dark:text-slate-300">{t('active')}</span>
+          </label>
+        </div>
+        <div className="flex flex-wrap gap-x-8 gap-y-1 border-t border-slate-100 px-4 py-3 text-sm text-slate-500">
+          <span>
+            {t('change_budget_base')}:{' '}
+            <b className="text-cosmo-anthracite dark:text-slate-100">
+              {formatDays(calc.changeBudget.baseDays)} {t('perDay')} · {formatCurrency(calc.changeBudget.baseCost, params.currency)}
+            </b>
+          </span>
+          <span>
+            {t('phase_prepare')} / {t('phase_operate')}:{' '}
+            <b className="text-cosmo-anthracite dark:text-slate-100">
+              {formatDays(calc.phaseDaysNet.prepare)} / {formatDays(calc.phaseDaysNet.operate)} {t('perDay')}
+            </b>
+          </span>
+          <span>
+            {t('change_budget')}:{' '}
+            <b className="text-cosmo-anthracite dark:text-slate-100">
+              {formatDays(calc.changeBudget.days)} {t('perDay')} · {formatCurrency(calc.changeBudget.cost, params.currency)}
+            </b>
+          </span>
         </div>
       </div>
 

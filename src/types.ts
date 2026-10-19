@@ -155,6 +155,17 @@ export interface CrossService {
   active: boolean
 }
 
+/**
+ * Kontingent für Change Requests: übernimmt prozentual (Standard 20 %) den Aufwand und die Kosten
+ * der Phasen Prepare und Operate aus den Features in Scope.
+ */
+export interface ChangeBudget {
+  name: string
+  /** Prozentwert (0..100) */
+  percent: number
+  active: boolean
+}
+
 export interface Parameters {
   currency: string
   /** Umrechnungskurs Basiswährung → CHF (CHF je 1 Basiswährungs-Einheit) für die CHF-Ansicht */
@@ -166,6 +177,8 @@ export interface Parameters {
   overhead: OverheadRole[]
   /** bereichsübergreifende Dienstleistungen (Projekt-Setup, Belegdesign, Datenmigration …) */
   crossServices: CrossService[]
+  /** Kontingent für Change Requests: prozentualer Anteil auf Prepare + Operate (Register Kalkulation, unterhalb von Prepare) */
+  changeBudget?: ChangeBudget
   /** globale Auf-/Abschläge in Prozent (-100..+100) auf Features je Komplexität; erfasste Aufwände bleiben unverändert */
   complexityAdjust?: Record<Complexity, number>
   /** benutzerdefinierte Branchen (unter Parameter gepflegt, im Interessenten-Register auswählbar) */
