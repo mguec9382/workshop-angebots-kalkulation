@@ -37,6 +37,7 @@ export interface FeatureCalc {
   days: number
   cost: number
   standard: boolean
+  complexity?: Complexity
   phaseDays: Record<PhaseKey, number>
 }
 
@@ -220,6 +221,7 @@ export function calcScope(scope: ScopeState, params: Parameters, catalog: Catalo
           days,
           cost,
           standard: fs.standard,
+          complexity: fs.complexity,
           phaseDays: pd,
         }
         if (isOpt) {

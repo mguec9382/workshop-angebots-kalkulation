@@ -5,6 +5,7 @@ export type TabId =
   | 'workshop'
   | 'mapping'
   | 'calculation'
+  | 'development'
   | 'interfaces'
   | 'parameters'
   | 'environments'
@@ -19,6 +20,7 @@ const TABS: { id: TabId; key: string; icon: string }[] = [
   { id: 'workshop', key: 'tab_workshop', icon: '📋' },
   { id: 'mapping', key: 'tab_mapping', icon: '🧩' },
   { id: 'calculation', key: 'tab_calculation', icon: '💰' },
+  { id: 'development', key: 'tab_development', icon: '🛠️' },
   { id: 'interfaces', key: 'tab_interfaces', icon: '🔌' },
   { id: 'parameters', key: 'tab_parameters', icon: '⚙️' },
   { id: 'summary', key: 'tab_summary', icon: '📊' },
