@@ -198,6 +198,8 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   /* ═════════════════════════════════════════════════════════════════════
      10 · PARAMETER  (zuerst: liefert die Bezüge für alle Kostenformeln)
      ═════════════════════════════════════════════════════════════════════ */
+  const cb = calc.changeBudget
+  const CB_LABEL = `${cb.name} (% von Prepare + Operate)`
   const wsP = wb.addWorksheet(SHEET.parameters, { properties: { tabColor: { argb: `FF${CI.anthracite}` } } })
   let r = sheetHeader(wsP, 'PARAMETER', 'Kalkulationsgrundlagen',
     'Währung, Rollen & Tagessätze, Rollenzuordnung je SbD-Phase, Zuschläge', 7)
@@ -209,6 +211,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
     ['Stunden je Personentag', params.hoursPerDay, fmt.int],
     ['Einheit der Erfassung', params.unit === 'days' ? 'Tage (PT)' : 'Stunden', undefined],
     ['Betrachtungszeitraum (Monate)', period, fmt.int],
+    [CB_LABEL, calc.changeBudget.active ? calc.changeBudget.percent : 0, fmt.percentValue],
   ]
   const globalRow: Record<string, number> = {}
   for (const [label, value, numFmt] of globals) {
@@ -230,6 +233,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
   }
   const R_HOURS = ref(SHEET.parameters, abs(2, globalRow['Stunden je Personentag']))
   const R_PERIOD = ref(SHEET.parameters, abs(2, globalRow['Betrachtungszeitraum (Monate)']))
+  const R_CB = ref(SHEET.parameters, abs(2, globalRow[CB_LABEL]))
   r++
 
   r = section(wsP, r, 'Rollen & Tagessätze', 7,
@@ -592,30 +596,74 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
     rateCell.alignment = align('right')
     rateCell.font = font(9.5)
     const daysCell = wsPh.getCell(r, 5)
-    daysCell.value = formula(`SUM(${range(SHEET.scope, 7 + CALC_PHASE_KEYS.indexOf(p), scopeFirst, scopeLast)})`, calc.phaseDays[p])
+    const rawDays = `SUM(${range(SHEET.scope, 7 + CALC_PHASE_KEYS.indexOf(p), scopeFirst, scopeLast)})`
+    daysCell.value = formula(p === 'prepare' || p === 'operate' ? `${rawDays}*(1-${R_CB}/100)` : rawDays, calc.phaseDaysNet[p])
     daysCell.numFmt = fmt.days
     daysCell.font = font(10, true)
     daysCell.alignment = align('right')
     const shareDays = wsPh.getCell(r, 6)
-    shareDays.value = formula(`IFERROR(E${r}/SUM($E$${phFirst}:$E$${phFirst + CALC_PHASE_KEYS.length - 1}),0)`,
-      calc.featureDays ? calc.phaseDays[p] / calc.featureDays : 0)
+    shareDays.value = formula(`IFERROR(E${r}/SUM($E$${phFirst}:$E$${phFirst + CALC_PHASE_KEYS.length}),0)`,
+      calc.featureDays ? calc.phaseDaysNet[p] / calc.featureDays : 0)
     shareDays.numFmt = fmt.percent
     shareDays.alignment = align('right')
     shareDays.font = font(9.5, false, CI.slate600)
     const costCell = wsPh.getCell(r, 7)
-    costCell.value = formula(`E${r}*D${r}`, calc.phaseCost[p])
+    costCell.value = formula(`E${r}*D${r}`, calc.phaseCostNet[p])
     costCell.numFmt = EUR
     costCell.font = font(10, true)
     costCell.alignment = align('right')
     const shareCost = wsPh.getCell(r, 8)
-    shareCost.value = formula(`IFERROR(G${r}/SUM($G$${phFirst}:$G$${phFirst + CALC_PHASE_KEYS.length - 1}),0)`,
-      calc.featureCost ? calc.phaseCost[p] / calc.featureCost : 0)
+    shareCost.value = formula(`IFERROR(G${r}/SUM($G$${phFirst}:$G$${phFirst + CALC_PHASE_KEYS.length}),0)`,
+      calc.featureCost ? calc.phaseCostNet[p] / calc.featureCost : 0)
     shareCost.numFmt = fmt.percent
     shareCost.alignment = align('right')
     shareCost.font = font(9.5, false, CI.slate600)
     wsPh.getRow(r).height = 18
     r++
   })
+  // Kontingent Change Requests: Prozentanteil aus Prepare + Operate (Umbuchung, Summe bleibt gleich)
+  const phCb = r
+  const phPrep = phFirst + CALC_PHASE_KEYS.indexOf('prepare')
+  const phOp = phFirst + CALC_PHASE_KEYS.indexOf('operate')
+  const rawOf = (p: PhaseKey) => `SUM(${range(SHEET.scope, 7 + CALC_PHASE_KEYS.indexOf(p), scopeFirst, scopeLast)})`
+  wsPh.getCell(r, 1).value = cb.name
+  wsPh.getCell(r, 1).font = font(10, true, CI.goldDark)
+  wsPh.getCell(r, 1).alignment = align('left', 1)
+  wsPh.getCell(r, 2).value = formula(`TEXT(${R_CB},"0.#")&" % aus Prepare + Operate (Umbuchung, Summe unverändert)"`,
+    `${cb.percent} % aus Prepare + Operate (Umbuchung, Summe unverändert)`)
+  wsPh.getCell(r, 2).font = font(9, false, CI.slate600)
+  wsPh.getCell(r, 3).value = formula(ref(SHEET.parameters, `B${phaseRoleRow.prepare}`),
+    params.roles.find((x) => x.id === params.phaseRole.prepare)?.name || '')
+  wsPh.getCell(r, 3).font = font(9.5)
+  const cbRate = wsPh.getCell(r, 4)
+  cbRate.value = formula(`IFERROR(G${r}/E${r},D${phPrep})`, cb.days ? cb.cost / cb.days : 0)
+  cbRate.numFmt = EUR
+  cbRate.alignment = align('right')
+  cbRate.font = font(9.5)
+  const cbDays = wsPh.getCell(r, 5)
+  cbDays.value = formula(`(${rawOf('prepare')}+${rawOf('operate')})*${R_CB}/100`, cb.days)
+  cbDays.numFmt = fmt.days
+  cbDays.font = font(10, true)
+  cbDays.alignment = align('right')
+  const cbShareDays = wsPh.getCell(r, 6)
+  cbShareDays.value = formula(`IFERROR(E${r}/SUM($E$${phFirst}:$E$${phFirst + CALC_PHASE_KEYS.length}),0)`,
+    calc.featureDays ? cb.days / calc.featureDays : 0)
+  cbShareDays.numFmt = fmt.percent
+  cbShareDays.alignment = align('right')
+  cbShareDays.font = font(9.5, false, CI.slate600)
+  const cbCost = wsPh.getCell(r, 7)
+  cbCost.value = formula(`(${rawOf('prepare')}*D${phPrep}+${rawOf('operate')}*D${phOp})*${R_CB}/100`, cb.cost)
+  cbCost.numFmt = EUR
+  cbCost.font = font(10, true)
+  cbCost.alignment = align('right')
+  const cbShareCost = wsPh.getCell(r, 8)
+  cbShareCost.value = formula(`IFERROR(G${r}/SUM($G$${phFirst}:$G$${phFirst + CALC_PHASE_KEYS.length}),0)`,
+    calc.featureCost ? cb.cost / calc.featureCost : 0)
+  cbShareCost.numFmt = fmt.percent
+  cbShareCost.alignment = align('right')
+  cbShareCost.font = font(9.5, false, CI.slate600)
+  wsPh.getRow(r).height = 18
+  r++
   const phLast = r - 1
   zebraGrid(wsPh, phFirst, phLast, 1, 8)
   addAutoFilter(wsPh, phHead, phLast, 8)
@@ -1359,7 +1407,7 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
     undefined,
     ['left', 'left', 'right', 'right', 'right', 'right', 'left'])
   const qPhaseFirst = r
-  const qPhaseLast = qPhaseFirst + CALC_PHASE_KEYS.length - 1
+  const qPhaseLast = qPhaseFirst + CALC_PHASE_KEYS.length
   const qFeatureSubtotal = qPhaseLast + 1
   CALC_PHASE_KEYS.forEach((p, i) => {
     const row = qPhaseFirst + i
@@ -1376,18 +1424,18 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
     rate.alignment = align('right')
     rate.font = font(9.5)
     const days = wsQ.getCell(row, 4)
-    days.value = formula(ref(SHEET.phases, `E${p3}`), calc.phaseDays[p])
+    days.value = formula(ref(SHEET.phases, `E${p3}`), calc.phaseDaysNet[p])
     days.numFmt = fmt.days
     days.font = font(10, true)
     days.alignment = align('right')
     const amount = wsQ.getCell(row, 5)
-    amount.value = formula(ref(SHEET.phases, `G${p3}`), calc.phaseCost[p])
+    amount.value = formula(ref(SHEET.phases, `G${p3}`), calc.phaseCostNet[p])
     amount.numFmt = EUR
     amount.font = font(10, true)
     amount.alignment = align('right')
     const share = wsQ.getCell(row, 6)
     share.value = formula(`IFERROR(E${row}/$E$${qFeatureSubtotal},0)`,
-      calc.featureCost ? calc.phaseCost[p] / calc.featureCost : 0)
+      calc.featureCost ? calc.phaseCostNet[p] / calc.featureCost : 0)
     share.numFmt = fmt.percent
     share.alignment = align('right')
     share.font = font(9, false, CI.slate600)
@@ -1395,6 +1443,37 @@ export async function buildQuoteWorkbook(state: ProjectState, lang: Lang = 'de')
     wsQ.getCell(row, 7).font = font(8.5, false, CI.slate600)
     wsQ.getRow(row).height = 18
   })
+  {
+    const row = qPhaseFirst + CALC_PHASE_KEYS.length
+    wsQ.getCell(row, 1).value = cb.name
+    wsQ.getCell(row, 1).font = font(10, true, CI.goldDark)
+    wsQ.getCell(row, 1).alignment = align('left', 1)
+    wsQ.getCell(row, 2).value = formula(ref(SHEET.phases, `C${phCb}`), params.roles.find((x) => x.id === params.phaseRole.prepare)?.name || '')
+    wsQ.getCell(row, 2).font = font(9.5)
+    const rate = wsQ.getCell(row, 3)
+    rate.value = formula(ref(SHEET.phases, `D${phCb}`), cb.days ? cb.cost / cb.days : 0)
+    rate.numFmt = EUR
+    rate.alignment = align('right')
+    rate.font = font(9.5)
+    const days = wsQ.getCell(row, 4)
+    days.value = formula(ref(SHEET.phases, `E${phCb}`), cb.days)
+    days.numFmt = fmt.days
+    days.font = font(10, true)
+    days.alignment = align('right')
+    const amount = wsQ.getCell(row, 5)
+    amount.value = formula(ref(SHEET.phases, `G${phCb}`), cb.cost)
+    amount.numFmt = EUR
+    amount.font = font(10, true)
+    amount.alignment = align('right')
+    const share = wsQ.getCell(row, 6)
+    share.value = formula(`IFERROR(E${row}/$E$${qFeatureSubtotal},0)`, calc.featureCost ? cb.cost / calc.featureCost : 0)
+    share.numFmt = fmt.percent
+    share.alignment = align('right')
+    share.font = font(9, false, CI.slate600)
+    wsQ.getCell(row, 7).value = 'Prozentanteil aus Prepare + Operate (Umbuchung, Summe unverändert)'
+    wsQ.getCell(row, 7).font = font(8.5, false, CI.slate600)
+    wsQ.getRow(row).height = 18
+  }
   zebraGrid(wsQ, qPhaseFirst, qPhaseLast, 1, 7)
   wsQ.getCell(qFeatureSubtotal, 1).value = 'Zwischensumme Feature-Aufwand'
   wsQ.getCell(qFeatureSubtotal, 1).alignment = align('left', 1)
