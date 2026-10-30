@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <title>Anmeldung</title>
+  </head>
+  <body>
+    <p style="font-family: system-ui, sans-serif">Anmeldung abgeschlossen – dieses Fenster kann geschlossen werden.</p>
+    <script>
+      // Ergebnis an die Plattform melden; Same-Origin-Kanal funktioniert auch ohne window.opener
+      var p = new URLSearchParams(location.search)
+      var ch = new BroadcastChannel('cc-parrot-oauth')
+      ch.postMessage({ state: p.get('state'), code: p.get('code'), error: p.get('error_description') || p.get('error') })
+      ch.close()
+      window.close()
+    </script>
+  </body>
+</html>

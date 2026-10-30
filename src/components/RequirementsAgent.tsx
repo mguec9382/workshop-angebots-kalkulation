@@ -3,7 +3,7 @@ import { useStore } from '../lib/store'
 import { useLang } from '../i18n/LanguageContext'
 import { catalogForEnvironment } from '../lib/mbpcCatalog'
 import { ACCEPTED_FILE_TYPES, applyRequirement, buildRequirements, extractFromFile, unapplyRequirement } from '../lib/requirementsAgent'
-import { buildParrotPackage, loadParrotConfig, openParrot, parseParrotResults, saveParrotConfig } from '../lib/parrotMcp'
+import { buildParrotPackage, isParrotLoggedIn, loadParrotUrl, openParrot, parrotLogin, parrotLogout, parseParrotResults, saveParrotUrl } from '../lib/parrotMcp'
 import { RequirementsTable } from './RequirementsTable'
 import type { Requirement } from '../types'
 
@@ -30,7 +30,8 @@ export function RequirementsAgent() {
   const [busy, setBusy] = useState(false)
   const [info, setInfo] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [cfg, setCfg] = useState(loadParrotConfig)
+  const [parrotUrl, setParrotUrl] = useState(loadParrotUrl)
+  const [loggedIn, setLoggedIn] = useState(isParrotLoggedIn)
 
   async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -76,15 +77,31 @@ export function RequirementsAgent() {
     setInfo(`${n} ${t('req_adopted')}`)
   }
 
-  async function checkWithParrot() {
-    if (!target || !cfg.url.trim()) return
-    saveParrotConfig(cfg.url, cfg.token)
+  async function loginToParrot() {
+    saveParrotUrl(parrotUrl)
     setBusy(true)
     setError(null)
     setInfo(null)
     try {
-      const check = await openParrot(cfg.url.trim(), cfg.token)
-      const todo = reqs.filter((r) => r.decision !== 'rejected' && !r.parrot)
+      await parrotLogin(parrotUrl.trim())
+      setLoggedIn(true)
+      setInfo(t('req_parrot_loggedin'))
+    } catch (err) {
+      setError(`${t('req_parrot_error')}: ${err instanceof Error ? err.message : String(err)}`)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function checkWithParrot() {
+    if (!target || !parrotUrl.trim()) return
+    saveParrotUrl(parrotUrl)
+    setBusy(true)
+    setError(null)
+    setInfo(null)
+    try {
+      const check = await openParrot(parrotUrl.trim())
+      const todo = reqs.filter((r) => r.decision !== 'rejected' && (!r.parrot || r.parrot.state === 'error'))
       for (let i = 0; i < todo.length; i++) {
         setInfo(`${t('req_parrot_running')} … ${i + 1}/${todo.length}`)
         const res = await check(todo[i])
@@ -92,10 +109,12 @@ export function RequirementsAgent() {
           const r = d.environments.find((x) => x.id === target.id)?.requirements?.find((x) => x.id === todo[i].id)
           if (r) r.parrot = res
         })
+        if (res.state === 'error') throw new Error(res.summary)
       }
       setInfo(`${todo.length} ${t('req_parrot_imported')}`)
     } catch (err) {
       setError(`${t('req_parrot_error')}: ${err instanceof Error ? err.message : String(err)}`)
+      setLoggedIn(isParrotLoggedIn())
     } finally {
       setBusy(false)
     }
@@ -176,29 +195,35 @@ export function RequirementsAgent() {
 
       {/* Gegenprüfung Cosmo Parrot */}
       <div className="mt-3 rounded-lg border border-dashed border-slate-200 p-3 dark:border-slate-700">
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <label className="block">
-            <span className="cc-label">{t('req_parrot_endpoint')}</span>
-            <input
-              className="cc-input"
-              placeholder="https://…"
-              value={cfg.url}
-              onChange={(e) => setCfg({ ...cfg, url: e.target.value })}
-            />
-          </label>
-          <label className="block">
-            <span className="cc-label">{t('req_parrot_token')}</span>
-            <input
-              className="cc-input"
-              type="password"
-              autoComplete="off"
-              value={cfg.token}
-              onChange={(e) => setCfg({ ...cfg, token: e.target.value })}
-            />
-          </label>
-        </div>
+        <label className="block">
+          <span className="cc-label">{t('req_parrot_endpoint')}</span>
+          <input
+            className="cc-input"
+            placeholder="https://…"
+            value={parrotUrl}
+            onChange={(e) => setParrotUrl(e.target.value)}
+          />
+        </label>
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <button className="cc-btn-gold" disabled={busy || !reqs.length || !cfg.url.trim()} onClick={checkWithParrot}>
+          {loggedIn ? (
+            <>
+              <span className="he-scope sc-in">{t('req_parrot_loggedin')}</span>
+              <button
+                className="cc-btn-ghost"
+                onClick={() => {
+                  parrotLogout()
+                  setLoggedIn(false)
+                }}
+              >
+                {t('req_parrot_logout')}
+              </button>
+            </>
+          ) : (
+            <button className="cc-btn-gold" disabled={busy || !parrotUrl.trim()} onClick={loginToParrot}>
+              🔐 {t('req_parrot_login')}
+            </button>
+          )}
+          <button className="cc-btn-gold" disabled={busy || !reqs.length || !loggedIn} onClick={checkWithParrot}>
             🦜 {t('req_parrot_check')}
           </button>
           <button
