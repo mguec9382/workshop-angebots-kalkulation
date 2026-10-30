@@ -3,9 +3,11 @@ import { useStore } from '../lib/store'
 import { useLang } from '../i18n/LanguageContext'
 import { catalogForEnvironment } from '../lib/mbpcCatalog'
 import { ACCEPTED_FILE_TYPES, applyRequirement, buildRequirements, extractFromFile, unapplyRequirement } from '../lib/requirementsAgent'
-import { buildParrotPackage, isParrotLoggedIn, loadParrotUrl, openParrot, parrotLogin, parrotLogout, parseParrotResults, saveParrotUrl } from '../lib/parrotMcp'
+import { buildCopilotPrompt, buildParrotPackage, isParrotLoggedIn, loadParrotUrl, openParrot, parrotLogin, parrotLogout, parseParrotResults, saveParrotUrl } from '../lib/parrotMcp'
 import { RequirementsTable } from './RequirementsTable'
 import type { Requirement } from '../types'
+
+const COPILOT_BLOCK = 20
 
 function download(name: string, content: string) {
   const url = URL.createObjectURL(new Blob([content], { type: 'application/json' }))
@@ -32,6 +34,9 @@ export function RequirementsAgent() {
   const [error, setError] = useState<string | null>(null)
   const [parrotUrl, setParrotUrl] = useState(loadParrotUrl)
   const [loggedIn, setLoggedIn] = useState(isParrotLoggedIn)
+  const [pasted, setPasted] = useState('')
+  const host = window.location.hostname
+  const canLogin = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.cosmoconsult.com')
 
   async function onFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -120,28 +125,52 @@ export function RequirementsAgent() {
     }
   }
 
-  async function onImportResult(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    e.target.value = ''
-    if (!file || !target) return
+  function applyResultText(text: string) {
+    if (!target) return
     setError(null)
     try {
-      const results = parseParrotResults(await file.text())
+      const results = parseParrotResults(text)
       let n = 0
       update((d) => {
         d.environments
           .find((x) => x.id === target.id)
           ?.requirements?.forEach((r) => {
-            const res = results.get(r.id)
+            const res = results.get(r.ref) ?? results.get(r.id)
             if (res) {
               r.parrot = res
               n++
             }
           })
       })
+      if (!n) throw new Error(t('req_copilot_nomatch'))
       setInfo(`${n} ${t('req_parrot_imported')}`)
+      setPasted('')
     } catch (err) {
       setError(err instanceof Error ? err.message : t('import_failed'))
+    }
+  }
+
+  async function onImportResult(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (file) applyResultText(await file.text())
+  }
+
+  async function copyCopilotBlock() {
+    const todo = reqs
+      .filter((r) => r.decision !== 'rejected' && (!r.parrot || r.parrot.state === 'error'))
+      .slice(0, COPILOT_BLOCK)
+    if (!todo.length) {
+      setInfo(t('req_copilot_done'))
+      return
+    }
+    setError(null)
+    try {
+      await navigator.clipboard.writeText(buildCopilotPrompt(todo))
+      window.open('https://github.com/copilot', '_blank', 'noopener')
+      setInfo(`${todo.length} ${t('req_copilot_copied')}`)
+    } catch {
+      setError(t('req_copilot_clipboard'))
     }
   }
 
@@ -219,7 +248,7 @@ export function RequirementsAgent() {
               </button>
             </>
           ) : (
-            <button className="cc-btn-gold" disabled={busy || !parrotUrl.trim()} onClick={loginToParrot}>
+            <button className="cc-btn-gold" disabled={busy || !canLogin || !parrotUrl.trim()} onClick={loginToParrot}>
               🔐 {t('req_parrot_login')}
             </button>
           )}
@@ -239,6 +268,30 @@ export function RequirementsAgent() {
           </button>
         </div>
         <div className="mt-1 text-[11px] text-slate-400">{t('req_parrot_hint')}</div>
+        {!canLogin && <div className="mt-1 text-[11px] font-semibold text-amber-600">{t('req_parrot_origin')}</div>}
+
+        {/* Prüfung über GitHub Copilot (Parrot-MCP dort angebunden) */}
+        <div className="mt-3 border-t border-dashed border-slate-200 pt-3 dark:border-slate-700">
+          <div className="text-xs font-semibold text-cosmo-anthracite dark:text-slate-100">
+            🐙 {t('req_copilot_title')}
+          </div>
+          <div className="mt-0.5 text-[11px] text-slate-400">{t('req_copilot_hint')}</div>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <button className="cc-btn-gold" disabled={!reqs.length} onClick={copyCopilotBlock}>
+              📋 {t('req_copilot_copy')} ({COPILOT_BLOCK})
+            </button>
+          </div>
+          <textarea
+            className="cc-input mt-2 w-full resize-y font-mono text-xs"
+            rows={3}
+            placeholder={t('req_copilot_paste')}
+            value={pasted}
+            onChange={(e) => setPasted(e.target.value)}
+          />
+          <button className="cc-btn-ghost mt-2" disabled={!pasted.trim()} onClick={() => applyResultText(pasted)}>
+            ✓ {t('req_copilot_apply')}
+          </button>
+        </div>
       </div>
 
       {error && <div className="mt-2 text-xs font-semibold text-rose-500">{error}</div>}

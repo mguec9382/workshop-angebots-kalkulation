@@ -60,7 +60,7 @@ const norm = (s: unknown) =>
     .trim()
 
 const REF_HEADERS = ['id', 'nr', 'no', 'ref', 'referenz', 'anf', 'anf nr', 'anforderungs id', 'anforderung id', 'req', 'req id', 'lfd nr', 'kennung']
-const TEXT_HEADERS = ['anforderung', 'anforderungen', 'requirement', 'requirements', 'beschreibung', 'description', 'text', 'titel', 'title', 'bezeichnung', 'funktion', 'feature', 'thema', 'kriterium']
+const TEXT_HEADERS = ['anforderung', 'anforderungen', 'requirement', 'requirements', 'beschreibung', 'description', 'text', 'titel', 'title', 'bezeichnung', 'funktion', 'feature', 'thema', 'kriterium', 'question', 'questions', 'frage', 'fragen', 'fragestellung', 'anforderungsbeschreibung']
 const PRIO_HEADERS = ['prio', 'prioritat', 'prioritaet', 'priorität', 'priority', 'muss kann', 'must have', 'kategorie']
 
 async function fromTable(file: File, e: string): Promise<RawRequirement[]> {
@@ -100,6 +100,11 @@ async function fromTable(file: File, e: string): Promise<RawRequirement[]> {
       const len = new Array<number>(width).fill(0)
       rows.forEach((r) => r.forEach((c, i) => (len[i] += String(c ?? '').length)))
       textCols = [len.indexOf(Math.max(...len))]
+      // Kopfzeile ohne bekannte Überschrift: erste Zeile überspringen, wenn sie deutlich kürzer als der Rest ist
+      const col = textCols[0]
+      const first = String(rows[0][col] ?? '').length
+      const avg = (len[col] - first) / Math.max(1, rows.length - 1)
+      if (rows.length > 1 && first <= 40 && first < avg / 2) headerIdx = 0
     }
     if (!textCols.length) continue
 
@@ -266,6 +271,7 @@ function sim(q: string, v: string): number {
 export const FIT_THRESHOLD = 0.5
 export const PARTIAL_THRESHOLD = 0.32
 const MIN_SUGGESTION = 0.12
+const MAX_TERMS = 4
 
 interface StepDoc {
   processId: string
@@ -320,7 +326,7 @@ export function matchText(index: MatchIndex, text: string, limit = 3): Requireme
   const unknownIdf = 0.5 * Math.log(1 + n)
 
   const scores = new Float64Array(n)
-  let denom = 0
+  const terms: { perDoc: Map<number, number>; best: number }[] = []
   for (const q of queries) {
     const perDoc = new Map<number, number>()
     let bestIdf = 0
@@ -331,9 +337,20 @@ export function matchText(index: MatchIndex, text: string, limit = 3): Requireme
       bestIdf = Math.max(bestIdf, i)
       for (const [d, w] of index.postings.get(v)!) perDoc.set(d, Math.max(perDoc.get(d) ?? 0, s * w * i))
     }
-    denom += (bestIdf || unknownIdf) * 3
-    perDoc.forEach((val, d) => (scores[d] += val))
+    terms.push({ perDoc, best: bestIdf })
   }
+
+  // Lange Sätze (z. B. Fragenkataloge): je Paket zählen nur die besten Treffer-Begriffe, sonst verwässert der Score
+  if (!terms.some((x) => x.best > 0)) return []
+  const maxByTerm = terms.map((x) => (x.best || unknownIdf) * 3).sort((a, b) => b - a)
+  const denom = maxByTerm.slice(0, MAX_TERMS).reduce((a, b) => a + b, 0)
+  const perDocVals = new Map<number, number[]>()
+  for (const x of terms) {
+    x.perDoc.forEach((val, d) => (perDocVals.get(d) ?? perDocVals.set(d, []).get(d)!).push(val))
+  }
+  perDocVals.forEach((vals, d) => {
+    scores[d] = vals.sort((a, b) => b - a).slice(0, MAX_TERMS).reduce((a, b) => a + b, 0)
+  })
 
   return [...scores.keys()]
     .map((d) => ({ d, score: scores[d] / denom }))

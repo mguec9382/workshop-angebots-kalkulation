@@ -320,32 +320,48 @@ function result(state: RequirementParrot['state'], text: string, sources?: strin
 
 /* ───────────── Variante B: Prüfpaket (Export / Import) ───────────── */
 
-/** Prüfauftrag für die Gegenprüfung mit Cosmo Parrot (z. B. im VS-Code-Chat). */
+const CHECK_INSTRUCTIONS =
+  'Prüfe jede Anforderung mit dem Cosmo-Parrot-MCP (search-cosmo-docs, ggf. search-cosmo-loop) gegen COSMO CONSULT Produkte und Microsoft Dynamics 365 Business Central. ' +
+  'Antworte ausschließlich mit einem JSON-Codeblock im Format {"results":[{"ref":"<ref>","state":"checked|nohit","summary":"<max. 400 Zeichen>","sources":["<url>"]}]}. ' +
+  'Ohne Treffer: state "nohit". Erfinde keine Quellen.'
+
+const checkItems = (reqs: Requirement[]) =>
+  reqs.map((r) => ({ ref: r.ref, text: r.text, mbpc: r.assigned?.label ?? null }))
+
+/** Prüfauftrag für die Gegenprüfung mit Cosmo Parrot (Datei für VS Code oder Copilot). */
 export function buildParrotPackage(reqs: Requirement[]): string {
   return JSON.stringify(
-    {
-      type: 'cc-parrot-check-request',
-      instructions:
-        'Prüfe jede Anforderung mit Cosmo Parrot (search-cosmo-docs, ggf. search-cosmo-loop) gegen COSMO CONSULT Produkte und Microsoft Dynamics 365 Business Central. ' +
-        'Antworte ausschließlich mit JSON im Format {"results":[{"id":"<id>","state":"checked|nohit","summary":"<max. 400 Zeichen>","sources":["<url>"]}]}. ' +
-        'Ohne Treffer: state "nohit". Erfinde keine Quellen.',
-      requirements: reqs.map((r) => ({ id: r.id, ref: r.ref, text: r.text, mbpc: r.assigned?.label ?? null })),
-    },
+    { type: 'cc-parrot-check-request', instructions: CHECK_INSTRUCTIONS, requirements: checkItems(reqs) },
     null,
     2,
   )
 }
 
-/** Liest ein Prüfergebnis (Variante B) und liefert Ergebnisse je Requirement-ID. */
+/** Chat-Prompt für GitHub Copilot: Anweisung + Anforderungen als JSON. */
+export function buildCopilotPrompt(reqs: Requirement[]): string {
+  return `${CHECK_INSTRUCTIONS}\n\n${JSON.stringify(checkItems(reqs), null, 2)}`
+}
+
+/** Zieht JSON aus einer Chat-Antwort (Codeblock oder Fließtext mit JSON). */
+function extractJson(raw: string): string {
+  const fence = /```(?:json)?\s*([\s\S]*?)```/i.exec(raw)
+  const body = fence ? fence[1] : raw
+  const start = body.search(/[[{]/)
+  const end = Math.max(body.lastIndexOf('}'), body.lastIndexOf(']'))
+  return start >= 0 && end > start ? body.slice(start, end + 1) : body
+}
+
+/** Liest ein Prüfergebnis; Schlüssel ist die Referenz (ref) oder die interne ID. */
 export function parseParrotResults(raw: string): Map<string, RequirementParrot> {
-  const data = JSON.parse(raw) as unknown
+  const data = JSON.parse(extractJson(raw)) as unknown
   const list = Array.isArray(data) ? data : (data as { results?: unknown[] })?.results
   if (!Array.isArray(list)) throw new Error('Ungültiges Format: erwartet {"results":[…]}.')
   const out = new Map<string, RequirementParrot>()
-  for (const e of list as { id?: string; state?: string; summary?: string; sources?: string[] }[]) {
-    if (!e?.id) continue
+  for (const e of list as { id?: string; ref?: string; state?: string; summary?: string; sources?: string[] }[]) {
+    const key = e?.ref ?? e?.id
+    if (!key) continue
     const state = e.state === 'nohit' || e.state === 'error' ? e.state : 'checked'
-    out.set(e.id, result(state, String(e.summary ?? ''), Array.isArray(e.sources) ? e.sources.map(String).slice(0, 5) : []))
+    out.set(key, result(state, String(e.summary ?? ''), Array.isArray(e.sources) ? e.sources.map(String).slice(0, 5) : []))
   }
   return out
 }
