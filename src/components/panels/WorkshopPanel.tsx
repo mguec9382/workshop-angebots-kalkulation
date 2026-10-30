@@ -9,6 +9,7 @@ import { defaultFeatureEffort, isEffortEmpty } from '../../data/seed'
 import { ScopeSegment } from '../ScopeSegment'
 import { EnvSelector } from '../EnvSelector'
 import { PanelTitle } from './ProspectPanel'
+import { RequirementsTable } from '../RequirementsTable'
 import type { Environment, ScopeState, ScopeStatus } from '../../types'
 
 const SCOPE_LABEL: Record<ScopeStatus, { de: string; en: string }> = {
@@ -23,6 +24,7 @@ export function WorkshopPanel() {
   const { state, update } = useStore()
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [noteOpen, setNoteOpen] = useState<Record<string, boolean>>({})
+  const [reqOpen, setReqOpen] = useState(true)
 
   const env = activeEnvironment(state)
 
@@ -161,11 +163,40 @@ export function WorkshopPanel() {
 
   const scList = (s: ScopeStatus) => `sc-${s}`
 
+  // übernommene Anforderungen je Feature (für die Chips an den Paketen)
+  const reqsByFeature = new Map<string, string[]>()
+  env.requirements?.forEach((r) => {
+    if (r.decision !== 'accepted' || !r.assigned) return
+    const k = featureKey(r.assigned.processId, r.assigned.areaIdx, r.assigned.stepIdx)
+    reqsByFeature.set(k, [...(reqsByFeature.get(k) ?? []), r.ref])
+  })
+  const reqCount = env.requirements?.length ?? 0
+
   return (
     <div className="space-y-4">
       <PanelTitle title={t('tab_workshop')} intro={t('workshop_intro')} />
 
       <EnvSelector />
+
+      {/* Anforderungen des Interessenten (aus dem Anforderungs-Agent im Register Environments) */}
+      <div className="cc-card p-4">
+        <button
+          className="flex w-full items-center gap-2 text-left text-sm font-bold text-cosmo-anthracite"
+          onClick={() => setReqOpen((v) => !v)}
+        >
+          <span className="text-slate-400">{reqOpen ? '▾' : '▸'}</span>
+          📋 {t('req_workshop_title')} · {env.name}
+          <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500">{reqCount}</span>
+        </button>
+        {reqOpen &&
+          (reqCount ? (
+            <div className="mt-3">
+              <RequirementsTable envId={env.id} />
+            </div>
+          ) : (
+            <div className="mt-2 text-xs text-slate-400">{t('req_workshop_empty')}</div>
+          ))}
+      </div>
 
       {/* Archetyp-Fokus (nur Standard-MBPC) */}
       {env.catalogSource !== 'mbpc' && (
@@ -350,6 +381,15 @@ export function WorkshopPanel() {
                                     )}
                                     <span className="min-w-0 flex-1 break-words text-xs text-slate-600">
                                       {stepLabel}
+                                      {reqsByFeature.get(fKey)?.map((ref) => (
+                                        <span
+                                          key={ref}
+                                          className="ml-1 rounded bg-cosmo-gold/15 px-1 py-0.5 text-[10px] font-bold text-cosmo-gold-dark"
+                                          title={t('req_workshop_title')}
+                                        >
+                                          {ref}
+                                        </span>
+                                      ))}
                                       {!explicit && fEff !== 'unset' && (
                                         <span className="ml-1 text-[10px] text-slate-300">
                                           ({lang === 'de' ? 'vererbt' : 'inherited'})

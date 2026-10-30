@@ -26,6 +26,7 @@ import {
 } from '../../lib/cosmoMbpc'
 import type { LicenseCatalog, LicenseCatalogItem, MbpcCatalog } from '../../types'
 import { PanelTitle } from './ProspectPanel'
+import { RequirementsAgent } from '../RequirementsAgent'
 
 export function EnvironmentPanel() {
   const { t, lang } = useLang()
@@ -281,6 +282,8 @@ export function EnvironmentPanel() {
           )}
         </div>
       </div>
+
+      <RequirementsAgent />
 
       <button
         className="cc-btn-gold"

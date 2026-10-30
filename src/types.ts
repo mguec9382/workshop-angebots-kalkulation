@@ -231,6 +231,49 @@ export interface Environment {
   catalogSource?: 'standard' | 'mbpc'
   /** bei catalogSource==='mbpc': ausgewählte Workloads (Produkt-IDs) für die Digitalisierung */
   workloads?: string[]
+  /** Anforderungen des Interessenten (Anforderungs-Agent), gegen den MBPC gematcht */
+  requirements?: Requirement[]
+}
+
+/* ---------- Anforderungs-Agent ---------- */
+
+/** Zuordnung einer Anforderung zu einem MBPC-Paket (Feature). */
+export interface RequirementMatch {
+  processId: string
+  areaIdx: number
+  stepIdx: number
+  /** Anzeigetexte zum Zeitpunkt der Zuordnung (bleiben bei Katalogwechsel lesbar) */
+  label: string
+  /** Trefferqualität 0..1 */
+  score: number
+}
+
+/** Ergebnis der Gegenprüfung gegen Cosmo Parrot (MCP). */
+export interface RequirementParrot {
+  state: 'checked' | 'nohit' | 'error'
+  summary: string
+  sources: string[]
+  checkedAt: string
+}
+
+export interface Requirement {
+  id: string
+  /** Referenz, z. B. ANF-001 (aus der Quelle übernommen oder generiert) */
+  ref: string
+  text: string
+  /** Quelldatei */
+  source: string
+  priority?: string
+  /** Abdeckung gegenüber dem MBPC: fit = Standard, partial = teilweise, gap = keine Zuordnung */
+  coverage: 'fit' | 'partial' | 'gap'
+  /** Vorschläge (absteigend nach Score) */
+  suggestions: RequirementMatch[]
+  /** gewählte Zuordnung */
+  assigned?: RequirementMatch
+  /** pending = Vorschlag, accepted = in den Scope übernommen, rejected = verworfen */
+  decision: 'pending' | 'accepted' | 'rejected'
+  parrot?: RequirementParrot
+  note?: string
 }
 
 /* ---------- Importierter Lizenzkatalog ---------- */
